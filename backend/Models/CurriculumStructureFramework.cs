@@ -11,7 +11,7 @@ public partial class CurriculumStructureFramework
 
     public int? CurriculumStructureId { get; set; }
 
-    public int? CurriculumFrameworkId { get; set; }
+    public string? CurriculumFrameworkId { get; set; }
 
     public virtual CurriculumFramework? CurriculumFramework { get; set; }
 

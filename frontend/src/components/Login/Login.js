@@ -21,13 +21,20 @@ const Login = () => {
         }
     };
 
+    const setUserInfo = (token) => {
+        const decodedToken = jwtDecode(token);
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', decodedToken.role);
+        localStorage.setItem('username', decodedToken.username || username);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const loginData = { UserName: username, PasswordHash: password };
 
         try {
-            const response = await fetch('http://localhost:5065/api/Login', {
+            const response = await fetch('http://localhost:5065/Account/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,8 +46,8 @@ const Login = () => {
 
             if (response.ok) {
                 alert(data.message);
-                const token = data.token;
-                const decodedToken = jwtDecode(token);
+                setUserInfo(data.token);
+                const decodedToken = jwtDecode(data.token);
                 handleRoleNavigation(decodedToken.role);
             } else {
                 setError(data.message || 'Đăng nhập thất bại');
@@ -50,6 +57,7 @@ const Login = () => {
             setError('Có lỗi xảy ra, vui lòng thử lại!');
         }
     };
+    
     return (
         <div>
             <h2>Đăng nhập</h2>

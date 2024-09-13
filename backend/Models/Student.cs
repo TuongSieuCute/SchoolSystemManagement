@@ -9,6 +9,8 @@ public partial class Student
 
     public string? FullName { get; set; }
 
+    public string? UrlImage { get; set; }
+
     public DateOnly? DateOfBirth { get; set; }
 
     public string? PlaceOfBirth { get; set; }
@@ -37,15 +39,17 @@ public partial class Student
 
     public string? PhoneNumber { get; set; }
 
-    public string? Email { get; set; }
-
     public string? AcademicYearId { get; set; }
+
+    public string? ClassStudentId { get; set; }
 
     public virtual AcademicYear? AcademicYear { get; set; }
 
     public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; } = new List<CourseRegistration>();
 
     public virtual ICollection<Cumulative> Cumulatives { get; set; } = new List<Cumulative>();
+
+    public virtual ICollection<CurriculumFrameworkStudent> CurriculumFrameworkStudents { get; set; } = new List<CurriculumFrameworkStudent>();
 
     public virtual ICollection<DepartmentStudent> DepartmentStudents { get; set; } = new List<DepartmentStudent>();
 

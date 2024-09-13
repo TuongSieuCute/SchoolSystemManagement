@@ -9,7 +9,7 @@ public partial class CourseCurriculumFramework
 
     public string? AcademicYearId { get; set; }
 
-    public int? CurriculumFrameworkId { get; set; }
+    public string? CurriculumFrameworkId { get; set; }
 
     public string? MajorId { get; set; }
 

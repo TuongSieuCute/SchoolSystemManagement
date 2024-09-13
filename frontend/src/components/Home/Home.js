@@ -8,9 +8,14 @@ const Home = () => {
         navigate('/login'); 
     };
 
+    const handleLoginAzure = () => {
+        navigate('/student');
+    };
+
     return (
         <div>
             <button onClick={handleLogin}>Đăng nhập</button>
+            <button onClick={handleLoginAzure}>Đăng nhập Azure</button>
         </div>
     );
 };

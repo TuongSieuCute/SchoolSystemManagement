@@ -5,7 +5,7 @@ namespace backend.Models;
 
 public partial class CurriculumFramework
 {
-    public int CurriculumFrameworkId { get; set; }
+    public string CurriculumFrameworkId { get; set; } = null!;
 
     public string? CurriculumFrameworkName { get; set; }
 
@@ -18,6 +18,10 @@ public partial class CurriculumFramework
     public string? MajorId { get; set; }
 
     public virtual ICollection<CourseCurriculumFramework> CourseCurriculumFrameworks { get; set; } = new List<CourseCurriculumFramework>();
+
+    public virtual ICollection<CurriculumFrameworkStudent> CurriculumFrameworkStudentCurriculumFrameworkId1Navigations { get; set; } = new List<CurriculumFrameworkStudent>();
+
+    public virtual ICollection<CurriculumFrameworkStudent> CurriculumFrameworkStudentCurriculumFrameworkId2Navigations { get; set; } = new List<CurriculumFrameworkStudent>();
 
     public virtual ICollection<CurriculumStructureFramework> CurriculumStructureFrameworks { get; set; } = new List<CurriculumStructureFramework>();
 
