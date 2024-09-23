@@ -10,15 +10,17 @@ public partial class Account
 
     public string? PasswordHash { get; set; }
 
+    public string? Salt { get; set; }
+
     public string? Role { get; set; }
 
     public bool? IsActive { get; set; }
 
     public string? Email { get; set; }
 
-    public virtual Student? Student { get; set; }
+    public virtual Lecturer? Lecturer { get; set; }
 
-    public virtual Teacher? Teacher { get; set; }
+    public virtual Student? Student { get; set; }
 
     [NotMapped]
     public string? NewPassword { get; set; }

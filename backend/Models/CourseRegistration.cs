@@ -5,7 +5,7 @@ namespace backend.Models;
 
 public partial class CourseRegistration
 {
-    public int CourseRegistrationId { get; set; }
+    public string CourseRegistrationId { get; set; } = null!;
 
     public decimal? MidtermGradePercentage { get; set; }
 
@@ -21,19 +21,15 @@ public partial class CourseRegistration
 
     public string? Literacy { get; set; }
 
-    public decimal? Tuition { get; set; }
-
     public string? StudentId { get; set; }
 
     public string? ModuleClassId { get; set; }
 
-    public int? TuitionRateId { get; set; }
+    public string? CumulativePointId { get; set; }
 
-    public virtual ICollection<Cumulative> Cumulatives { get; set; } = new List<Cumulative>();
+    public virtual CumulativePoint? CumulativePoint { get; set; }
 
     public virtual ModuleClass? ModuleClass { get; set; }
 
     public virtual Student? Student { get; set; }
-
-    public virtual TuitionRate? TuitionRate { get; set; }
 }

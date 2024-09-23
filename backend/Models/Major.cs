@@ -11,19 +11,9 @@ public partial class Major
 
     public string? DepartmentId { get; set; }
 
-    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
-
-    public virtual ICollection<CourseCurriculumFramework> CourseCurriculumFrameworks { get; set; } = new List<CourseCurriculumFramework>();
-
-    public virtual ICollection<Cumulative> Cumulatives { get; set; } = new List<Cumulative>();
-
-    public virtual ICollection<CurriculumFramework> CurriculumFrameworks { get; set; } = new List<CurriculumFramework>();
-
     public virtual Department? Department { get; set; }
 
-    public virtual ICollection<MajorStudent> MajorStudents { get; set; } = new List<MajorStudent>();
+    public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 
-    public virtual ICollection<MajorTeacher> MajorTeachers { get; set; } = new List<MajorTeacher>();
-
-    public virtual ICollection<ModuleClass> ModuleClasses { get; set; } = new List<ModuleClass>();
+    public virtual ICollection<TrainingProgram> TrainingPrograms { get; set; } = new List<TrainingProgram>();
 }

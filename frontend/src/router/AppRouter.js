@@ -7,6 +7,7 @@ import Student from '../components/Student/Student';
 import Information from '../components/Student/Information/Information';
 import Teacher from '../components/Teacher/Teacher';
 import ChangePassword from '../components/Student/Information/ChangePassword';
+import CurriculumList from '../components/Student/Curriculum/CurriculumList';
 
 const AppRouter = () => {
     return (
@@ -18,6 +19,7 @@ const AppRouter = () => {
                 <Route path="/student" element={<Student />}>
                     <Route path="information" element={<Information />}/>
                     <Route path="changePassword" element={<ChangePassword />}/>
+                    <Route path="curriculum" element={<CurriculumList />}/>
                 </Route>
                 <Route path="/teacher" element={<Teacher />}></Route>
             </Routes>

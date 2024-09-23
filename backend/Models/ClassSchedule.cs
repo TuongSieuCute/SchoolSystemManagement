@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 namespace backend.Models;
 
-public partial class TimeTable
+public partial class ClassSchedule
 {
-    public int TimeTableId { get; set; }
+    public int ScheduleId { get; set; }
+
+    public string? ModuleClassId { get; set; }
 
     public string? DayOfWeek { get; set; }
 
@@ -18,8 +20,6 @@ public partial class TimeTable
     public DateOnly? StartDate { get; set; }
 
     public DateOnly? EndDate { get; set; }
-
-    public string? ModuleClassId { get; set; }
 
     public string? ClassRoomId { get; set; }
 

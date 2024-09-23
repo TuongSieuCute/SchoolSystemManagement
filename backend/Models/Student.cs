@@ -39,21 +39,13 @@ public partial class Student
 
     public string? PhoneNumber { get; set; }
 
-    public string? AcademicYearId { get; set; }
-
-    public string? ClassStudentId { get; set; }
-
-    public virtual AcademicYear? AcademicYear { get; set; }
+    public string? StudentClassId { get; set; }
 
     public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; } = new List<CourseRegistration>();
 
-    public virtual ICollection<Cumulative> Cumulatives { get; set; } = new List<Cumulative>();
+    public virtual ICollection<CumulativePoint> CumulativePoints { get; set; } = new List<CumulativePoint>();
 
-    public virtual ICollection<CurriculumFrameworkStudent> CurriculumFrameworkStudents { get; set; } = new List<CurriculumFrameworkStudent>();
-
-    public virtual ICollection<DepartmentStudent> DepartmentStudents { get; set; } = new List<DepartmentStudent>();
-
-    public virtual ICollection<MajorStudent> MajorStudents { get; set; } = new List<MajorStudent>();
+    public virtual StudentClass? StudentClass { get; set; }
 
     public virtual Account StudentNavigation { get; set; } = null!;
 }

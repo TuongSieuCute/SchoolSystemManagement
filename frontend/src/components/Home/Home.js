@@ -1,22 +1,29 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
+import { LoginButton } from './LoginButton';
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useIsAuthenticated, useMsal } from '@azure/msal-react';
+import { LogOutButton } from './LogoutButton';
 const Home = () => {
     const navigate = useNavigate();
-
+    const isAuthenticated = useIsAuthenticated();
+    const { accounts } = useMsal();
     const handleLogin = () => {
-        navigate('/login'); 
+        navigate('/login');
     };
-
-    const handleLoginAzure = () => {
-        navigate('/student');
-    };
-
     return (
-        <div>
-            <button onClick={handleLogin}>Đăng nhập</button>
-            <button onClick={handleLoginAzure}>Đăng nhập Azure</button>
-        </div>
+        <>
+            <div>
+                <button onClick={handleLogin}>Đăng nhập</button>
+                {!isAuthenticated ? <LoginButton /> : <LogOutButton />}
+            </div>
+
+            <AuthenticatedTemplate>
+                {accounts[0]?.idTokenClaims.roles}
+            </AuthenticatedTemplate>
+            <UnauthenticatedTemplate>
+
+            </UnauthenticatedTemplate>
+        </>
     );
 };
 

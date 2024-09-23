@@ -33,7 +33,7 @@ const ChangePassword = () => {
         const ChangePasswordData = { UserName: username, PasswordHash: oldPassword, NewPassword: newPassword };
 
         try {
-            const response = await fetch('http://localhost:5065/Account/changePassword', {
+            const response = await fetch('http://localhost:5065/api/Account/changePassword', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

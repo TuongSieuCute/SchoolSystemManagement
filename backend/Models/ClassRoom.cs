@@ -11,5 +11,9 @@ public partial class ClassRoom
 
     public string? Floor { get; set; }
 
-    public virtual ICollection<TimeTable> TimeTables { get; set; } = new List<TimeTable>();
+    public string? RoomType { get; set; }
+
+    public byte? Capacity { get; set; }
+
+    public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
 }

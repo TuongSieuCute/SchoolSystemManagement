@@ -22,25 +22,22 @@ namespace backend.Controllers
         [HttpGet("{studentId}")]
         public IActionResult GetCourse(string studentId)
         {
-            var query = from A in _context.AcademicYears
-            join S in _context.Students on A.AcademicYearId equals S.AcademicYearId
-            join CS in _context.CurriculumFrameworkStudents on S.StudentId equals CS.StudentId
-            join CL in _context.ClassStudents on S.ClassStudentId equals CL.ClassStudentId
-            join M in _context.Majors on CL.MajorId equals M.MajorId
-            join T in _context.Teachers on CL.TeacherId equals T.TeacherId
-            join D in _context.Departments on M.DepartmentId equals D.DepartmentId
-            where S.StudentId == studentId
-            select new
-            {
-                AcademicYearName = A.AcademicYearName,
-                Year = A.Year,
-                CurriculumFrameworkId1 = CS.CurriculumFrameworkId1,
-                CurriculumFrameworkId2 = CS.CurriculumFrameworkId2,
-                ClassStudentId = CL.ClassStudentId,
-                FullName = T.FullName,
-                MajorName = M.MajorName,
-                DepartmentName = D.DepartmentName
-            };
+            var query = from tcs in _context.TrainingProgramCourseStudents
+                        join sc in _context.StudentClasses on tcs.StudentId equals studentId
+                        join c in _context.Courses on sc.CourseId equals c.CourseId
+                        join l in _context.Lecturers on sc.LecturerId equals l.LecturerId
+                        join m in _context.Majors on sc.MajorId equals m.MajorId
+                        join d in _context.Departments on m.DepartmentId equals d.DepartmentId
+                        select new
+                        {
+                            c.CourseName,
+                            c.AcademicYear,
+                            tcs.TrainingProgramCourseId,
+                            sc.StudentClassId,
+                            l.FullName,
+                            m.MajorName,
+                            d.DepartmentName
+                        };
 
             if (query == null)
             {

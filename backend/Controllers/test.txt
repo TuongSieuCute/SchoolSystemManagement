@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using backend.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+namespace backend.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ModuleClassController : Controller
+    {
+        private readonly SchoolSystemManagementContext _context;
+
+        public ModuleClassController(SchoolSystemManagementContext context)
+        {
+            _context = context;
+        }
+        [HttpPost]
+        public IActionResult CreateModuleClass([FromBody] ModuleClass moduleClass)
+        {
+            var moduleClasses = new List<ModuleClass>();
+
+            for (int i = 0; i < moduleClass.SubjectIds.Count; i++)
+            {
+                string subjectId = moduleClass.SubjectIds[i];
+                int classQuantity = moduleClass.ClassQuantities[i];
+                int lessonsPerDay = moduleClass.LessonsPerDay ?? 5;
+                int daysAWeek = moduleClass.DaysAWeek ?? 1;
+
+                for (int j = 0; j < classQuantity; j++)
+                {
+                    var newModuleClass = new ModuleClass
+                    {
+                        ModuleClassId = $"{subjectId}{GenerateRandomNumber(100, 999)}",
+                        MaximumNumberOfStudents = moduleClass.MaximumNumberOfStudents,
+                        LecturerId = null,
+                        TrainingProgramCourseId = moduleClass.TrainingProgramCourseId,
+                        SubjectId = subjectId,
+                        SemesterId = moduleClass.SemesterId,
+                        ClassSchedules = new List<ClassSchedule>() // Khởi tạo danh sách ClassSchedule
+                    };
+
+                    for (int k = 0; k < daysAWeek; k++)
+                    {
+                        var lessonTimes = GetLessonTimes(moduleClass.LessonsPerDay ?? 0);
+                        var lessonTime = lessonTimes[new Random().Next(lessonTimes.Count)];
+                        string dayString = GetRandomDayOfWeek();
+                        DayOfWeek dayOfWeek = (DayOfWeek)Enum.Parse(typeof(DayOfWeek), dayString, true);
+                        DateOnly startDate = moduleClass.StartDate ?? DateOnly.FromDateTime(DateTime.Today);
+                        DateOnly nextWeekday = GetNextSpecificWeekday(startDate, dayOfWeek);
+                        byte? numberOfWeek = moduleClass.NumberOfWeek;
+
+                        var classSchedule = new ClassSchedule
+                        {
+                            ModuleClassId = newModuleClass.ModuleClassId,
+                            DayOfWeek = dayOfWeek.ToString(),
+                            LessonStart = lessonTime.Item1,
+                            LessonEnd = lessonTime.Item2,
+                            NumberOfWeek = numberOfWeek,
+                            StartDate = nextWeekday,
+                            EndDate = nextWeekday.AddDays((int)numberOfWeek * 7),
+                            ClassRoomId = GetRandomClassRoomIdByRoomType(moduleClass.RoomType) // Tìm ClassRoomId dựa vào RoomType
+                        };
+
+                        newModuleClass.ClassSchedules.Add(classSchedule);
+                    }
+
+                    // Thêm ModuleClass vào danh sách
+                    moduleClasses.Add(newModuleClass);
+                }
+            }
+
+            // Thêm vào DbContext
+            _context.ModuleClasses.AddRange(moduleClasses);
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        private int GenerateRandomNumber(int min, int max)
+        {
+            Random random = new Random();
+            return random.Next(min, max + 1);
+        }
+        private string GetRandomDayOfWeek()
+        {
+            string[] daysOfWeek = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+            Random random = new Random();
+            int index = random.Next(daysOfWeek.Length);
+            return daysOfWeek[index];
+        }
+
+        private List<(byte, byte)> GetLessonTimes(int lessonsPerDay)
+        {
+            var lessonTimes = new List<(byte, byte)>();
+
+            switch (lessonsPerDay)
+            {
+                case 3:
+                    lessonTimes.Add((1, 3));
+                    lessonTimes.Add((4, 6));
+                    lessonTimes.Add((7, 9));
+                    lessonTimes.Add((10, 12));
+                    break;
+                case 4:
+                    lessonTimes.Add((1, 4));
+                    lessonTimes.Add((2, 5));
+                    lessonTimes.Add((3, 6));
+                    lessonTimes.Add((7, 10));
+                    lessonTimes.Add((8, 11));
+                    lessonTimes.Add((9, 12));
+                    break;
+                case 5:
+                    lessonTimes.Add((1, 5));
+                    lessonTimes.Add((2, 6));
+                    lessonTimes.Add((7, 11));
+                    lessonTimes.Add((8, 12));
+                    break;
+                case 6:
+                    lessonTimes.Add((1, 6));
+                    lessonTimes.Add((7, 12));
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+
+            return lessonTimes;
+        }
+
+        private DateOnly GetNextSpecificWeekday(DateOnly start, DayOfWeek day) // DayOfWeek là từ chủ nhật (0) đến thứ 7 (6)
+        {
+            int daysUntilNextDay = ((int)day - (int)start.DayOfWeek + 7) % 7; // day = thứ 6, start = thứ 3 => ((5 - 2) + 7) % 7 = 3
+            return start.AddDays(daysUntilNextDay);
+        }
+
+        public string GetRandomClassRoomIdByRoomType(string roomType)
+        {
+            using (var context = new SchoolSystemManagementContext())
+            {
+                // Query all classrooms that match the given RoomType
+                var classrooms = context.ClassRooms
+                    .Where(c => c.RoomType == roomType)
+                    .ToList();
+
+                // If no classrooms are found, return null or an empty string
+                if (classrooms.Count == 0)
+                    return null; // or return an empty string: ""
+
+                // Randomly select one classroom from the list
+                var random = new Random();
+                int randomIndex = random.Next(classrooms.Count);
+
+                // Return the ClassRoomId as a string
+                return classrooms[randomIndex].ClassRoomId;
+            }
+        }
+    }
+}

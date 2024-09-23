@@ -7,8 +7,7 @@ import '../Student.css'
 const Information = () => {
     const [student, setStudent] = useState([]);
     const [course, setCourse] = useState([]);
-
-    const username = getUserInfo().username;
+    const [username, setUsername] = useState("")
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,8 +22,12 @@ const Information = () => {
                 .then(data => { setCourse(data) })
                 .catch(err => console.error('Lỗi', err));
         }
-    }, []);
+    }, [username]);
 
+    useEffect(() => {
+        setUsername(getUserInfo().username);
+    }, [])
+    
     const handleClickChangePassword = () => {
         navigate('/student/changePassword');
     };
@@ -37,7 +40,6 @@ const Information = () => {
                     {student ? (
                         <div>
                             <img src={student.urlImage} alt="" />
-                            <button>Đổi ảnh</button>
                         </div>
                     ) : ('')}
                 </div>
@@ -121,8 +123,7 @@ const Information = () => {
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    ) : ('')}
+                        </div>) : ('')}
                 </div>
             </div>
             <h2>Thông tin khóa học</h2>
@@ -133,11 +134,11 @@ const Information = () => {
                             <tbody>
                                 <tr>
                                     <th>Khóa học:</th>
-                                    <td>{course[0].academicYearName}</td>
+                                    <td>{course[0].courseName}</td>
                                 </tr>
                                 <tr>
-                                    <th>Năm nhập học:</th>
-                                    <td>{course[0].year}</td>
+                                    <th>Niên khóa:</th>
+                                    <td>{course[0].academicYear}</td>
                                 </tr>
                                 <tr>
                                     <th>Khoa:</th>
@@ -153,25 +154,33 @@ const Information = () => {
                         <table>
                             <tbody>
                                 <tr>
-                                    <th>Chương trình đào tạo 1:</th>
-                                    <td>{course[0].curriculumFrameworkId1}</td>
-                                </tr>
-                                <tr>
-                                    <th>Chương trình đào tạo 2:</th>
-                                    <td>{course[0].curriculumFrameworkId2}</td>
-                                </tr>
-                                <tr>
                                     <th>Lớp sinh viên:</th>
-                                    <td>{course[0].classStudentId}</td>
+                                    <td>{course[0].studentClassId}</td>
                                 </tr>
                                 <tr>
                                     <th>Tên cố vấn học tập:</th>
                                     <td>{course[0].fullName}</td>
                                 </tr>
+                                {course.length > 1 ? (
+                                    <div>
+                                        <tr>
+                                            <th>Chương trình đào tạo 1:</th>
+                                            <td>{course[0].trainingProgramCourseId}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Chương trình đào tạo 2:</th>
+                                            <td>{course[1].trainingProgramCourseId}</td>
+                                        </tr>
+                                    </div>
+                                ) : (
+                                    <tr>
+                                        <th>Chương trình đào tạo:</th>
+                                        <td>{course[0].trainingProgramCourseId}</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
-                    </div>
-                ) : ('')}
+                    </div>) : ('')}
             </div>
             <button onClick={handleClickChangePassword}>Đổi mật khẩu</button>
             <button>Cập nhật thông tin sinh viên</button>

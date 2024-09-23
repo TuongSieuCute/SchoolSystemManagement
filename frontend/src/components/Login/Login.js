@@ -14,10 +14,10 @@ const Login = () => {
                 navigate('/admin');
                 break;
             case '1':
-                navigate('/student');
+                navigate('/teacher');
                 break;
             default:
-                navigate('/teacher');
+                navigate('/student');
         }
     };
 
@@ -34,7 +34,7 @@ const Login = () => {
         const loginData = { UserName: username, PasswordHash: password };
 
         try {
-            const response = await fetch('http://localhost:5065/Account/login', {
+            const response = await fetch('http://localhost:5065/api/Account/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

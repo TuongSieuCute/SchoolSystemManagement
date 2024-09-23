@@ -1,9 +1,10 @@
 import React from 'react';
+import AddModuleClass from './ModuleClass/AddModuleClass';
 
 const Admin = () => {
     return (
         <div>
-            Admin
+            <AddModuleClass></AddModuleClass>
         </div>
     );
 };

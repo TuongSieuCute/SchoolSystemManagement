@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace backend.Models;
 
-public partial class Teacher
+public partial class Lecturer
 {
-    public string TeacherId { get; set; } = null!;
+    public string LecturerId { get; set; } = null!;
 
     public string? FullName { get; set; }
 
@@ -33,15 +33,13 @@ public partial class Teacher
 
     public string? PhoneNumber { get; set; }
 
-    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+    public string? DepartmentId { get; set; }
 
-    public virtual ICollection<DepartmentTeacher> DepartmentTeachers { get; set; } = new List<DepartmentTeacher>();
+    public virtual Department? Department { get; set; }
 
-    public virtual ICollection<MajorTeacher> MajorTeachers { get; set; } = new List<MajorTeacher>();
+    public virtual Account LecturerNavigation { get; set; } = null!;
 
     public virtual ICollection<ModuleClass> ModuleClasses { get; set; } = new List<ModuleClass>();
 
-    public virtual ICollection<SubjectTeacher> SubjectTeachers { get; set; } = new List<SubjectTeacher>();
-
-    public virtual Account TeacherNavigation { get; set; } = null!;
+    public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 }

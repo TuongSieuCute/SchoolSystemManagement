@@ -16,8 +16,4 @@ public partial class Subject
     public virtual Department? Department { get; set; }
 
     public virtual ICollection<ModuleClass> ModuleClasses { get; set; } = new List<ModuleClass>();
-
-    public virtual ICollection<SubjectTeacher> SubjectTeachers { get; set; } = new List<SubjectTeacher>();
-
-    public virtual ICollection<TeachingPlan> TeachingPlans { get; set; } = new List<TeachingPlan>();
 }

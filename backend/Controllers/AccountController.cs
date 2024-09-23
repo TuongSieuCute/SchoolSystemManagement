@@ -15,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -42,7 +42,7 @@ namespace backend.Controllers
                     return Unauthorized();
                 }
 
-                string hashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash);
+                string hashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash + username.Salt);
 
                 if (username.PasswordHash != hashedPassword)
                 {
@@ -96,7 +96,8 @@ namespace backend.Controllers
                     return Unauthorized();
                 }
 
-                string currentHashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash);
+                string currentHashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash + username.Salt);
+
                 if (username.PasswordHash != currentHashedPassword)
                 {
                     return Unauthorized();
@@ -107,7 +108,7 @@ namespace backend.Controllers
                     return BadRequest();
                 }
 
-                string newHashedPassword = _hashPassword.ComputeSha256Hash(account.NewPassword);
+                string newHashedPassword = _hashPassword.ComputeSha256Hash(account.NewPassword + username.Salt);
                 username.PasswordHash = newHashedPassword;
 
                 await _context.SaveChangesAsync();
