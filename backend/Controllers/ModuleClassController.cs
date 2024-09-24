@@ -117,7 +117,7 @@ namespace backend.Controllers
                     {
                         await _context.SaveChangesAsync();
                     }
-                    catch (DbUpdateException ex)
+                    catch (DbUpdateException)
                     {
                         // Xử lý trường hợp xung đột khi lưu vào cơ sở dữ liệu
                         _context.ModuleClasses.Remove(newModuleClass);
@@ -131,66 +131,45 @@ namespace backend.Controllers
             return Ok(moduleClass);
         }
 
-        [HttpPut("{moduleClassId}")]
-        public async Task<IActionResult> UpdateLecturerId(string moduleClassId, [FromBody] ModuleClass moduleClass)
+        [HttpPut]
+        public async Task<IActionResult> UpdateLecturerId([FromBody] ModuleClass moduleClass)
         {
-            var existingModuleClass = await _context.ModuleClasses.FindAsync(moduleClassId);
+            var existingModuleClass = await _context.ModuleClasses
+                .FirstOrDefaultAsync(mc => mc.ModuleClassId == moduleClass.ModuleClassId);
+
             if (existingModuleClass == null)
             {
-                return NotFound();
+                return NotFound($"Không tìm thấy Mã lớp học phần {existingModuleClass}");
             }
 
-            // Lấy LecturerId mới
-            var newLecturerId = moduleClass.LecturerId;
-
-            // Kiểm tra tính duy nhất của ClassSchedule
-            var count = await _context.ClassSchedules
-                .CountAsync(c => c.ModuleClassId != moduleClassId &&
-                                 _context.ModuleClasses.Any(m => m.ModuleClassId == c.ModuleClassId && m.LecturerId == newLecturerId) &&
-                                 c.DayOfWeek == _context.ClassSchedules
-                                     .Where(cs => cs.ModuleClassId == moduleClassId)
-                                     .Select(cs => cs.DayOfWeek)
-                                     .FirstOrDefault() &&
-                                 c.LessonStart == _context.ClassSchedules
-                                     .Where(cs => cs.ModuleClassId == moduleClassId)
-                                     .Select(cs => cs.LessonStart)
-                                     .FirstOrDefault() &&
-                                 c.LessonEnd == _context.ClassSchedules
-                                     .Where(cs => cs.ModuleClassId == moduleClassId)
-                                     .Select(cs => cs.LessonEnd)
-                                     .FirstOrDefault());
-
-            if (count > 0)
+            if (existingModuleClass.LecturerId != null)
             {
-                return BadRequest("Duplicate ClassSchedule entries found for the new LecturerId.");
+                return BadRequest("Không thể đăng kí dạy học do đã có giảng viên.");
             }
 
-            // Cập nhật LecturerId
-            existingModuleClass.LecturerId = newLecturerId;
-            _context.ModuleClasses.Update(existingModuleClass);
+            // Kiểm tra sự xung đột lịch học
+            var hasConflict = await _context.ClassSchedules
+                .Where(cs1 => cs1.ModuleClassId == moduleClass.ModuleClassId)
+                .AnyAsync(cs1 => _context.ClassSchedules
+                    .Where(cs2 => _context.ModuleClasses
+                        .Where(innerMc => innerMc.LecturerId == moduleClass.LecturerId)
+                        .Select(innerMc => innerMc.ModuleClassId)
+                        .Contains(cs2.ModuleClassId))
+                    .Any(cs2 => cs1.DayOfWeek == cs2.DayOfWeek &&
+                        ((cs1.LessonStart < cs2.LessonEnd && cs1.LessonEnd > cs2.LessonStart) ||
+                        (cs1.LessonStart >= cs2.LessonStart && cs1.LessonStart <= cs2.LessonEnd) ||
+                        (cs1.LessonEnd >= cs2.LessonStart && cs1.LessonEnd <= cs2.LessonEnd)) &&
+                        (cs1.StartDate <= cs2.EndDate && cs1.EndDate >= cs2.StartDate)));
 
-            try
+            if (hasConflict)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ModuleClassExists(moduleClassId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict("Không thể đăng kí giảng dạy do trùng lịch dạy.");
             }
 
-            return NoContent();
-        }
+            existingModuleClass.LecturerId = moduleClass.LecturerId;
+            await _context.SaveChangesAsync();
 
-        private bool ModuleClassExists(string id)
-        {
-            return _context.ModuleClasses.Any(e => e.ModuleClassId == id);
+            return Ok(new { message = "Đăng kí giảng dạy thành công" });
         }
     }
 }

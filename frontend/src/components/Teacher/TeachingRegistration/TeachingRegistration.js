@@ -1,15 +1,14 @@
 import React from 'react';
 
 const TeachingRegistration = () => {
-    const moduleClassId = "COMP1814532";
-
     const registerTeaching = async () => {
         const data = {
+            "moduleClassId": "COMP1320887",
             "lecturerId": "GV.0001",
         };
 
         try {
-            const response = await fetch(`http://localhost:5065/api/ModuleClass/${moduleClassId}`, {
+            const response = await fetch('http://localhost:5065/api/ModuleClass', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
