@@ -22,6 +22,8 @@ public partial class ModuleClass
 
     public virtual Lecturer? Lecturer { get; set; }
 
+    public virtual ICollection<ModuleClassTrainingProgramCourse> ModuleClassTrainingProgramCourses { get; set; } = new List<ModuleClassTrainingProgramCourse>();
+
     public virtual Semester? Semester { get; set; }
 
     public virtual Subject? Subject { get; set; }
@@ -40,6 +42,9 @@ public partial class ModuleClass
 
     [NotMapped]
     public string? RoomType { get; set; }
+
+    [NotMapped]
+    public List<string>? TrainingProgramCourseIds { get; set; } = new List<string>();
 }
 
 public class SubjectEntry 

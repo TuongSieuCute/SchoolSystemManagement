@@ -5,15 +5,14 @@ const AddModuleClass = () => {
     const data = {
       "maximumNumberOfStudents": 50,
       "subjectIds": [
-        { "subjectId": "COMP1814", "count": 10 },
-        { "subjectId": "COMP1813", "count": 10 },
-        { "subjectId": "COMP1811", "count": 10 }
+        { "subjectId": "COMP1320", "count": 6 },
       ],
       "semesterId": "HK2",
-      "daysAWeek": 2, // so ngay trong tuan
-      "lessonsPerDay": 3,
+      "daysAWeek": 1, // so ngay trong tuan
+      "lessonsPerDay": 5,
       "numberOfWeek": 10,
       "roomType": "Phòng máy tính",
+      "trainingProgramCourseIds": ["K47.CNTT.2021"]
     };
     
     try {

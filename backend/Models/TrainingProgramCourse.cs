@@ -13,5 +13,7 @@ public partial class TrainingProgramCourse
 
     public virtual Course? Course { get; set; }
 
+    public virtual ICollection<ModuleClassTrainingProgramCourse> ModuleClassTrainingProgramCourses { get; set; } = new List<ModuleClassTrainingProgramCourse>();
+
     public virtual TrainingProgram? TrainingProgram { get; set; }
 }

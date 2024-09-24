@@ -5,9 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace backend.Helper
+namespace backend.Services
 {
-    public class HashPassword
+    public class HashPasswordService
     {
         public string ComputeSha256Hash(string password)
         {

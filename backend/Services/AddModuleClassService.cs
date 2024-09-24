@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Helper
+namespace backend.Services
 {
-    public class AddModuleClass
+    public class AddModuleClassService
     {
         private readonly SchoolSystemManagementContext _context;
 
-        public AddModuleClass(SchoolSystemManagementContext context)
+        public AddModuleClassService(SchoolSystemManagementContext context)
         {
             _context = context;
         }

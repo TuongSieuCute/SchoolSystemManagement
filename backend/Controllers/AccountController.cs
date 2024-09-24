@@ -6,8 +6,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using backend.Helper;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,13 +20,13 @@ namespace backend.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly SchoolSystemManagementContext _context;
-        private readonly HashPassword _hashPassword;
+        private readonly HashPasswordService _hashPasswordService;
 
-        public AccountController(IConfiguration configuration, SchoolSystemManagementContext context)
+        public AccountController(IConfiguration configuration, SchoolSystemManagementContext context, HashPasswordService hashPasswordService)
         {
             _configuration = configuration;
             _context = context;
-            _hashPassword = new HashPassword();
+            _hashPasswordService = hashPasswordService;
         }
 
         [HttpPost("login")]
@@ -42,7 +42,7 @@ namespace backend.Controllers
                     return Unauthorized();
                 }
 
-                string hashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash + username.Salt);
+                string hashedPassword = _hashPasswordService.ComputeSha256Hash(account.PasswordHash + username.Salt);
 
                 if (username.PasswordHash != hashedPassword)
                 {
@@ -96,7 +96,7 @@ namespace backend.Controllers
                     return Unauthorized();
                 }
 
-                string currentHashedPassword = _hashPassword.ComputeSha256Hash(account.PasswordHash + username.Salt);
+                string currentHashedPassword = _hashPasswordService.ComputeSha256Hash(account.PasswordHash + username.Salt);
 
                 if (username.PasswordHash != currentHashedPassword)
                 {
@@ -108,7 +108,7 @@ namespace backend.Controllers
                     return BadRequest();
                 }
 
-                string newHashedPassword = _hashPassword.ComputeSha256Hash(account.NewPassword + username.Salt);
+                string newHashedPassword = _hashPasswordService.ComputeSha256Hash(account.NewPassword + username.Salt);
                 username.PasswordHash = newHashedPassword;
 
                 await _context.SaveChangesAsync();

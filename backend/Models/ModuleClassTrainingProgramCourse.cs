@@ -5,6 +5,8 @@ namespace backend.Models;
 
 public partial class ModuleClassTrainingProgramCourse
 {
+    public int ModuleClassTrainingProgramCourseId { get; set; }
+
     public string? ModuleClassId { get; set; }
 
     public string? TrainingProgramCourseId { get; set; }

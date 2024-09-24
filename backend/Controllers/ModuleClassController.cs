@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using backend.Helper;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,12 +18,12 @@ namespace backend.Controllers
     public class ModuleClassController : Controller
     {
         private readonly SchoolSystemManagementContext _context;
-        private readonly AddModuleClass _addModuleClass;
+        private readonly AddModuleClassService _addModuleClassService;
 
-        public ModuleClassController(SchoolSystemManagementContext context, AddModuleClass addModuleClass)
+        public ModuleClassController(SchoolSystemManagementContext context, AddModuleClassService addModuleClassService)
         {
             _context = context;
-            _addModuleClass = addModuleClass;
+            _addModuleClassService = addModuleClassService;
         }
 
         [HttpPost]
@@ -33,11 +33,11 @@ namespace backend.Controllers
             {
                 string subjectId = subjectEntry.SubjectId;
                 int count = subjectEntry.Count;
-                
+
                 // Tạo số lượng lớp học phần theo từng môn học
                 for (int i = 0; i < count; i++)
                 {
-                    string moduleClassId = _addModuleClass.GenerateModuleClassId(subjectId);
+                    string moduleClassId = _addModuleClassService.GenerateModuleClassId(subjectId);
 
                     var newModuleClass = new ModuleClass
                     {
@@ -53,16 +53,27 @@ namespace backend.Controllers
 
                     if (existingModuleClass != null)
                     {
-                        return Conflict(new { message = "Xung độ Mã lớp học phần. Vui lòng thử lại."});
+                        return Conflict(new { message = "Xung độ Mã lớp học phần. Vui lòng thử lại." });
                     }
 
                     _context.ModuleClasses.Add(newModuleClass);
+
+                    foreach (var trainingProgramCourseId in moduleClass.TrainingProgramCourseIds)
+                    {
+                        var newModuleClassTrainingProgramCourse = new ModuleClassTrainingProgramCourse
+                        {
+                            ModuleClassId = moduleClassId,
+                            TrainingProgramCourseId = trainingProgramCourseId
+                        };
+
+                        _context.ModuleClassTrainingProgramCourses.Add(newModuleClassTrainingProgramCourse);
+                    }
 
                     byte daysAWeek = moduleClass.DaysAWeek ?? 1;
                     byte lessonsPerDay = moduleClass.LessonsPerDay ?? 5;
                     byte numberOfWeek = moduleClass.NumberOfWeek ?? 10;
 
-                    var (startDate, endDate) = await _addModuleClass.GetCurrentSemesterPeriodAsync(moduleClass.SemesterId);
+                    var (startDate, endDate) = await _addModuleClassService.GetCurrentSemesterPeriodAsync(moduleClass.SemesterId);
                     if (!startDate.HasValue || !endDate.HasValue)
                     {
                         return BadRequest("Không tìm thấy thời gian phù hợp.");
@@ -73,7 +84,7 @@ namespace backend.Controllers
                     // Tạo thời gian biểu cho các lớp học phần
                     for (int j = 0; j < daysAWeek; j++)
                     {
-                        var uniqueSchedule = await _addModuleClass.FindUniqueSchedule(moduleClass.RoomType, startDate.Value, endDate.Value, numberOfWeek, lessonsPerDay);
+                        var uniqueSchedule = await _addModuleClassService.FindUniqueSchedule(moduleClass.RoomType, startDate.Value, endDate.Value, numberOfWeek, lessonsPerDay);
                         if (uniqueSchedule == null)
                         {
                             scheduleConflict = true;
@@ -111,6 +122,7 @@ namespace backend.Controllers
                         // Xử lý trường hợp xung đột khi lưu vào cơ sở dữ liệu
                         _context.ModuleClasses.Remove(newModuleClass);
                         _context.ClassSchedules.RemoveRange(_context.ClassSchedules.Where(cs => cs.ModuleClassId == moduleClassId));
+                        _context.ModuleClassTrainingProgramCourses.RemoveRange(_context.ModuleClassTrainingProgramCourses.Where(mc => mc.ModuleClassId == moduleClassId));
 
                         return StatusCode(StatusCodes.Status409Conflict, "Đã có xung đột xảy ra khi lưu dữ liệu. Vui lòng thử lại.");
                     }
