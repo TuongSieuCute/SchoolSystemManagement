@@ -147,7 +147,7 @@ namespace backend.Controllers
                 return BadRequest("Không thể đăng kí dạy học do đã có giảng viên.");
             }
 
-            // Kiểm tra sự xung đột lịch học
+            // Kiểm tra sự xung đột lịch dạy
             var hasConflict = await _context.ClassSchedules
                 .Where(cs1 => cs1.ModuleClassId == moduleClass.ModuleClassId)
                 .AnyAsync(cs1 => _context.ClassSchedules

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import './Student.css'
+import CourseRegistration from './CourseRegistration';
 
 const Student = () => {
     return (
         <div>
-            <div className='sidebar'>
+            {/* <div className='sidebar'>
                 <ul>
                     <li>
                         <Link to={"/student/information"}>
@@ -21,7 +22,8 @@ const Student = () => {
             </div>
             <div className='content'>
                 <Outlet />
-            </div>
+            </div> */}
+            <CourseRegistration></CourseRegistration>
         </div>
     );
 };

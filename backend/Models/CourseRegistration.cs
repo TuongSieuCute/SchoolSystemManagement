@@ -5,7 +5,7 @@ namespace backend.Models;
 
 public partial class CourseRegistration
 {
-    public string CourseRegistrationId { get; set; } = null!;
+    public int CourseRegistrationId { get; set; }
 
     public decimal? MidtermGradePercentage { get; set; }
 
@@ -20,6 +20,8 @@ public partial class CourseRegistration
     public decimal? AverageGrade4 { get; set; }
 
     public string? Literacy { get; set; }
+
+    public bool? IsPass { get; set; }
 
     public string? StudentId { get; set; }
 

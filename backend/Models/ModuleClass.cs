@@ -29,9 +29,6 @@ public partial class ModuleClass
     public virtual Subject? Subject { get; set; }
 
     [NotMapped]
-    public List<SubjectEntry>? SubjectIds { get; set; } = new List<SubjectEntry>();
-
-    [NotMapped]
     public byte? DaysAWeek { get; set; }
 
     [NotMapped]
@@ -42,6 +39,9 @@ public partial class ModuleClass
 
     [NotMapped]
     public string? RoomType { get; set; }
+
+    [NotMapped]
+    public List<SubjectEntry> SubjectIds { get; set; } = new List<SubjectEntry>();
 
     [NotMapped]
     public List<string>? TrainingProgramCourseIds { get; set; } = new List<string>();
