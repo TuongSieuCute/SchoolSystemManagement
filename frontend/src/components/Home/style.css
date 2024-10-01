@@ -1,0 +1,138 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: var(--background-secondary-color);
+}   
+
+.login-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px;
+    width: 800px;
+    height: 480px;
+    border-radius: 10px;
+    background: var(--background-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.login-container .login-image {
+    padding: 40px 20px 40px 40px;
+}
+
+.login-container .login-form {
+    padding: 40px 40px 40px 20px;
+    text-align: center;
+}
+
+form .login-input {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    margin: 40px 0;
+}
+
+.login-input input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid black;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+.login-input input:focus,
+.login-input input:valid {
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.login-input label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    font-size: 16px;
+    padding-left: 10px;
+    transition: .5s;
+}
+
+.login-input input:focus ~ label,
+.login-input input:valid ~ label {
+    top: -5px;
+    color: var(--primary-color);
+}
+
+.login-input .login-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    translate: 0 -50%;
+    font-size: 16px;
+}
+
+.login-input input:focus ~ .login-icon,
+.login-input input:valid ~ .login-icon {
+    color: var(--primary-color);
+}
+
+.error {
+    color: var(--danger-color);
+    margin-bottom: 10px;
+    margin-top: -20px;
+}
+
+form button {
+    width: 100%;
+    height: 45px;
+    background: var(--background-color);
+    border: 2px solid black;
+    outline: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+form button:hover {
+    background: var(--primary-color);
+    color: var(--text-color-white-1);
+}
+
+.or {
+    margin: 10px 0;
+    color: var(--text-color-gray);
+    width: 100%;
+}
+
+.button-microsoft {
+    width: 100%;
+    height: 45px;
+    background: var(--secondary-color);
+    border: 2px solid black;
+    outline: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-color-white-1);
+    font-weight: bold;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-microsoft img {
+    position: absolute;
+    left: 15px;             
+    width: 30px;
+}
+
+.button-microsoft .text-microsoft {
+    flex: 1;                 
+    text-align: center;
+}

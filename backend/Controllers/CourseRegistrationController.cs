@@ -24,14 +24,6 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<IActionResult> PostCourseRegistration([FromBody] CourseRegistration courseRegistration)
         {
-            var existingModuleClass = await _context.ModuleClasses
-                .FirstOrDefaultAsync(mc => mc.ModuleClassId == courseRegistration.ModuleClassId);
-
-            if (existingModuleClass == null)
-            {
-                return NotFound($"Không tìm thấy Mã lớp học phần {existingModuleClass}");
-            }
-
             // Kiểm tra sự xung đột lịch học
             var hasConflict = from cs1 in _context.ClassSchedules
                               where cs1.ModuleClassId == courseRegistration.ModuleClassId
@@ -66,6 +58,28 @@ namespace backend.Controllers
             {
                 return Conflict("Thất bại");
             }
+
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> PutCourseRegistration([FromBody] CourseRegistration courseRegistration)
+        {
+            var existingCourseRegistration = await _context.CourseRegistrations
+                .FirstOrDefaultAsync(cr => cr.ModuleClassId == courseRegistration.ModuleClassId
+                                        && cr.StudentId == courseRegistration.StudentId);
+
+            if (existingCourseRegistration == null)
+            {
+                return NotFound();
+            }
+            
+            existingCourseRegistration.MidtermGradePercentage = courseRegistration.MidtermGradePercentage;
+            existingCourseRegistration.FinalExamGradePercentage = courseRegistration.FinalExamGradePercentage;
+            existingCourseRegistration.MidtermGrade = courseRegistration.MidtermGrade;
+            existingCourseRegistration.FinalExamGrade = courseRegistration.FinalExamGrade;
+
+            await _context.SaveChangesAsync();
 
             return Ok();
         }

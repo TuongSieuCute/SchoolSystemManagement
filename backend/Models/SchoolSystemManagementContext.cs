@@ -15,6 +15,8 @@ public partial class SchoolSystemManagementContext : DbContext
     {
     }
 
+    partial void OnModelBuidld(ModelBuilder modelBuilder);
+
     public virtual DbSet<Account> Accounts { get; set; }
 
     public virtual DbSet<ClassRoom> ClassRooms { get; set; }
@@ -153,6 +155,10 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<CourseRegistration>(entity =>
         {
+            entity.ToTable(cr => cr.HasTrigger("trgAfterUpdateStudent"));
+            base.OnModelCreating(modelBuilder);
+            this.OnModelBuidld(modelBuilder);
+            
             entity.HasKey(e => e.CourseRegistrationId).HasName("PK__CourseRe__A0FC0B761866A3B0");
 
             entity.ToTable("CourseRegistration");

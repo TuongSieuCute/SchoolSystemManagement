@@ -14,7 +14,7 @@ const Home = () => {
         <>
             <div>
                 <button onClick={handleLogin}>Đăng nhập</button>
-                {!isAuthenticated ? <LoginButton /> : <LogOutButton />}
+                {/* {!isAuthenticated ? <LoginButton /> : <LogOutButton />} */}
             </div>
 
             <AuthenticatedTemplate>

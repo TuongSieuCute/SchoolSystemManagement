@@ -1,15 +1,19 @@
 import React from 'react';
 
-const CourseRegistration = () => {
+const Grades = () => {
     const postData = async () => {
         const data = {
             "studentId": "47.01.104.233",
-            "moduleClassId": "COMP1320998"
+            "moduleClassId": "COMP1320998",
+            "midtermGradePercentage": 0.4,
+            "finalExamGradePercentage": 0.6,
+            "midtermGrade": 7,
+            "finalExamGrade": 2.5,
         };
 
         try {
             const response = await fetch('http://localhost:5065/api/CourseRegistration', {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -30,10 +34,11 @@ const CourseRegistration = () => {
     };
     return (
         <div>
-            <h1>Test POST Đăng kí học phần</h1>
+            <h1>Test PUT Nhập điểm</h1>
             <button onClick={postData}>Send Test Data</button>
         </div>
     );
 };
 
-export default CourseRegistration;
+export default Grades;
+

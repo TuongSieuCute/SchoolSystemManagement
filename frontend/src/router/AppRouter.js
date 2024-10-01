@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
 import Home from '../components/Home/Home';
-import Login from '../components/Login/Login';
 import Admin from '../components/Admin/Admin';
 import Student from '../components/Student/Student';
 import Information from '../components/Student/Information/Information';
 import Teacher from '../components/Teacher/Teacher';
 import ChangePassword from '../components/Student/Information/ChangePassword';
 import CurriculumList from '../components/Student/Curriculum/CurriculumList';
+import Login from '../components/Home/Login';
 
 const AppRouter = () => {
     return (
