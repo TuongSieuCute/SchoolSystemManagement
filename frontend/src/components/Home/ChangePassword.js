@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { getUserInfo } from '../../../helper/token';
+import { getUserInfoLocal } from '../../helper/token';
 import { useNavigate } from 'react-router-dom';
-import '../Student.css'
 
 const ChangePassword = () => {
     const [oldPassword, setOldPassword] = useState('');
@@ -9,7 +8,7 @@ const ChangePassword = () => {
     const [againNewPassword, setAgainNewPassword] = useState('');
     const [error, setError] = useState('');
 
-    const username = getUserInfo().username;
+    const username = getUserInfoLocal().username;
     const navigate = useNavigate();
 
     const handleChangePassword = async (e) => {

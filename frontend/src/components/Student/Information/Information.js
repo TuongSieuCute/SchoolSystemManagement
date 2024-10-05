@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserInfo } from '../../../helper/token';
+import { getUserInfoLocal } from '../../../helper/token';
 import { useNavigate } from 'react-router-dom';
 import format from 'date-fns/format'
 import '../Student.css'
@@ -25,7 +25,7 @@ const Information = () => {
     }, [username]);
 
     useEffect(() => {
-        setUsername(getUserInfo().username);
+        setUsername(getUserInfoLocal().username);
     }, [])
     
     const handleClickChangePassword = () => {

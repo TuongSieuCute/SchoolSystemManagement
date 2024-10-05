@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock } from "react-icons/fa";
-import '../../index.css'
-import './style.css'
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { loginRequest } from "../../helper/authConfig";
+import '../../index.css'
+import './Home.css'
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,20 +15,51 @@ const Login = () => {
     const isAuthenticated = useIsAuthenticated();
     const { accounts, instance } = useMsal();
 
+    const handleRoleNavigation = (role) => {
+        switch (role) {
+            case '0':
+            case 'Admin':
+                navigate('/admin');
+                break;
+            case '1':
+            case 'Teacher':
+                navigate('/teacher');
+                break;
+            default:
+                navigate('/student');
+        }
+    };
+
+    const setUserInfoAzure = (role, username) => {
+        localStorage.setItem('loginMethod', 'azure');
+        localStorage.setItem('role', role);
+        localStorage.setItem('username', username);
+    };
+
     useEffect(() => {
         if (isAuthenticated && accounts.length > 0) {
-            const decodedToken = jwtDecode(accounts[0].idToken);
-            handleRoleNavigation(decodedToken.role);
+
+            const roles = accounts[0]?.idTokenClaims?.roles || [];
+            
+            if (roles.length > 0) {
+                handleRoleNavigation(roles[0]);
+            }
         }
     }, [isAuthenticated, accounts]);
-
+    
     const handleAzureLogin = async () => {
         try {
             const loginResponse = await instance.loginPopup(loginRequest);
+            
+            if (loginResponse.account) {
 
-            if (loginResponse.idToken) {
-                const decodedToken = jwtDecode(loginResponse.idToken);
-                handleRoleNavigation(decodedToken.role);
+                const roles = loginResponse.account.idTokenClaims?.roles || [];
+                const username = loginResponse.account.username;
+                
+                if (roles.length > 0) {
+                    setUserInfoAzure(roles[0], username);
+                    handleRoleNavigation(roles[0]);
+                }
             }
         } catch (error) {
             console.error('Azure login error:', error);
@@ -36,33 +67,12 @@ const Login = () => {
         }
     };
 
-    const handleRoleNavigation = (role) => {
-        switch (role) {
-            case '0':
-                navigate('/admin');
-                break;
-            case '1':
-                navigate('/teacher');
-                break;
-            case 'Admin':
-                navigate('/admin');
-                break;
-            case 'Teacher':
-                navigate('/teacher');
-                break;
-            case 'Student':
-                navigate('/student');
-                break;
-            default:
-                navigate('/student');
-        }
-    };
-
-    const setUserInfo = (token) => {
+    const setUserInfoLocal = (token) => {
         const decodedToken = jwtDecode(token);
         localStorage.setItem('token', token);
         localStorage.setItem('role', decodedToken.role);
         localStorage.setItem('username', decodedToken.username || username);
+        localStorage.setItem('loginMethod', 'local');
     };
 
     const handleSubmit = async (e) => {
@@ -82,8 +92,8 @@ const Login = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setUserInfo(data.token);
-                const decodedToken = jwtDecode(data.token);
+                setUserInfoLocal(data.token);
+                const decodedToken = jwtDecode(data.token); // Giải mã Token
                 handleRoleNavigation(decodedToken.role);
             }
 
@@ -94,8 +104,8 @@ const Login = () => {
     };
 
     return (
-        <div className='container'>
-            <div className='login-container'>
+        <div className='login-container'>
+            <div className='login-box'>
                 <div className='login-image'>
                     <img src='/Images/login.png' alt='hcmue' />
                 </div>
@@ -125,7 +135,7 @@ const Login = () => {
                         {error && <p className='error'>{error}</p>}
                         <button type="submit">Đăng nhập</button>
                     </form>
-                    <p class="or">--- or ---</p>
+                    <p className="or">--- or ---</p>
                     <button className='button-microsoft' onClick={handleAzureLogin}>
                         <img src='/Images/icon-microsoft.svg' alt='icon microsoft' />
                         <span className='text-microsoft'>Đăng nhập bằng Microsoft</span>

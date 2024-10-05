@@ -1,9 +1,34 @@
-import React from 'react';
-import { Link, Outlet } from 'react-router-dom';
-import './Student.css'
-import CourseRegistration from './CourseRegistration';
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../Home/Sidebar';
+import { getUserInfoLocal, getUserInfoAzure } from '../../helper/token';
+import { useMsal } from "@azure/msal-react";
+import { SidebarData } from './SidebarData.js'
+
 
 const Student = () => {
+    const [username, setUsername] = useState("");
+    const { accounts } = useMsal();
+
+    useEffect(() => {
+        const userInfo = getUserInfoLocal();
+
+        if (userInfo && userInfo.username) 
+        {
+            setUsername(userInfo.username);
+        } 
+        else 
+        {
+            const azureUserInfo = getUserInfoAzure(accounts);
+            if (azureUserInfo) {
+                setUsername(azureUserInfo.username);
+            }
+        }
+    }, [accounts]);
+
+    if (!username) {
+        return null; // Hoặc một component loading
+    }
+
     return (
         <div>
             {/* <div className='sidebar'>
@@ -23,7 +48,7 @@ const Student = () => {
             <div className='content'>
                 <Outlet />
             </div> */}
-            <CourseRegistration></CourseRegistration>
+            <Sidebar username={username} sidebardata={SidebarData}></Sidebar>
         </div>
     );
 };

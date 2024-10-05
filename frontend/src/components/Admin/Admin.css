@@ -1,0 +1,81 @@
+.classroom-container {
+    background-color: var(--background-color);
+    margin: 20px;
+    border-radius: 20px;
+    width: 100% - 250PX;
+}
+
+.classroom-box {
+    padding: 20px;
+}
+
+.schedule-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lesson-schedule {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+}
+
+.lesson-schedule label {
+    margin-bottom: 10px; 
+    font-weight: bold; 
+}
+
+.custom-datepicker {
+    width: 200px;
+    height: 32px;
+    padding-left: 10px;
+}
+
+.button-search {
+    width: 100px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: var(--text-color-white-1);
+    margin-top: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.table-schedule {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.table-schedule table {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+}
+
+.table-schedule th, .table-schedule td {
+    padding: 12px 15px;
+    border: 1px solid #ccc; 
+}
+
+.table-schedule th {
+    background-color: #f2f2f2; 
+    font-weight: bold;
+    text-align: center; 
+}
+
+.table-schedule tbody tr:nth-child(even) {
+    background-color: #f9f9f9; 
+}
+
+.table-schedule tbody tr:hover {
+    background-color: #f1f1f1; 
+}
+
+.table-schedule td {
+    text-align: center; 
+}
+
+.table-schedule tbody td {
+    color: #333; 
+}

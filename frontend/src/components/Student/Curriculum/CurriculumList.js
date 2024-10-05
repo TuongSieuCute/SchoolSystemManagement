@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserInfo } from '../../../helper/token';
+import { getUserInfoLocal } from '../../../helper/token';
 import CurriculumItem from './CurriculumItem';
 
 const CurriculumList = () => {
@@ -16,7 +16,7 @@ const CurriculumList = () => {
     }, [username]);
 
     useEffect(() => {
-        setUsername(getUserInfo().username);
+        setUsername(getUserInfoLocal().username);
     }, [])
 
     const sortSemesters = (semesters) => {
