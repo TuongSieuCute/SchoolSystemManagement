@@ -8,9 +8,9 @@ import Teacher from '../components/Teacher/Teacher';
 import CurriculumList from '../components/Student/Curriculum/CurriculumList';
 import Login from '../components/Home/Login';
 import ClassRoom from '../components/Admin/ClassRoom';
-import AddModuleClass from '../components/Admin/AddModuleClass';
 import ChangePassword from '../components/Home/ChangePassword';
 import Logout from '../components/Home/Logout';
+import ModuleClass from '../components/Admin/ModuleClass/ModuleClass';
 
 const AppRouter = () => {
     return (
@@ -21,7 +21,7 @@ const AppRouter = () => {
                 <Route path="/changePassword" element={<ChangePassword />}></Route>
                 <Route path="/admin" element={<Admin />}>
                     <Route path="classroom" element={<ClassRoom />}/>
-                    <Route path="add-module-class" element={<AddModuleClass />}/>
+                    <Route path="moduleClass" element={<ModuleClass />}/>
                 </Route>
                 <Route path="/student" element={<Student />}>
                     <Route path="information" element={<Information />}/>

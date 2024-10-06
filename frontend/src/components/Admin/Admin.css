@@ -1,11 +1,11 @@
-.classroom-container {
+.admin-container {
     background-color: var(--background-color);
     margin: 20px;
     border-radius: 20px;
     width: 100% - 250PX;
 }
 
-.classroom-box {
+.box {
     padding: 20px;
 }
 
@@ -42,40 +42,40 @@
     cursor: pointer;
 }
 
-.table-schedule {
+.table {
     margin-top: 20px;
     width: 100%;
 }
 
-.table-schedule table {
+.table table {
     width: 100%;
     max-width: 1200px;
     margin-top: 20px;
 }
 
-.table-schedule th, .table-schedule td {
+.table th, .table td {
     padding: 12px 15px;
     border: 1px solid #ccc; 
 }
 
-.table-schedule th {
+.table th {
     background-color: #f2f2f2; 
     font-weight: bold;
     text-align: center; 
 }
 
-.table-schedule tbody tr:nth-child(even) {
+.table tbody tr:nth-child(even) {
     background-color: #f9f9f9; 
 }
 
-.table-schedule tbody tr:hover {
+.table tbody tr:hover {
     background-color: #f1f1f1; 
 }
 
-.table-schedule td {
+.table td {
     text-align: center; 
 }
 
-.table-schedule tbody td {
+.table tbody td {
     color: #333; 
 }

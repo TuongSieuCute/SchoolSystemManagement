@@ -69,8 +69,8 @@ const ClassRoom = () => {
     }, []);
 
     return (
-        <div className='classroom-container'>
-            <div className='classroom-box'>
+        <div className='admin-container'>
+            <div className='box'>
                 <div className='schedule-form'>
                     <div className='lesson-schedule'>
                         <label>Chọn ngày:</label>
@@ -111,7 +111,7 @@ const ClassRoom = () => {
                     </div>
                     <button className='button-search' onClick={fetchListRoom}>Tìm kiếm</button>
                 </div>
-                <div className='table-schedule'>
+                <div className='table'>
                     <h1>Danh sách phòng học:</h1>
                     <table>
                         <thead>

@@ -26,6 +26,29 @@ namespace backend.Controllers
             _addModuleClassService = addModuleClassService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ModuleClass>>> GetModuleClasses()
+        {
+            var result = await (from mc in _context.ModuleClasses
+                                join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
+                                select new
+                                {
+                                    mc.ModuleClassId,
+                                    mc.SubjectId,
+                                    mc.MaximumNumberOfStudents,
+                                    mc.LecturerId,
+                                    cs.DayOfWeek,
+                                    cs.LessonStart,
+                                    cs.LessonEnd,
+                                    cs.NumberOfWeek,
+                                    cs.StartDate,
+                                    cs.EndDate,
+                                    cs.ClassRoomId,
+                                }).ToListAsync();
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostModuleClass([FromBody] ModuleClass moduleClass)
         {

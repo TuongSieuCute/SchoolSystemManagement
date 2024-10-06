@@ -9,6 +9,6 @@ export const SidebarData = [
     {
         title: "Lớp học phần",
         icon: <GiTeacher />,
-        link: "/admin/add-module-class"
+        link: "/admin/moduleClass"
     },
 ]

@@ -14,7 +14,7 @@ const AddModuleClass = () => {
       "roomType": "Phòng máy tính",
       "trainingProgramCourseIds": ["K47.CNTT.2021"]
     };
-    
+
     try {
       const response = await fetch('http://localhost:5065/api/ModuleClass', {
         method: 'POST',
@@ -38,9 +38,10 @@ const AddModuleClass = () => {
   };
 
   return (
-    <div>
-      <h1>Test POST Module Class</h1>
-      <button onClick={postData}>Send Test Data</button>
+    <div className='admin-container'>
+      <div className='box'>
+        <button>Thêm Lớp học phần</button>
+      </div>
     </div>
   );
 };
