@@ -9,6 +9,7 @@
     --secondary-color: #222222;
     --success-color: #28A745;
     --danger-color: #FF4C4C;
+    --modal-color:  rgba(49, 49, 49, 0.8);
 }
 
 * {
@@ -29,4 +30,35 @@ body {
 a {
     text-decoration: none;
     color: var(--text-color);
+}
+
+.modal, .overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1300;
+}
+
+.overlay {
+    position: relative;
+    background-color: var(--modal-color);
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    border-radius: 8px; 
+    padding: 20px;
+    max-width: 50%; 
+    max-height: 90%;
+    overflow: visible;
+    position: relative;
+    z-index: 1400;
+    height: 500px;
 }

@@ -58,7 +58,7 @@ const Sidebar = (props) => {
                         </ul>
                     </div>
                 </div>
-                <div class="main-content">
+                <div className="main-content">
                     <Outlet />
                 </div>
             </div>

@@ -198,4 +198,12 @@ update CourseRegistration set MidtermGradePercentage = null, FinalExamGradePerce
 AverageGrade10 = null, AverageGrade4 = null
 
 
-
+----------------------------------------------------------------------------------------
+select *
+from ModuleClass mc, ClassSchedule cs, Subject s, Lecturer l
+------------------------------------------------------------------------------------------
+select * 
+from TrainingProgram_Course as tc, InstructionalPlan as ip, Subject as s
+where tc.TrainingProgram_CourseId in (N'K47.CNTT.2021')
+and tc.TrainingProgram_CourseId = ip.TrainingProgram_CourseId
+and ip.SubjectId = s.SubjectId

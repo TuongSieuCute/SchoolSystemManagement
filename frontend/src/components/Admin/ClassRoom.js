@@ -115,11 +115,11 @@ const ClassRoom = () => {
                     <h1>Danh sách phòng học:</h1>
                     <table>
                         <thead>
-                            <th>Mã phòng</th>
-                            <th>Khu vực</th>
-                            <th>Tầng</th>
-                            <th>Loại phòng</th>
-                            <th>Số lượng</th>
+                            <tr>Mã phòng</tr>
+                            <tr>Khu vực</tr>
+                            <tr>Tầng</tr>
+                            <tr>Loại phòng</tr>
+                            <tr>Số lượng</tr>
                         </thead>
                         <tbody>
                             {listRooms.length === 0 ? (

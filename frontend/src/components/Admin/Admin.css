@@ -42,7 +42,7 @@
     cursor: pointer;
 }
 
-.table {
+/* .table {
     margin-top: 20px;
     width: 100%;
 }
@@ -78,4 +78,21 @@
 
 .table tbody td {
     color: #333; 
+} */
+
+.form-edit {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown {
+    /* position: absolute; */
+    z-index: 1500;
+    background-color: red;
+    width: 100%;
+    border: 1px solid black;
+}
+
+.dropdown:hover {
+    background-color: red;
 }

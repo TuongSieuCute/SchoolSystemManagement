@@ -31,12 +31,14 @@ namespace backend.Controllers
         {
             var result = await (from mc in _context.ModuleClasses
                                 join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
+                                join s in _context.Subjects on mc.SubjectId equals s.SubjectId
+                                join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
+                                from l in lecturersGroup.DefaultIfEmpty()
                                 select new
                                 {
                                     mc.ModuleClassId,
                                     mc.SubjectId,
                                     mc.MaximumNumberOfStudents,
-                                    mc.LecturerId,
                                     cs.DayOfWeek,
                                     cs.LessonStart,
                                     cs.LessonEnd,
@@ -44,6 +46,8 @@ namespace backend.Controllers
                                     cs.StartDate,
                                     cs.EndDate,
                                     cs.ClassRoomId,
+                                    s.SubjectName,
+                                    l.FullName,
                                 }).ToListAsync();
 
             return Ok(result);
@@ -152,6 +156,12 @@ namespace backend.Controllers
                 }
             }
             return Ok(moduleClass);
+        }
+
+        [HttpPut("edit-moduleclass")]
+        public async Task<IActionResult> UpdateModuleClass([FromBody] ModuleClass moduleClass) {
+
+            return Ok();
         }
 
         [HttpPut]
