@@ -53,6 +53,49 @@ namespace backend.Controllers
             return Ok(result);
         }
 
+        [HttpGet("subject")]
+        public async Task<ActionResult<IEnumerable<ModuleClass>>> GetModuleClassesSubject(string? subjectId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            var semester = await _context.SemesterPeriods
+                                     .Where(sp => sp.StartDate > today)
+                                     .OrderBy(sp => sp.StartDate)
+                                     .FirstOrDefaultAsync();
+
+            var semesterId = semester.SemesterId;
+            var startDate = semester.StartDate;
+
+            var result = await (from mc in _context.ModuleClasses
+                                join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
+                                join s in _context.Subjects on mc.SubjectId equals s.SubjectId
+                                join ts in _context.TrainingProgramModuleGroupSubjects on s.SubjectId equals ts.SubjectId
+                                join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
+                                from l in lecturersGroup.DefaultIfEmpty()
+                                where (string.IsNullOrEmpty(subjectId) || s.SubjectId == subjectId)
+                                && mc.SemesterId == semesterId
+                                && cs.StartDate >= startDate
+                                select new
+                                {
+                                    mc.ModuleClassId,
+                                    mc.MaximumNumberOfStudents,
+                                    mc.LecturerId,
+                                    cs.DayOfWeek,
+                                    cs.LessonStart,
+                                    cs.LessonEnd,
+                                    cs.ClassRoomId,
+                                    cs.StartDate,
+                                    cs.EndDate,
+                                    s.SubjectId,
+                                    s.SubjectName,
+                                    s.NumberOfCredit,
+                                    ts.SubjectType,
+                                    l.FullName
+                                }).ToListAsync();
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostModuleClass([FromBody] ModuleClass moduleClass)
         {
@@ -159,7 +202,8 @@ namespace backend.Controllers
         }
 
         [HttpPut("edit-moduleclass")]
-        public async Task<IActionResult> UpdateModuleClass([FromBody] ModuleClass moduleClass) {
+        public async Task<IActionResult> UpdateModuleClass([FromBody] ModuleClass moduleClass)
+        {
 
             return Ok();
         }
@@ -203,6 +247,23 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Đăng kí giảng dạy thành công" });
+        }
+
+        [HttpPut("delete-LectureId")]
+        public async Task<IActionResult> DeleteLecturerId([FromBody] ModuleClass moduleClass)
+        {
+            var existingModuleClass = await _context.ModuleClasses
+                .FirstOrDefaultAsync(mc => mc.ModuleClassId == moduleClass.ModuleClassId);
+
+            if (existingModuleClass == null)
+            {
+                return NotFound($"Không tìm thấy Mã lớp học phần {existingModuleClass}");
+            }
+
+            existingModuleClass.LecturerId = null;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Hủy đăng kí giảng dạy thành công." });
         }
     }
 }

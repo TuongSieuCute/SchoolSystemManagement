@@ -207,3 +207,12 @@ from TrainingProgram_Course as tc, InstructionalPlan as ip, Subject as s
 where tc.TrainingProgram_CourseId in (N'K47.CNTT.2021')
 and tc.TrainingProgram_CourseId = ip.TrainingProgram_CourseId
 and ip.SubjectId = s.SubjectId
+
+-------------------------------------------------------------------------------------
+select * 
+from ModuleClass as mc, ClassSchedule as cs
+where mc.ModuleClassId = cs.ModuleClassId
+
+delete ModuleClass_TrainingProgram_Course
+delete ClassSchedule
+delete ModuleClass

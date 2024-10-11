@@ -11,6 +11,8 @@ import ClassRoom from '../components/Admin/ClassRoom';
 import ChangePassword from '../components/Home/ChangePassword';
 import Logout from '../components/Home/Logout';
 import ModuleClass from '../components/Admin/ModuleClass/ModuleClass';
+import TeachingRegistration from '../components/Teacher/TeachingRegistration/TeachingRegistration';
+import TeachingRegistrationDetail from '../components/Teacher/TeachingRegistration/TeachingRegistrationDetail';
 
 const AppRouter = () => {
     return (
@@ -20,14 +22,17 @@ const AppRouter = () => {
                 <Route path="/login" element={<Login />}></Route>
                 <Route path="/changePassword" element={<ChangePassword />}></Route>
                 <Route path="/admin" element={<Admin />}>
-                    <Route path="classroom" element={<ClassRoom />}/>
-                    <Route path="moduleClass" element={<ModuleClass />}/>
+                    <Route path="classroom" element={<ClassRoom />} />
+                    <Route path="moduleClass" element={<ModuleClass />} />
                 </Route>
                 <Route path="/student" element={<Student />}>
-                    <Route path="information" element={<Information />}/>
-                    <Route path="curriculum" element={<CurriculumList />}/>
+                    <Route path="information" element={<Information />} />
+                    <Route path="curriculum" element={<CurriculumList />} />
                 </Route>
-                <Route path="/teacher" element={<Teacher />}></Route>
+                <Route path="/teacher" element={<Teacher />}>
+                    <Route path="teaching-registration" element={<TeachingRegistration />} />
+                    <Route path="teaching-registration-detail" element={<TeachingRegistrationDetail />} />
+                </Route>
                 <Route path="/logout" element={<Logout />}></Route>
             </Routes>
         </BrowserRouter>
