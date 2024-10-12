@@ -13,6 +13,9 @@ import Logout from '../components/Home/Logout';
 import ModuleClass from '../components/Admin/ModuleClass/ModuleClass';
 import TeachingRegistration from '../components/Teacher/TeachingRegistration/TeachingRegistration';
 import TeachingRegistrationDetail from '../components/Teacher/TeachingRegistration/TeachingRegistrationDetail';
+import RegisterModule from '../components/Student/RegisterModule/RegisterModule';
+import RegisterModuleDetail from '../components/Student/RegisterModule/RegisterModuleDetail';
+import Grades from '../components/Teacher/Grades';
 
 const AppRouter = () => {
     return (
@@ -28,10 +31,13 @@ const AppRouter = () => {
                 <Route path="/student" element={<Student />}>
                     <Route path="information" element={<Information />} />
                     <Route path="curriculum" element={<CurriculumList />} />
+                    <Route path="register-module" element={<RegisterModule />} />
+                    <Route path="register-module-detail" element={<RegisterModuleDetail />} />
                 </Route>
                 <Route path="/teacher" element={<Teacher />}>
                     <Route path="teaching-registration" element={<TeachingRegistration />} />
                     <Route path="teaching-registration-detail" element={<TeachingRegistrationDetail />} />
+                    <Route path="grades" element={<Grades />} />
                 </Route>
                 <Route path="/logout" element={<Logout />}></Route>
             </Routes>

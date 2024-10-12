@@ -21,9 +21,69 @@ namespace backend.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetRegisteredModules(string? studentId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            var registeredClasses = await (from cr in _context.CourseRegistrations
+                                           join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
+                                           join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
+                                           join s in _context.Subjects on mc.SubjectId equals s.SubjectId
+                                           join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
+                                           from l in lecturersGroup.DefaultIfEmpty()
+                                           where cr.StudentId == studentId && cs.EndDate >= today
+                                           select new
+                                           {
+                                               mc.ModuleClassId,
+                                               cs.DayOfWeek,
+                                               cs.LessonStart,
+                                               cs.LessonEnd,
+                                               cs.ClassRoomId,
+                                               cs.StartDate,
+                                               cs.EndDate,
+                                               s.SubjectName,
+                                               s.NumberOfCredit,
+                                               l.FullName,
+                                           })
+                                   .ToListAsync();
+
+            return Ok(registeredClasses);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostCourseRegistration([FromBody] CourseRegistration courseRegistration)
         {
+            // Lấy SubjectId của lớp mà sinh viên đang cố gắng đăng ký
+            var moduleClass = await _context.ModuleClasses
+                .FirstOrDefaultAsync(mc => mc.ModuleClassId == courseRegistration.ModuleClassId);
+
+            if (moduleClass == null)
+            {
+                return NotFound($"Không tìm thấy lớp học với ID {courseRegistration.ModuleClassId}.");
+            }
+
+            // Kiểm tra xem sinh viên đã đăng ký bất kỳ lớp nào thuộc cùng môn học (SubjectId) hay chưa
+            var existingRegistration = await (from cr in _context.CourseRegistrations
+                                              join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
+                                              where cr.StudentId == courseRegistration.StudentId &&
+                                                    mc.SubjectId == moduleClass.SubjectId
+                                              select cr)
+                                              .FirstOrDefaultAsync();
+
+            if (existingRegistration != null)
+            {
+                var classSchedule = await _context.ClassSchedules
+                    .FirstOrDefaultAsync(cs => cs.ModuleClassId == courseRegistration.ModuleClassId);
+
+                var today = DateOnly.FromDateTime(DateTime.Now);
+
+                if (classSchedule?.EndDate >= today)
+                {
+                    return NotFound("Đã đăng kí học phần của môn học này.");
+                }
+            }
+
             // Kiểm tra sự xung đột lịch học
             var hasConflict = from cs1 in _context.ClassSchedules
                               where cs1.ModuleClassId == courseRegistration.ModuleClassId
@@ -73,7 +133,7 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-            
+
             existingCourseRegistration.MidtermGradePercentage = courseRegistration.MidtermGradePercentage;
             existingCourseRegistration.FinalExamGradePercentage = courseRegistration.FinalExamGradePercentage;
             existingCourseRegistration.MidtermGrade = courseRegistration.MidtermGrade;
@@ -82,6 +142,23 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCourseRegistration([FromQuery] string studentId, [FromQuery] string moduleClassId)
+        {
+            var result = await _context.CourseRegistrations
+                .FirstOrDefaultAsync(cr => cr.StudentId == studentId && cr.ModuleClassId == moduleClassId);
+
+            if (result == null)
+            {
+                return NotFound($"Không tìm thấy đăng ký của sinh viên.");
+            }
+
+            _context.CourseRegistrations.Remove(result);
+            await _context.SaveChangesAsync();
+
+            return NoContent(); 
         }
     }
 }

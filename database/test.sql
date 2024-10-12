@@ -201,6 +201,9 @@ AverageGrade10 = null, AverageGrade4 = null
 ----------------------------------------------------------------------------------------
 select *
 from ModuleClass mc, ClassSchedule cs, Subject s, Lecturer l
+where mc.ModuleClassId = cs.ModuleClassId
+and mc.SubjectId = s.SubjectId
+and mc.LecturerId = 'GV.0001'
 ------------------------------------------------------------------------------------------
 select * 
 from TrainingProgram_Course as tc, InstructionalPlan as ip, Subject as s
@@ -209,10 +212,32 @@ and tc.TrainingProgram_CourseId = ip.TrainingProgram_CourseId
 and ip.SubjectId = s.SubjectId
 
 -------------------------------------------------------------------------------------
-select * 
-from ModuleClass as mc, ClassSchedule as cs
-where mc.ModuleClassId = cs.ModuleClassId
+
+select * from ModuleClass
 
 delete ModuleClass_TrainingProgram_Course
 delete ClassSchedule
 delete ModuleClass
+
+select top 1 * from SemesterPeriod
+where GETDATE() < StartDate
+ORDER BY StartDate ASC;
+
+SELECT *
+FROM ModuleClass AS mc
+JOIN ClassSchedule AS cs ON mc.ModuleClassId = cs.ModuleClassId
+JOIN Subject AS s ON mc.SubjectId = s.SubjectId
+JOIN TrainingProgram_ModuleGroup_Subject AS ts ON ts.SubjectId = s.SubjectId
+--WHERE s.SubjectId = 'COMP1010' OR s.SubjectId is null
+where mc.SemesterId = (SELECT TOP 1 SemesterId 
+                    FROM SemesterPeriod 
+                    WHERE StartDate > GETDATE()
+                    ORDER BY StartDate ASC)
+AND cs.StartDate >= (SELECT TOP 1 StartDate 
+                    FROM SemesterPeriod 
+                    WHERE StartDate > '2024-07-05'
+                    ORDER BY StartDate ASC)
+
+select * from CourseRegistration as cr, class
+
+delete CourseRegistration where CourseRegistrationId = 2

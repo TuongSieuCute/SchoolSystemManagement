@@ -6,4 +6,9 @@ export const SidebarData = [
         icon: <GiTeacher />,
         link: "/teacher/teaching-registration"
     },
+    {
+        title: "Nhập điểm",
+        icon: <GiTeacher />,
+        link: "/teacher/grades"
+    },
 ]

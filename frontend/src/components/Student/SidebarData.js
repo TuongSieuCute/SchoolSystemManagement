@@ -11,4 +11,9 @@ export const SidebarData = [
         icon: <GiTeacher />,
         link: "/student/curriculum"
     },
+    {
+        title: "Đăng kí học phần",
+        icon: <GiTeacher />,
+        link: "/student/register-module"
+    },
 ]
