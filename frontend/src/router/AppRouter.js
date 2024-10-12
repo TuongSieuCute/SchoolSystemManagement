@@ -16,6 +16,8 @@ import TeachingRegistrationDetail from '../components/Teacher/TeachingRegistrati
 import RegisterModule from '../components/Student/RegisterModule/RegisterModule';
 import RegisterModuleDetail from '../components/Student/RegisterModule/RegisterModuleDetail';
 import Grades from '../components/Teacher/Grades';
+import SelectGrades from '../components/Student/SelectGrades';
+import TimeTable from '../components/Student/TimeTable';
 
 const AppRouter = () => {
     return (
@@ -31,6 +33,8 @@ const AppRouter = () => {
                 <Route path="/student" element={<Student />}>
                     <Route path="information" element={<Information />} />
                     <Route path="curriculum" element={<CurriculumList />} />
+                    <Route path="select-grades" element={<SelectGrades />} />
+                    <Route path="timetable" element={<TimeTable />} />
                     <Route path="register-module" element={<RegisterModule />} />
                     <Route path="register-module-detail" element={<RegisterModuleDetail />} />
                 </Route>

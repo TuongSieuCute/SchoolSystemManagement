@@ -26,27 +26,45 @@ namespace backend.Controllers
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
 
-            var registeredClasses = await (from cr in _context.CourseRegistrations
-                                           join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
-                                           join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
-                                           join s in _context.Subjects on mc.SubjectId equals s.SubjectId
-                                           join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
-                                           from l in lecturersGroup.DefaultIfEmpty()
-                                           where cr.StudentId == studentId && cs.EndDate >= today
-                                           select new
-                                           {
-                                               mc.ModuleClassId,
-                                               cs.DayOfWeek,
-                                               cs.LessonStart,
-                                               cs.LessonEnd,
-                                               cs.ClassRoomId,
-                                               cs.StartDate,
-                                               cs.EndDate,
-                                               s.SubjectName,
-                                               s.NumberOfCredit,
-                                               l.FullName,
-                                           })
-                                   .ToListAsync();
+            var query = from cr in _context.CourseRegistrations
+                        join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
+                        join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
+                        join s in _context.Subjects on mc.SubjectId equals s.SubjectId
+                        join st in _context.Students on cr.StudentId equals st.StudentId
+                        join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
+                        from l in lecturersGroup.DefaultIfEmpty()
+                        where cs.EndDate >= today
+                        select new
+                        {
+                            cr.StudentId,
+                            cr.MidtermGradePercentage,
+                            cr.FinalExamGradePercentage,
+                            cr.MidtermGrade,
+                            cr.FinalExamGrade,
+                            cr.AverageGrade10,
+                            cr.AverageGrade4,
+                            cr.Literacy,
+                            cr.IsPass,
+                            mc.ModuleClassId,
+                            cs.DayOfWeek,
+                            cs.LessonStart,
+                            cs.LessonEnd,
+                            cs.ClassRoomId,
+                            cs.StartDate,
+                            cs.EndDate,
+                            s.SubjectId,
+                            s.SubjectName,
+                            s.NumberOfCredit,
+                            FullNameStudent = st.FullName,
+                            l.FullName,
+                        };
+
+            if (!string.IsNullOrEmpty(studentId))
+            {
+                query = query.Where(cr => cr.StudentId == studentId);
+            }
+
+            var registeredClasses = await query.ToListAsync();
 
             return Ok(registeredClasses);
         }
@@ -158,7 +176,7 @@ namespace backend.Controllers
             _context.CourseRegistrations.Remove(result);
             await _context.SaveChangesAsync();
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 }
