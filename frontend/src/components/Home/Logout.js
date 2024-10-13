@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useMsal } from "@azure/msal-react"
+import { useMsal } from '@azure/msal-react';
 
 const Logout = () => {
     const { instance } = useMsal();
 
     const handleAzureLogout = () => {
         instance.logoutPopup({
-            postLogoutRedirectUri: "/",
-            mainWindowRedirectUri: "/",
+            postLogoutRedirectUri: '/',
+            mainWindowRedirectUri: '/',
         }).then(() => {
             clearLocalStorage();
         });

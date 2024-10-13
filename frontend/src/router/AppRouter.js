@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import Home from '../components/Home/Home';
 import Admin from '../components/Admin/Admin';
 import Student from '../components/Student/Student';
@@ -19,7 +19,7 @@ import Grades from '../components/Teacher/Grades';
 import SelectGrades from '../components/Student/SelectGrades';
 import TimeTable from '../components/Student/TimeTable';
 
-const AppRouter = () => {
+export const AppRouter = () => {
     return (
         <BrowserRouter>
             <Routes>
@@ -48,5 +48,3 @@ const AppRouter = () => {
         </BrowserRouter>
     );
 };
-
-export default AppRouter;

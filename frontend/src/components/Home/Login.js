@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { jwtDecode } from "jwt-decode";
+import React, { useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaLock } from "react-icons/fa";
+import { FaUser, FaLock } from 'react-icons/fa';
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
-import { loginRequest } from "../../helper/authConfig";
-import '../../index.css'
-import './Home.css'
+import { loginRequest } from '../../helper/authConfig';
+import '../../index.css';
+import './Home.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,20 +15,20 @@ const Login = () => {
     const isAuthenticated = useIsAuthenticated();
     const { accounts, instance } = useMsal();
 
-    const handleRoleNavigation = (role) => {
+    const handleRoleNavigation = useCallback((role) => {
         switch (role) {
-            case '0':
-            case 'Admin':
-                navigate('/admin');
-                break;
-            case '1':
-            case 'Teacher':
-                navigate('/teacher');
-                break;
-            default:
-                navigate('/student');
+        case '0':
+        case 'Admin':
+            navigate('/admin');
+            break;
+        case '1':
+        case 'Teacher':
+            navigate('/teacher');
+            break;
+        default:
+            navigate('/student');
         }
-    };
+    }, [navigate]);
 
     const setUserInfoAzure = (role, username) => {
         localStorage.setItem('loginMethod', 'azure');
@@ -40,22 +40,22 @@ const Login = () => {
         if (isAuthenticated && accounts.length > 0) {
 
             const roles = accounts[0]?.idTokenClaims?.roles || [];
-            
+
             if (roles.length > 0) {
                 handleRoleNavigation(roles[0]);
             }
         }
-    }, [isAuthenticated, accounts]);
-    
+    }, [isAuthenticated, accounts, handleRoleNavigation]);
+
     const handleAzureLogin = async () => {
         try {
             const loginResponse = await instance.loginPopup(loginRequest);
-            
+
             if (loginResponse.account) {
 
                 const roles = loginResponse.account.idTokenClaims?.roles || [];
                 const username = loginResponse.account.username;
-                
+
                 if (roles.length > 0) {
                     setUserInfoAzure(roles[0], username);
                     handleRoleNavigation(roles[0]);

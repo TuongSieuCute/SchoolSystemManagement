@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getUserInfoLocal, getUserInfoAzure } from '../../helper/token';
+import { getUserInfoLocal, getUserInfoAzure } from '../../helper/token.js';
 import { useMsal } from "@azure/msal-react";
 import { SidebarData } from './SidebarData.js';
-import Sidebar from '../Home/Sidebar';
+import Sidebar from '../Home/Sidebar.js';
 
 const Admin = () => {
     const [username, setUsername] = useState("");
@@ -11,12 +11,10 @@ const Admin = () => {
     useEffect(() => {
         const userInfo = getUserInfoLocal();
 
-        if (userInfo && userInfo.username) 
-        {
+        if (userInfo && userInfo.username) {
             setUsername(userInfo.username);
-        } 
-        else 
-        {
+        }
+        else {
             const azureUserInfo = getUserInfoAzure(accounts);
             if (azureUserInfo) {
                 setUsername(azureUserInfo.username);

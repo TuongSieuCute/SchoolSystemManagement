@@ -1,3 +1,13 @@
+.home-body{
+    /**
+    tính min height của body bằng 100% trừ đi tổng chiều cao của header (94.28px) và
+    footer (215.56px): 94.28px + 215.56px = 309.84px
+    */
+    min-height: calc(100vh - 309.84px);
+}
+.news-thumbnail{
+    width: 100%;
+}
 /* CSS LOGIN OPEN */
 .login-container {
     display: flex;
@@ -268,7 +278,7 @@ form button:hover {
     display: flex;
     align-items: center; 
     width: 100%;
-    color: var(--text-color);
+    /* color: var(--text-color); */
 }
 
 .sidebarList li:hover .link,

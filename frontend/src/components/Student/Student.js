@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../Home/Sidebar';
 import { getUserInfoLocal, getUserInfoAzure } from '../../helper/token';
-import { useMsal } from "@azure/msal-react";
-import { SidebarData } from './SidebarData.js'
+import { useMsal } from '@azure/msal-react';
+import { SidebarData } from './SidebarData.js';
 
 
 const Student = () => {
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState('');
     const { accounts } = useMsal();
 
     useEffect(() => {
         const userInfo = getUserInfoLocal();
 
-        if (userInfo && userInfo.username) 
-        {
+        if (userInfo && userInfo.username) {
             setUsername(userInfo.username);
-        } 
-        else 
-        {
+        } else {
             const azureUserInfo = getUserInfoAzure(accounts);
             if (azureUserInfo) {
                 setUsername(azureUserInfo.username);

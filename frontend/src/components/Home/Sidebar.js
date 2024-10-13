@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import Logout from './Logout';
-import '../../index.css'
-import './Home.css'
+import '../../index.css';
+import './Home.css';
 
 const Sidebar = (props) => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -16,7 +16,7 @@ const Sidebar = (props) => {
         return <Link to="/changePassword"></Link>;
     };
 
-    
+
     return (
         <div className="page-container">
             <div className="top-bar">
@@ -43,7 +43,7 @@ const Sidebar = (props) => {
                             {props.sidebardata?.map((value, index) => {
                                 const isActive = location.pathname === value.link;
                                 return (
-                                    <li key={index} className={isActive ? "active" : ""}>
+                                    <li key={index} className={isActive ? 'active' : ''}>
                                         <Link to={value.link} className='link'>
                                             <div className="sidebarIcon">
                                                 {value.icon}

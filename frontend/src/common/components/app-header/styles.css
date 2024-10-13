@@ -1,0 +1,11 @@
+.app-header {
+  background: var(--primary-400);
+}
+
+.app-header .image-logo {
+  width: 8rem;
+}
+
+.app-header a {
+  color: var(--primary-color-text);
+}

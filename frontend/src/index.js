@@ -5,14 +5,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from './helper/authConfig';
+import { PrimeReactProvider } from 'primereact/api';
 import { MsalProvider } from '@azure/msal-react';
 const msalInstance = new PublicClientApplication(msalConfig);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <MsalProvider instance={msalInstance}>
-      <App />
-    </MsalProvider>
+    <PrimeReactProvider>
+      <MsalProvider instance={msalInstance}>
+        <App />
+      </MsalProvider>
+    </PrimeReactProvider>
   </React.StrictMode>
 );
 
