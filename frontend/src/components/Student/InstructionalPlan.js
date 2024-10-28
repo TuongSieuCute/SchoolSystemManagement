@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';
+import { FloatLabel } from 'primereact/floatlabel';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { getUserInfoLocal } from '../../helper/token';
@@ -102,12 +103,16 @@ const InstructionalPlan = () => {
 
     return (
         <div>
+            <h1>Chương trình đào tạo</h1>
             <div>
-                <Dropdown
-                    value={defaultDropdown}
-                    options={dropdownOptions}
-                    onChange={(e) => setDefaultDropdown(e.value)}
-                />
+                <FloatLabel>
+                    <Dropdown
+                        value={defaultDropdown}
+                        options={dropdownOptions}
+                        onChange={(e) => setDefaultDropdown(e.value)}
+                    />
+                    <label htmlFor="defaultDropdown">Chương trình đào tạo</label>
+                </FloatLabel>
             </div>
             <div>
                 {Object.keys(subjectSemester)
