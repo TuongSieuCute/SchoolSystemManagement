@@ -5,13 +5,13 @@ namespace backend.Models;
 
 public partial class TrainingProgramModuleGroupSubject
 {
-    public int? TrainingProgramModuleGroupId { get; set; }
+    public string? TrainingProgramModuleGroupId { get; set; }
 
     public string? SubjectId { get; set; }
 
-    public string? SubjectType { get; set; }
+    public string? SemesterId { get; set; }
 
-    public bool? IsCreditGpa { get; set; }
+    public virtual Semester? Semester { get; set; }
 
     public virtual Subject? Subject { get; set; }
 

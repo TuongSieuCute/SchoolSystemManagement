@@ -9,7 +9,7 @@ export const SidebarData = [
     {
         title: "Chương trình đào tạo",
         icon: <GiTeacher />,
-        link: "/student/curriculum"
+        link: "/student/instructionalPlan"
     },
     {
         title: "Thời khóa biểu",

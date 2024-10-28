@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
+// import 'primereact/resources/themes/saga-blue/theme.css';
+// import 'primereact/resources/primereact.min.css';
+import { Button } from 'primereact/button';
+import { InputNumber } from 'primereact/inputnumber';
+import { Dialog } from 'primereact/dialog';
+import { Chip } from 'primereact/chip';
+import { InputText } from 'primereact/inputtext';
+import { DataTable, } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+const AddModuleClass = ({ visible, toggleModalInsert }) => {
 
-const AddModuleClass = ( {toggleModalInsert} ) => {
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [trainingProgramCourseIds, setTrainingProgramCourseIds] = useState([]);
     const [selectedTrainingProgramCourseId, setSelectedTrainingProgramCourseId] = useState([]);
@@ -20,7 +27,7 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
         { id: 'HK1', name: 'Học kì 1' },
         { id: 'HK2', name: 'Học kì 2' },
         { id: 'HKH', name: 'Học kì hè' },
-    ]
+    ];
 
     const daysAWeek = ['1', '2'];
     const lessonsPerDay = ['3', '4', '5', '6'];
@@ -40,7 +47,7 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
                 }
             })
             .catch(err => console.error('Lỗi khi gọi API:', err));
-    }, [])
+    }, []);
 
     useEffect(() => {
         const trainingProgramCourseIdsString = selectedTrainingProgramCourseId.join(',');
@@ -50,15 +57,17 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
             .then(data => {
                 if (Array.isArray(data)) {
                     setSubjects(data.map(item => ({
-                        label: item.subjectName,
-                        value: item.subjectId
+                        label: `${item.subjectId} - ${item.subjectName}`,
+                        value: item,
+                        name: item.subjectName,
+                        id: item.subjectId,
                     })));
                 } else {
                     console.error('Dữ liệu trả về không hợp lệ:', data);
                 }
             })
             .catch(err => console.error('Lỗi khi gọi API:', err));
-    }, [selectedTrainingProgramCourseId])
+    }, [selectedTrainingProgramCourseId]);
 
     const handleSelectTrainingProgramCourseId = (e) => {
         const value = e.value;
@@ -79,7 +88,6 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
 
     const handleSelectSubject = (e) => {
         const value = e.value;
-
         if (selectedSubjects.includes(value)) {
             return;
         }
@@ -96,7 +104,7 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
     };
 
     const handleRemoveSubject = (id) => {
-        setSelectedSubjects(selectedSubjects.filter(existingId => existingId !== id));
+        setSelectedSubjects(selectedSubjects.filter(subject => subject.subjectId !== id));
 
         const newQuantities = { ...quantities };
         delete newQuantities[id];
@@ -128,7 +136,7 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
             });
 
             if (response.ok) {
-                alert("Thêm lớp học phần thành công!");
+                alert('Thêm lớp học phần thành công!');
                 const result = await response.json();
                 console.log('Success:', result);
             } else {
@@ -140,137 +148,140 @@ const AddModuleClass = ( {toggleModalInsert} ) => {
         }
     };
 
-    return (
+
+    const renderModalFooter = (
         <div>
-            <h1>Thêm lớp học phần:</h1>
-            <div>
-                <label>Học kì:</label>
-                <Dropdown
-                    value={selectedSemester}
-                    options={semester.map(s => ({ label: s.name, value: s.id }))}
-                    onChange={(e) => setSelectedSemester(e.target.value)}
-                    appendTo="self"
-                    required
-                />
-            </div>
+            <Button onClick={postData}>Thêm </Button>
+            <Button onClick={toggleModalInsert}>Thoát</Button>
+        </div>
+    );
 
-            <div>
-                <label>Chương trình đào tạo</label>
-                <Dropdown
-                    value={selectedTrainingProgramCourseId}
-                    options={trainingProgramCourseIds}
-                    onChange={handleSelectTrainingProgramCourseId}
-                    appendTo="self"
-                    required
-                />
+    return (
+        <Dialog visible={visible} header="Thêm lớp học phần" footer={renderModalFooter} className="w-6">
+            <div className="formgrid">
+                <div className="field">
+                    <label htmlFor='hocKy'>Học kì:
+                    </label>
+                    <Dropdown
+                        value={selectedSemester}
+                        options={semester.map(s => ({ label: s.name, value: s.id }))}
+                        onChange={(e) => setSelectedSemester(e.target.value)}
+                        className='w-full'
+                        required
+                        name='hocKy'
+                    />
+                </div>
 
-                {selectedTrainingProgramCourseId.length > 0 && (
-                    <div>
-                        <ul>
+                <div className="field">
+                    <label htmlFor="chuongTrinhDaoTao">Chương trình đào tạo</label>
+                    <Dropdown
+                        value={selectedTrainingProgramCourseId}
+                        options={trainingProgramCourseIds}
+                        onChange={handleSelectTrainingProgramCourseId}
+                        appendTo="self"
+                        required
+                        className='w-full'
+                        name="chuongTrinhDaoTao"
+                    />
+
+                    {selectedTrainingProgramCourseId.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-2">
                             {selectedTrainingProgramCourseId.map((item, index) => (
-                                <li key={index}>
-                                    {item}
-                                    <button onClick={() => handleRemoveTrainingProgramCourseId(item)}>x</button>
-                                </li>
+                                <Chip key={index} label={item} removable onRemove={() => handleRemoveTrainingProgramCourseId(item)} />
                             ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-
-            <div>
-                <label>Học phần:</label>
-                <Dropdown
-                    value={selectedSubjects}
-                    options={subjects}
-                    onChange={handleSelectSubject}
-                    appendTo="self"
-                    required
-                    itemTemplate={(item) => (
-                        <div>
-                            {item.value} - {item.label}
                         </div>
                     )}
-                />
+                </div>
 
-                {selectedSubjects.length > 0 && (
-                    <div>
-                        <ul>
-                            {selectedSubjects.map((item, index) => {
-                                const subject = subjects.find(s => s.value === item);
-                                return (
-                                    <li key={index}>
-                                        {subject ? `${subject.value} - ${subject.label}` : item}
-                                        <input
-                                            type="number"
-                                            value={quantities[item] || 1}
-                                            onChange={(e) => handleQuantityChange(item, e.target.value)}
-                                        />
-                                        <button onClick={() => handleRemoveSubject(item)}>x</button>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                )}
+                <div className="field">
+                    <label>Học phần:</label>
+                    <Dropdown
+                        value={selectedSubjects}
+                        options={subjects}
+                        optionLabel='label'
+                        onChange={handleSelectSubject}
+                        appendTo="self"
+                        className='w-full'
+                        required
+                    />
+                    {
+                        selectedSubjects.length > 0 && (
+                            <DataTable value={selectedSubjects} className="w-full mt-2">
+                                <Column field="subjectId" header="Mã học phần" />
+                                <Column field="subjectName" header="Tên học phần" />
+                                <Column header="Số lượng lớp" body={(rowData) => (
+                                    <InputNumber max={60} min={1} value={quantities[rowData.subjectId]} onChange={(e) => handleQuantityChange(rowData.subjectId, e.value)} />
+                                )} />
+                                <Column body={(rowData) => (
+                                    <Button icon="pi pi-times" severity='danger' onClick={() => handleRemoveSubject(rowData.subjectId)} />
+                                )} />
+                            </DataTable>
+                        )
+                    }
+                </div>
+
+                <div className="field">
+                    <label>Số lượng tuần học:</label>
+                    <InputText
+                        type='number'
+                        value={numberOfWeek !== null ? numberOfWeek : ''}
+                        onChange={(e) => setNumberOfWeek(e.target.value)}
+                        min="0"
+                        required
+                        className='w-full'
+                    />
+                </div>
+
+                <div className="field">
+                    <label>Số ngày học trong 1 tuần:</label>
+                    <Dropdown
+                        value={selectedDayAWeek}
+                        options={daysAWeek}
+                        onChange={(e) => setSelectedDayAWeek(e.target.value)}
+                        appendTo="self"
+                        className='w-full'
+                        required
+                    />
+                </div>
+
+                <div className="field">
+                    <label>Số tiết học trong 1 ngày:</label>
+                    <Dropdown
+                        value={selectedLessonPerday}
+                        options={lessonsPerDay}
+                        onChange={(e) => setSelectedLessonPerday(e.target.value)}
+                        appendTo="self"
+                        required
+                        className='w-full'
+                    />
+                </div>
+
+                <div className="field">
+                    <label>Loại phòng học:</label>
+                    <Dropdown
+                        value={selectedRoomType}
+                        options={roomType}
+                        onChange={(e) => setSelectedRoomType(e.target.value)}
+                        appendTo="self"
+                        className='w-full'
+                    />
+                </div>
+
+                <div className="field">
+                    <label>Số lượng sinh viên tối đa:</label>
+                    <InputText
+                        type='number'
+                        value={maximumNumberOfStudent !== null ? maximumNumberOfStudent : ''}
+                        onChange={(e) => setMaximumNumberOfStudent(e.target.value)}
+                        min="0"
+                        className='w-full'
+                        required
+                    />
+                </div>
             </div>
 
-            <div>
-                <label>Số lượng tuần học:</label>
-                <input
-                    type='number'
-                    value={numberOfWeek !== null ? numberOfWeek : ""}
-                    onChange={(e) => setNumberOfWeek(e.target.value)}
-                    min="0"
-                    required
-                />
-            </div>
+        </Dialog>
 
-            <div>
-                <label>Số ngày học trong 1 tuần:</label>
-                <Dropdown
-                    value={selectedDayAWeek}
-                    options={daysAWeek}
-                    onChange={(e) => setSelectedDayAWeek(e.target.value)}
-                    appendTo="self"
-                    required
-                />
-            </div>
-
-            <div>
-                <label>Số tiết học trong 1 ngày:</label>
-                <Dropdown
-                    value={selectedLessonPerday}
-                    options={lessonsPerDay}
-                    onChange={(e) => setSelectedLessonPerday(e.target.value)}
-                    appendTo="self"
-                    required
-                />
-            </div>
-
-            <div>
-                <label>Loại phòng học:</label>
-                <Dropdown
-                    value={selectedRoomType}
-                    options={roomType}
-                    onChange={(e) => setSelectedRoomType(e.target.value)}
-                    appendTo="self"
-                />
-            </div>
-
-            <div>
-                <label>Số lượng sinh viên tối đa:</label>
-                <input
-                    type='number'
-                    value={maximumNumberOfStudent !== null ? maximumNumberOfStudent : ""}
-                    onChange={(e) => setMaximumNumberOfStudent(e.target.value)}
-                    min="0"
-                    required
-                />
-            </div>
-            <button onClick={postData}>Thêm lớp học phần</button>
-            <button onClick={toggleModalInsert}>Thoát</button>
-        </div >
     );
 };
 

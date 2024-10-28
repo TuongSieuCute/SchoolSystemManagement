@@ -43,7 +43,7 @@ public partial class Student
 
     public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; } = new List<CourseRegistration>();
 
-    public virtual ICollection<CumulativePoint> CumulativePoints { get; set; } = new List<CumulativePoint>();
+    public virtual CumulativePoint? CumulativePoint { get; set; }
 
     public virtual StudentClass? StudentClass { get; set; }
 

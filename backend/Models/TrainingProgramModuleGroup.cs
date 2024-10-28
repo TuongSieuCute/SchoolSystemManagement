@@ -5,7 +5,7 @@ namespace backend.Models;
 
 public partial class TrainingProgramModuleGroup
 {
-    public int TrainingProgramModuleGroupId { get; set; }
+    public string TrainingProgramModuleGroupId { get; set; } = null!;
 
     public byte? NumberOfElectiveCredits { get; set; }
 

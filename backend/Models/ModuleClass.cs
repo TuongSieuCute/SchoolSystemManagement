@@ -6,7 +6,7 @@ namespace backend.Models;
 
 public partial class ModuleClass
 {
-    public string? ModuleClassId { get; set; }
+    public string ModuleClassId { get; set; } = null!;
 
     public byte? MaximumNumberOfStudents { get; set; }
 

@@ -11,9 +11,9 @@ public partial class Subject
 
     public byte? NumberOfCredit { get; set; }
 
-    public string? DepartmentId { get; set; }
+    public string? SubjectType { get; set; }
 
-    public virtual Department? Department { get; set; }
+    public bool? IsCreditGpa { get; set; }
 
     public virtual ICollection<ModuleClass> ModuleClasses { get; set; } = new List<ModuleClass>();
 }

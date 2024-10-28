@@ -27,11 +27,13 @@ public partial class CourseRegistration
 
     public string? ModuleClassId { get; set; }
 
-    public string? CumulativePointId { get; set; }
+    public string? TuitionFeesId { get; set; }
 
-    public virtual CumulativePoint? CumulativePoint { get; set; }
+    public decimal? Total { get; set; }
 
     public virtual ModuleClass? ModuleClass { get; set; }
 
     public virtual Student? Student { get; set; }
+
+    public virtual TuitionFee? TuitionFees { get; set; }
 }

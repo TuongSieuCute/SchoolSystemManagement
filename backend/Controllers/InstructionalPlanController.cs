@@ -23,21 +23,28 @@ namespace backend.Controllers
         [HttpGet("{studentId}")]
         public IActionResult GetInstructionalPlan(string studentId)
         {
-            var query = from s in _context.Students
-                        join i in _context.InstructionalPlans on s.StudentId equals studentId
-                        join se in _context.Semesters on i.SemesterId equals se.SemesterId
-                        join su in _context.Subjects on i.SubjectId equals su.SubjectId
-                        join tms in _context.TrainingProgramModuleGroupSubjects on su.SubjectId equals tms.SubjectId
+            var query = from tcs in _context.TrainingProgramCourseStudents
+                        join tc in _context.TrainingProgramCourses on tcs.TrainingProgramCourseId equals tc.TrainingProgramCourseId
+                        join t in _context.TrainingPrograms on tc.TrainingProgramId equals t.TrainingProgramId
+                        join tm in _context.TrainingProgramModuleGroups on t.TrainingProgramId equals tm.TrainingProgramId
+                        join tms in _context.TrainingProgramModuleGroupSubjects on tm.TrainingProgramModuleGroupId equals tms.TrainingProgramModuleGroupId
+                        join su in _context.Subjects on tms.SubjectId equals su.SubjectId
+                        join se in _context.Semesters on tms.SemesterId equals se.SemesterId
+                        join m in _context.ModuleGroups on tm.ModuleGroupId equals m.ModuleGroupId
+                        where tcs.StudentId == studentId
                         select new
                         {
+                            t.TrainingProgramName,
+                            se.SemesterId,
                             se.SemesterName,
-                            su.SubjectId,
+                            su.SubjectId, 
                             su.SubjectName,
                             su.NumberOfCredit,
-                            tms.SubjectType,
-                            tms.IsCreditGpa,
-                            i.TrainingProgramCourseId,
-                            s.FullName
+                            su.SubjectType,
+                            su.IsCreditGpa,
+                            tm.TrainingProgramModuleGroupId,
+                            tm.NumberOfElectiveCredits,
+                            m.ModuleGroupId
                         };
 
             if (query == null)

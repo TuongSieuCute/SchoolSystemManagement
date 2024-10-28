@@ -34,7 +34,7 @@ a {
   text-decoration: none;
   /* color: var(--text-color); */
 }
-
+/* 
 .modal, .overlay {
     display: flex;
     align-items: center;
@@ -52,7 +52,7 @@ a {
 .overlay {
     position: relative;
     background-color: var(--modal-color);
-}
+} 
 
 .modal-content {
     background-color: var(--background-color);
@@ -64,4 +64,4 @@ a {
     position: relative;
     z-index: 1400;
     height: 500px;
-}
+}*/

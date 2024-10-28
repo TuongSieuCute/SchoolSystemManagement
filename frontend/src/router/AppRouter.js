@@ -5,7 +5,7 @@ import Admin from '../components/Admin/Admin';
 import Student from '../components/Student/Student';
 import Information from '../components/Student/Information/Information';
 import Teacher from '../components/Teacher/Teacher';
-import CurriculumList from '../components/Student/Curriculum/CurriculumList';
+import InstructionalPlan from '../components/Student/InstructionalPlan';
 import Login from '../components/Home/Login';
 import ClassRoom from '../components/Admin/ClassRoom';
 import ChangePassword from '../components/Home/ChangePassword';
@@ -32,7 +32,7 @@ export const AppRouter = () => {
                 </Route>
                 <Route path="/student" element={<Student />}>
                     <Route path="information" element={<Information />} />
-                    <Route path="curriculum" element={<CurriculumList />} />
+                    <Route path="instructionalPlan" element={<InstructionalPlan />} />
                     <Route path="select-grades" element={<SelectGrades />} />
                     <Route path="timetable" element={<TimeTable />} />
                     <Route path="register-module" element={<RegisterModule />} />
