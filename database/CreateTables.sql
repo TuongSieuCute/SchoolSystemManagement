@@ -283,3 +283,4 @@ CREATE TABLE CourseRegistration
 	FOREIGN KEY(ModuleClassId) REFERENCES ModuleClass(ModuleClassId),
     FOREIGN KEY(TuitionFeesId) REFERENCES TuitionFees(TuitionFeesId),
 )
+use master

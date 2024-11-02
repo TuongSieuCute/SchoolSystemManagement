@@ -295,7 +295,8 @@ INSERT INTO TrainingProgram_Course(TrainingProgramId, CourseId) VALUES
 ('CTXH.2021', 'K50')
 
 INSERT INTO TrainingProgram_Course_Student(TrainingProgram_CourseId, StudentId) VALUES
-('K47.CNTT.2021', '47.01.104.233')
+('K47.CNTT.2021', '47.01.104.233'),
+('K47.GDMN.2021', '47.01.104.233')
 
 INSERT INTO TrainingProgram_ModuleGroup(NumberOfElectiveCredits, TrainingProgramId, ModuleGroupId) VALUES
 (2, 'GDMN.2021', 'NHP1'), 
@@ -793,15 +794,15 @@ INSERT INTO ModuleClass(ModuleClassId, MaximumNumberOfStudents, LecturerId, Subj
 ('PSYC1001001', 40, null, 'PSYC1001', 'HK1')
 
 INSERT INTO ClassSchedule(ModuleClassId, DayOfWeek, LessonStart, LessonEnd, NumberOfWeek, StartDate, EndDate, ClassRoomId) VALUES
-('COMP1010001', N'Thứ hai', 2, 6, 10, '2021-09-06', '2021-11-08', 'I.102'),
-('COMP1800001', N'Thứ hai', 7, 11, 10, '2021-09-06', '2021-11-08', 'B.101'),
-('COMP1801001', N'Thứ ba', 2, 6, 10, '2021-09-07', '2021-11-09', 'B.102'),
-('COMP1802001', N'Thứ ba', 7, 11, 10, '2021-09-07', '2021-11-09', 'I.103'),
-('MILI2701001', N'Thứ tư', 1, 6, 5, '2021-09-08', '2021-10-06', 'B.103'),
-('PHYL2401001', N'Thứ tư', 7, 12, 10, '2021-09-08', '2021-11-10', 'CV.LTR'),
-('POLI1903001', N'Thứ năm', 1, 6, 5, '2021-09-09', '2021-10-07', 'B.104'),
-('POLI2001001', N'Thứ năm', 7, 12, 5, '2021-09-09', '2021-10-07', 'B.105'),
-('PSYC1001001', N'Thứ sáu', 1, 6, 5, '2021-09-10', '2021-10-08', 'B.201')
+('COMP1010001', N'Thứ hai', 2, 6, 10, '2021-09-06', '2021-11-08', 'I.102'),
+('COMP1800001', N'Thứ hai', 7, 11, 10, '2021-09-06', '2021-11-08', 'B.101'),
+('COMP1801001', N'Thứ ba', 2, 6, 10, '2021-09-07', '2021-11-09', 'B.102'),
+('COMP1802001', N'Thứ ba', 7, 11, 10, '2021-09-07', '2021-11-09', 'I.103'),
+('MILI2701001', N'Thứ tư', 1, 6, 5, '2021-09-08', '2021-10-06', 'B.101'),
+('PHYL2401001', N'Thứ tư', 7, 12, 10, '2021-09-08', '2021-11-10', 'CV.LTR'),
+('POLI1903001', N'Thứ năm', 1, 6, 5, '2021-09-09', '2021-10-07', 'B.102'),
+('POLI2001001', N'Thứ năm', 7, 12, 5, '2021-09-09', '2021-10-07', 'B.105'),
+('PSYC1001001', N'Thứ sáu', 1, 6, 5, '2021-09-10', '2021-10-08', 'B.101')
 
 INSERT INTO ModuleClass_TrainingProgram_Course(ModuleClassId, TrainingProgram_CourseId) VALUES
 ('COMP1010001', 'K47.CNTT.2021'),
