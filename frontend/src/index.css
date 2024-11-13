@@ -30,6 +30,8 @@ body {
 .sidebar-container {
     background-color: var(--bg-header-sidebar); 
     color: var(--cl-text-white);
+    transition: max-width 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
 }
 
 .sidebar-link {
@@ -37,12 +39,19 @@ body {
 }
 
 .sidebar-link:hover,
-.sidebar-link.active {
-    background-color: var(--bg-menu-highlight);
-}
-
+.sidebar-link.active,
 .list-bottom:hover {
     background-color: var(--bg-menu-highlight);
+    font-weight: 600;
+}
+
+.sidebar-open {
+    margin-left: 276px;
+}
+
+.sidebar-close {
+    margin-left: 100px;
+    transition: margin-left 0.3s ease;
 }
 
 /* 

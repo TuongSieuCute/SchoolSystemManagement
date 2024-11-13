@@ -1,76 +1,21 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import Logout from './Logout';
+import { NavLink, Outlet } from 'react-router-dom';
+import { Tooltip } from 'primereact/tooltip';
 import '../../index.css';
-// import './Home.css';
 
 const Sidebar = (props) => {
-    // const [dropdownVisible, setDropdownVisible] = useState(false);
-    // const location = useLocation();
+    const [isOpen, setIsOpen] = useState(true);
 
-    // const toggleDropdown = () => {
-    //     setDropdownVisible(!dropdownVisible);
-    // };
-
-    // const handleChangePassword = () => {
-    //     return <Link to="/changePassword"></Link>;
-    // };
-
-
-    // return (
-    //     <div className="page-container">
-    //         <div className="top-bar">
-    //             <div className="user-profile" onClick={toggleDropdown}>
-    //                 <div className="user-avatar"></div>
-    //                 <span className="user-name">{props.username}</span>
-    //             </div>
-    //             {dropdownVisible && (
-    //                 <div className="dropdown-menu">
-    //                     <ul>
-    //                         <li onClick={handleChangePassword}>Đổi mật khẩu</li>
-    //                         <Logout />
-    //                     </ul>
-    //                 </div>
-    //             )}
-    //         </div>
-    //         <div className="content-wrapper">
-    //             <div className="sidebar-container">
-    //                 <div className="sidebar-box">
-    //                     <div className="logo">
-    //                         <img src='/Images/logoHcmue.png' alt='logo Hcmue' />
-    //                     </div>
-    //                     <ul className="sidebarList">
-    //                         {props.sidebardata?.map((value, index) => {
-    //                             const isActive = location.pathname === value.link;
-    //                             return (
-    //                                 <li key={index} className={isActive ? 'active' : ''}>
-    //                                     <Link to={value.link} className='link'>
-    //                                         <div className="sidebarIcon">
-    //                                             {value.icon}
-    //                                         </div>
-    //                                         <div className="sidebarTitle">
-    //                                             {value.title}
-    //                                         </div>
-    //                                     </Link>
-    //                                 </li>
-    //                             );
-    //                         })}
-    //                     </ul>
-    //                 </div>
-    //             </div>
-    //             <div className="main-content">
-    //                 <Outlet />
-    //             </div>
-    //         </div>
-    //     </div>
-    // );
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
 
     return (
         <div>
-            <div className='w-16rem h-screen pt-4 fixed top-0 left-0 z-1 flex flex-column sidebar-container'>
+            <div className={`${isOpen ? 'w-16rem' : 'w-5rem'} h-screen pt-4 fixed top-0 left-0 z-1 flex flex-column sidebar-container`}>
                 <div className='flex flex-column md:flex-row justify-content pl-4'>
-                    <i className='pi pi-bars text-2xl'></i>
-                    <span className='pl-3 text-base font-bold'>Sư Phạm Hồ Chí Minh</span>
+                    <i className='pi pi-bars text-2xl cursor-pointer' onClick={toggleSidebar}></i>
+                    {isOpen && <span className='pl-3 text-base font-bold'>Sư Phạm Hồ Chí Minh</span>}
                 </div>
                 <div className='flex-1 p-2'>
                     <ul className='list-none pl-0'>
@@ -82,39 +27,73 @@ const Sidebar = (props) => {
                                         activeClassName="active"
                                         className='flex flex-column md:flex-row justify-content no-underline px-3 pt-2 mr-2 mt-2 border-round-xl sidebar-link'
                                     >
-                                        <div className='text-2xl'>
-                                            {value.icon}
-                                        </div>
-                                        <div className='pl-3 text-base'>
-                                            {value.title}
-                                        </div>
+                                        {isOpen ? (
+                                            <>
+                                                <div className='text-2xl'>{value.icon}</div>
+                                                <div className='pl-3 text-base'>{value.title}</div>
+                                            </>
+                                        ) : (
+                                            <div className='relative'>
+                                                <Tooltip target=".custom-target-icon" />
+                                                <i
+                                                    className='text-2xl cursor-pointer custom-target-icon'
+                                                    data-pr-tooltip={value.title}
+                                                >
+                                                    {value.icon}
+                                                </i>
+                                            </div>
+                                        )}
                                     </NavLink>
                                 </li>
                             );
                         })}
                     </ul>
                 </div>
-                <ul className='flex flex-column p-3 list-none pl-2 mr-2'>
-                    <li className='flex align-items-center mb-3'>
+                <ul className='flex flex-column p-3 list-none pl-2 mr-1'>
+                    <li className='flex align-items-center mb-2 pl-2'>
                         <div className='w-3rem h-3rem border-circle border-2 border-white flex justify-content-center align-items-center'>
                             <i className='pi pi-user text-3xl'></i>
                         </div>
-                        <span className='pl-2'>Nguyễn Cát Tường</span>
+                        {isOpen && <span className='pl-2'>Nguyễn Cát Tường</span>}
                     </li>
 
-                    <li className='flex align-items-center mb-3 pl-2 py-2 border-round-xl list-bottom'>
-                        <i className='pi pi-key text-2xl'></i>
-                        <span className='pl-3 text-base'>Đổi mật khẩu</span>
+                    <li className='flex align-items-center mb-2 pl-3 py-2 border-round-xl cursor-pointer list-bottom'>
+                        {isOpen ? (
+                            <>
+                                <i className='pi pi-key text-2xl'></i>
+                                <span className='pl-3 text-base'>Đổi mật khẩu</span>
+                            </>
+                        ) : (
+                            <div className='relative'>
+                                <Tooltip target=".custom-target-icon" />
+                                <i
+                                    className='pi pi-key text-2xl cursor-pointer custom-target-icon'
+                                    data-pr-tooltip='Đổi mật khẩu'
+                                ></i>
+                            </div>
+                        )}
                     </li>
 
-                    <li className='flex align-items-center pl-2 py-2 border-round-xl list-bottom'>
-                        <i className='pi pi-sign-out text-2xl'></i>
-                        <span className='pl-3 text-base'>Đăng xuất</span>
+                    <li className='flex align-items-center pl-3 py-2 border-round-xl cursor-pointer list-bottom'>
+                        {isOpen ? (
+                            <>
+                                <i className='pi pi-sign-out text-2xl'></i>
+                                <span className='pl-3 text-base'>Đăng xuất</span>
+                            </>
+                        ) : (
+                            <div className='relative'>
+                                <Tooltip target=".custom-target-icon" />
+                                <i
+                                    className='pi pi-sign-out text-2xl cursor-pointer custom-target-icon'
+                                    data-pr-tooltip='Đăng xuất'
+                                ></i>
+                            </div>
+                        )}
                     </li>
                 </ul>
 
             </div>
-            <div className=''>
+            <div className={`${isOpen ? 'sidebar-open' : 'sidebar-close'}`}>
                 <Outlet />
             </div>
         </div>
