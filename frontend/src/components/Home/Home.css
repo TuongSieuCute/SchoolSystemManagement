@@ -175,7 +175,7 @@ form button:hover {
     position: relative;
 }
 
-.user-profile {
+/* .user-profile {
     display: flex;
     align-items: center;
     margin-right: 20px;
@@ -192,7 +192,7 @@ form button:hover {
 
 .user-name {
     font-weight: bold;
-}
+} */
 
 .dropdown-menu {
     position: absolute; 
@@ -226,7 +226,7 @@ form button:hover {
     height: calc(100vh - 70px); 
 }
 
-.sidebar-container {
+/* .sidebar-container {
     background-color: var(--background-color);
     width: 250px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -236,7 +236,7 @@ form button:hover {
     top: 0; 
     left: 0;
     z-index: 1100;
-}
+} */
 
 .sidebar-box {
     display: flex;

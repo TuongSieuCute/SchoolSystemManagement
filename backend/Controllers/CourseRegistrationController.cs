@@ -24,16 +24,16 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRegisteredModules(string? studentId)
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-
             var query = from cr in _context.CourseRegistrations
                         join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
                         join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
                         join s in _context.Subjects on mc.SubjectId equals s.SubjectId
+                        join tms in _context.TrainingProgramModuleGroupSubjects on s.SubjectId equals tms.SubjectId
+                        join tm in _context.TrainingProgramModuleGroups on tms.TrainingProgramModuleGroupId equals tm.TrainingProgramModuleGroupId
+                        join t in _context.TrainingPrograms on tm.TrainingProgramId equals t.TrainingProgramId
                         join st in _context.Students on cr.StudentId equals st.StudentId
                         join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
                         from l in lecturersGroup.DefaultIfEmpty()
-                        where cs.EndDate >= today
                         select new
                         {
                             cr.StudentId,
@@ -55,7 +55,10 @@ namespace backend.Controllers
                             s.SubjectId,
                             s.SubjectName,
                             s.NumberOfCredit,
+                            s.IsCreditGpa,
                             FullNameStudent = st.FullName,
+                            t.TrainingProgramId,
+                            t.TrainingProgramName,
                             l.FullName,
                         };
 

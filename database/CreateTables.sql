@@ -159,15 +159,6 @@ CREATE TABLE TrainingProgram_Course
 	FOREIGN KEY(CourseId) REFERENCES Course(CourseId),
 )
 
-CREATE TABLE TrainingProgram_Course_Student
-(
-    TrainingProgram_CourseId VARCHAR(20),
-    StudentId VARCHAR(20),
-
-	FOREIGN KEY(TrainingProgram_CourseId) REFERENCES TrainingProgram_Course(TrainingProgram_CourseId),
-	FOREIGN KEY(StudentId) REFERENCES Student(StudentId),
-)
-
 CREATE TABLE TrainingProgram_ModuleGroup
 (
     TrainingProgram_ModuleGroupId VARCHAR(20) PRIMARY KEY,
@@ -215,11 +206,9 @@ CREATE TABLE ModuleClass
     MaximumNumberOfStudents TINYINT, -- So luong sinh vien toi da
     LecturerId VARCHAR(20),
     SubjectId VARCHAR(20),
-    SemesterId VARCHAR(20),
 
 	FOREIGN KEY(LecturerId) REFERENCES Lecturer(LecturerId),
 	FOREIGN KEY(SubjectId) REFERENCES Subject(SubjectId),
-	FOREIGN KEY(SemesterId) REFERENCES Semester(SemesterId),
 )
 
 CREATE TABLE ClassSchedule
@@ -238,20 +227,12 @@ CREATE TABLE ClassSchedule
 	FOREIGN KEY(ClassRoomId) REFERENCES ClassRoom(ClassRoomId),
 )
 
-CREATE TABLE ModuleClass_TrainingProgram_Course
-(
-	ModuleClass_TrainingProgram_CourseId INT IDENTITY(1,1) PRIMARY KEY, 
-	ModuleClassId VARCHAR(20),
-	TrainingProgram_CourseId VARCHAR(20),
-
-	FOREIGN KEY(ModuleClassId) REFERENCES ModuleClass(ModuleClassId),
-	FOREIGN KEY(TrainingProgram_CourseId) REFERENCES TrainingProgram_Course(TrainingProgram_CourseId),
-)
-
 -- Diem tich luy
 CREATE TABLE CumulativePoint
 (
-    CumulativePointId VARCHAR(20) PRIMARY KEY, -- MSSV
+    CumulativePointId INT IDENTITY(1,1) PRIMARY KEY, 
+	TrainingProgram_CourseId VARCHAR(20),
+	StudentId VARCHAR(20),
     TotalCredit TINYINT, -- Tong so tin chi dang ki
 	CreditPass TINYINT, -- So tin chi dat
 	CreditFall TINYINT, -- So tin chi rot
@@ -259,7 +240,8 @@ CREATE TABLE CumulativePoint
 	CumulativeAverageGrade10 DECIMAL(3,1), -- Diem TB tich luy he 10
 	CumulativeAverageGrade4 DECIMAL(2,1), -- Diem TB tich luy he 4
 
-	FOREIGN KEY(CumulativePointId) REFERENCES Student(StudentId),
+	FOREIGN KEY(TrainingProgram_CourseId) REFERENCES TrainingProgram_Course(TrainingProgram_CourseId),
+	FOREIGN KEY(StudentId) REFERENCES Student(StudentId),
 )
 
 -- Bang Dang ki hoc phan
@@ -283,4 +265,3 @@ CREATE TABLE CourseRegistration
 	FOREIGN KEY(ModuleClassId) REFERENCES ModuleClass(ModuleClassId),
     FOREIGN KEY(TuitionFeesId) REFERENCES TuitionFees(TuitionFeesId),
 )
-use master

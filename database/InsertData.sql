@@ -294,10 +294,6 @@ INSERT INTO TrainingProgram_Course(TrainingProgramId, CourseId) VALUES
 ('CNTT.2021', 'K50'),
 ('CTXH.2021', 'K50')
 
-INSERT INTO TrainingProgram_Course_Student(TrainingProgram_CourseId, StudentId) VALUES
-('K47.CNTT.2021', '47.01.104.233'),
-('K47.GDMN.2021', '47.01.104.233')
-
 INSERT INTO TrainingProgram_ModuleGroup(NumberOfElectiveCredits, TrainingProgramId, ModuleGroupId) VALUES
 (2, 'GDMN.2021', 'NHP1'), 
 (2, 'GDMN.2021', 'NHP2'),
@@ -782,16 +778,16 @@ INSERT INTO ClassRoom(ClassRoomId, Sector, Floor, RoomType, Capacity) VALUES
 
 ('CV.LTR', null, null, N'Công viên Lê Thị Riêng', null)
 
-INSERT INTO ModuleClass(ModuleClassId, MaximumNumberOfStudents, LecturerId, SubjectId, SemesterId) VALUES
-('COMP1010001', 40, null, 'COMP1010', 'HK1'),
-('COMP1800001', 40, null, 'COMP1800', 'HK1'),
-('COMP1801001', 40, null, 'COMP1801', 'HK1'),
-('COMP1802001', 40, null, 'COMP1802', 'HK1'),
-('MILI2701001', 40, null, 'MILI2701', 'HK1'),
-('PHYL2401001', 40, null, 'PHYL2401', 'HK1'),
-('POLI1903001', 40, null, 'POLI1903', 'HK1'),
-('POLI2001001', 40, null, 'POLI2001', 'HK1'),
-('PSYC1001001', 40, null, 'PSYC1001', 'HK1')
+INSERT INTO ModuleClass(ModuleClassId, MaximumNumberOfStudents, LecturerId, SubjectId) VALUES
+('COMP1010001', 40, null, 'COMP1010'),
+('COMP1800001', 40, null, 'COMP1800'),
+('COMP1801001', 40, null, 'COMP1801'),
+('COMP1802001', 40, null, 'COMP1802'),
+('MILI2701001', 40, null, 'MILI2701'),
+('PHYL2401001', 40, null, 'PHYL2401'),
+('POLI1903001', 40, null, 'POLI1903'),
+('POLI2001001', 40, null, 'POLI2001'),
+('PSYC1001001', 40, null, 'PSYC1001')
 
 INSERT INTO ClassSchedule(ModuleClassId, DayOfWeek, LessonStart, LessonEnd, NumberOfWeek, StartDate, EndDate, ClassRoomId) VALUES
 ('COMP1010001', N'Thứ hai', 2, 6, 10, '2021-09-06', '2021-11-08', 'I.102'),
@@ -804,19 +800,9 @@ INSERT INTO ClassSchedule(ModuleClassId, DayOfWeek, LessonStart, LessonEnd, Numb
 ('POLI2001001', N'Thứ năm', 7, 12, 5, '2021-09-09', '2021-10-07', 'B.105'),
 ('PSYC1001001', N'Thứ sáu', 1, 6, 5, '2021-09-10', '2021-10-08', 'B.101')
 
-INSERT INTO ModuleClass_TrainingProgram_Course(ModuleClassId, TrainingProgram_CourseId) VALUES
-('COMP1010001', 'K47.CNTT.2021'),
-('COMP1800001', 'K47.CNTT.2021'),
-('COMP1801001', 'K47.CNTT.2021'),
-('COMP1802001', 'K47.CNTT.2021'),
-('MILI2701001', 'K47.CNTT.2021'),
-('PHYL2401001', 'K47.CNTT.2021'),
-('POLI1903001', 'K47.CNTT.2021'),
-('POLI2001001', 'K47.CNTT.2021'),
-('PSYC1001001', 'K47.CNTT.2021')
-
-INSERT INTO CumulativePoint(CumulativePointId, TotalCredit, CreditPass, CreditFall, CumulativeCredit, CumulativeAverageGrade10, CumulativeAverageGrade4) VALUES 
-('47.01.104.233', 0, 0, 0, 0, 0, 0)
+INSERT INTO CumulativePoint(TrainingProgram_CourseId, StudentId, TotalCredit, CreditPass, CreditFall, CumulativeCredit, CumulativeAverageGrade10, CumulativeAverageGrade4) VALUES 
+('K47.CNTT.2021', '47.01.104.233', 0, 0, 0, 0, 0, 0),
+('K47.GDMN.2021', '47.01.104.233', 0, 0, 0, 0, 0, 0)
 
 INSERT INTO CourseRegistration(StudentId, ModuleClassId) VALUES
 ('47.01.104.233', 'COMP1010001'),
@@ -865,3 +851,5 @@ UPDATE CourseRegistration
 SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 8
 WHERE StudentId = '47.01.104.233'
 AND ModuleClassId = 'PSYC1001001'
+
+select * from CourseRegistration
