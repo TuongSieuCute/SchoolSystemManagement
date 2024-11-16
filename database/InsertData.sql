@@ -852,4 +852,3 @@ SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade =
 WHERE StudentId = '47.01.104.233'
 AND ModuleClassId = 'PSYC1001001'
 
-select * from CourseRegistration

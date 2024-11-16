@@ -42,59 +42,112 @@ BEGIN
 	JOIN Subject s ON mc.SubjectId = s.SubjectId
 END
 GO
---SELECT dbo.CalculateNewCumulativeAverageGrade10('47.01.104.233', 'COMP1010001', 0, 0, 8.5, 3); 
-CREATE OR ALTER FUNCTION CalculateNewCumulativeAverageGrade10
+
+CREATE OR ALTER FUNCTION ChangeAverageGrade10
+(
+	@AverageGrade10 DECIMAL(3,1)
+)
+RETURNS DeCIMAL(3,1)
+AS
+BEGIN
+	DECLARE @AverageGrade4 DECIMAL(3,1)
+	SET @AverageGrade4 = CASE 
+                            WHEN @AverageGrade10 >= 8.5 AND @AverageGrade10 <= 10 THEN 4.0
+                            WHEN @AverageGrade10 >= 8.0 AND @AverageGrade10 < 8.5 THEN 3.5
+                            WHEN @AverageGrade10 >= 7.0 AND @AverageGrade10 < 8.0 THEN 3.0
+                            WHEN @AverageGrade10 >= 6.5 AND @AverageGrade10 < 7.0 THEN 2.5
+                            WHEN @AverageGrade10 >= 5.5 AND @AverageGrade10 < 6.5 THEN 2.0
+                            WHEN @AverageGrade10 >= 5.0 AND @AverageGrade10 < 5.5 THEN 1.5
+                            WHEN @AverageGrade10 >= 4.0 AND @AverageGrade10 < 5.0 THEN 1.0
+                            ELSE 0.0
+                         END;
+	RETURN @AverageGrade4
+END
+GO
+
+CREATE OR ALTER FUNCTION CheckSubjectId
 (
 	@StudentId VARCHAR(20),
-	@ModuleClassId VARCHAR(20),
-	@CumulativeAverageGrade10Present DECIMAL(3,1),
+	@ModuleClassId VARCHAR(20)
+)
+RETURNS DeCIMAL(3,1)
+AS
+BEGIN
+	DECLARE @SubjectId VARCHAR(20)
+	DECLARE @OldAverageGrade10 DECIMAL(3,1) = 0
+
+	SELECT @SubjectId = mc.SubjectId
+	FROM ModuleClass mc
+	WHERE mc.ModuleClassId = @ModuleClassId
+
+	SELECT TOP 1 @OldAverageGrade10 = cr.AverageGrade10
+	FROM CourseRegistration cr
+	JOIN ModuleClass mc ON cr.ModuleClassId = mc.ModuleClassId
+	WHERE cr.StudentId = @StudentId
+	AND mc.SubjectId = @SubjectId
+	AND mc.ModuleClassId <> @ModuleClassId
+	ORDER BY StudentId DESC
+
+	RETURN @OldAverageGrade10
+END
+GO
+
+CREATE OR ALTER FUNCTION CalculateNewCumulativeAverageGrade10
+(
+	@AverageGrade10 DECIMAL(3,1),
+	@NumberOfCredit TINYINT,
+	@CumulativeAverageGrade10 DECIMAL(3,1),
 	@CumulativeCredit TINYINT,
-	@NewAverageGrade10 DECIMAL(3,1),
-	@Credit TINYINT
+	@StudentId VARCHAR(20),
+	@ModuleClassId VARCHAR(20)
+
 )
 RETURNS DECIMAL(3,1)
 AS
 BEGIN
-	DECLARE @TotalPoints DECIMAL(10, 1)
-    DECLARE @NewGPA DECIMAL(3, 1)
 	DECLARE @SubjectId VARCHAR(20)
 	DECLARE @OldAverageGrade10 DECIMAL(3,1) = 0
-	DECLARE @Result DECIMAL = 0;
+	DECLARE @TotalCumulativeAverageGrade10 DECIMAL(4,1) = 0
+	DECLARE @NewGPA DECIMAL(3,1) = 0
 
-	SELECT @SubjectId = SubjectId
-	FROM ModuleClass
-	WHERE ModuleClassId = @ModuleClassId
+	SELECT @SubjectId = mc.SubjectId
+	FROM ModuleClass mc
+	WHERE mc.ModuleClassId = @ModuleClassId
 
-	SELECT @OldAverageGrade10 = AverageGrade10
-	FROM CourseRegistration cr
-	WHERE cr.ModuleClassId IN (SELECT s.ModuleClassId 
-							FROM ModuleClass s 
-							JOIN ClassSchedule c ON s.ModuleClassId = c.ModuleClassId
-							WHERE s.SubjectId = @SubjectId
-							AND cr.StudentId = @StudentId)
-
-    -- Tinh tong diem tich luy truoc khi cong
-    SET @TotalPoints = @CumulativeAverageGrade10Present * @CumulativeCredit
-
-    -- Tru diem tich luy mon da hoc lai
-	IF @OldAverageGrade10 IS NULL
+	-- Kiem tra mon hoc do co tinh diem tich luy hay khong
+	IF EXISTS (
+		SELECT 1
+		FROM Subject s
+		WHERE s.SubjectId = @SubjectId
+		AND s.IsCredit_GPA = 0)
 	BEGIN
-		SET @CumulativeCredit = @CumulativeCredit + @Credit
-		SET @Result = 1; -- Gán giá tr? ??c bi?t ?? ki?m tra
-	END
-	ELSE
-	BEGIN
-		SET @TotalPoints = @TotalPoints - (@OldAverageGrade10 * @Credit)
-		SET @Result = 2; -- Gán giá tr? ??c bi?t ?? ki?m tra
+		RETURN @CumulativeAverageGrade10
 	END
 
-    -- Cong them diem
-    SET @TotalPoints = @TotalPoints + (@NewAverageGrade10 * @Credit);
+	SET @OldAverageGrade10 = dbo.CheckSubjectId(@StudentId, @ModuleClassId)
 
-    -- Tinh lai GPA moi
-    SET @NewGPA = @TotalPoints / @CumulativeCredit
+	-- Tong diem tich luy hien tai
+	SET @TotalCumulativeAverageGrade10 = @CumulativeAverageGrade10 * @CumulativeCredit
 
-    RETURN @NewGPA;
+	IF @OldAverageGrade10 > 0 -- Da hoc mon nay roi
+	BEGIN
+		-- Tru diem tich luy cu
+		SET @TotalCumulativeAverageGrade10 = @TotalCumulativeAverageGrade10 - (@OldAverageGrade10 * @NumberOfCredit)
+
+		-- Tru tin chi tich luy cu
+		SET @CumulativeCredit = @CumulativeCredit - @NumberOfCredit
+	END
+	
+	-- Tong diem tich luy moi
+	SET @TotalCumulativeAverageGrade10 = @TotalCumulativeAverageGrade10 + (@AverageGrade10 * @NumberOfCredit)
+
+	-- Tong tin chi tich luy moi
+	SET @CumulativeCredit = @CumulativeCredit + @NumberOfCredit
+
+	-- GPA moi
+	SET @NewGPA = @TotalCumulativeAverageGrade10 / @CumulativeCredit
+
+	RETURN @NewGPA
 END
 GO
 
@@ -103,21 +156,11 @@ ON CourseRegistration
 AFTER UPDATE
 AS
 BEGIN
-	SET CONTEXT_INFO 0x1
-
+	-- UPDATE bang CourseRegistration
     UPDATE cr
     SET 
         cr.AverageGrade10 = Calc.GradeTotal,
-        cr.AverageGrade4 = CASE 
-							WHEN Calc.GradeTotal >= 8.5 AND Calc.GradeTotal <= 10 THEN 4.0
-							WHEN Calc.GradeTotal >= 8.0 AND Calc.GradeTotal <= 8.4 THEN 3.5
-							WHEN Calc.GradeTotal >= 7.0 AND Calc.GradeTotal <= 7.9 THEN 3
-							WHEN Calc.GradeTotal >= 6.5 AND Calc.GradeTotal <= 6.9 THEN 2.5
-							WHEN Calc.GradeTotal >= 5.5 AND Calc.GradeTotal <= 6.4 THEN 2
-							WHEN Calc.GradeTotal >= 5.0 AND Calc.GradeTotal <= 5.4 THEN 1.5
-							WHEN Calc.GradeTotal >= 4.0 AND Calc.GradeTotal <= 4.9 THEN 1
-							ELSE 0
-						   END,
+        cr.AverageGrade4 = dbo.ChangeAverageGrade10(Calc.GradeTotal),
         cr.Literacy = CASE 
                         WHEN Calc.GradeTotal >= 8.5 AND Calc.GradeTotal <= 10 THEN 'A'
                         WHEN Calc.GradeTotal >= 8.0 AND Calc.GradeTotal <= 8.4 THEN 'B+'
@@ -129,116 +172,87 @@ BEGIN
                         ELSE 'F'
                       END,
         cr.IsPass = CASE 
-                        WHEN Calc.GradeTotal >= 4.0 AND Calc.GradeTotal <= 10 THEN 1  -- TRUE
-                        ELSE 0  -- FALSE
+                        WHEN Calc.GradeTotal >= 4.0 AND Calc.GradeTotal <= 10 THEN 1 
+                        ELSE 0 
                     END
     FROM CourseRegistration AS cr
     JOIN Inserted i ON cr.ModuleClassId = i.ModuleClassId AND cr.StudentId = i.StudentId
-	CROSS APPLY (SELECT (i.MidtermGrade * i.MidtermGradePercentage) + (i.FinalExamGrade * i.FinalExamGradePercentage) AS GradeTotal) AS Calc
+	CROSS APPLY (SELECT CONVERT(DECIMAL(3,1), (i.MidtermGrade * i.MidtermGradePercentage) + (i.FinalExamGrade * i.FinalExamGradePercentage)) AS GradeTotal) AS Calc
 	JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId
-END
-GO
 
-CREATE OR ALTER TRIGGER trgTotalGrades
-ON CourseRegistration
-AFTER UPDATE
-AS
-BEGIN
-	DECLARE @ContextInfo varbinary(128)
-    SET @ContextInfo = CONTEXT_INFO()
+	-- UPDATE bang CumulativePoint
+	DECLARE @OldAverageGrade10 DECIMAL(3,1) = 0
+	SELECT @OldAverageGrade10 = dbo.CheckSubjectId(i.StudentId, i.ModuleClassId)
+	FROM inserted i
 
-	DECLARE @StudentId VARCHAR(20)
-    DECLARE @SubjectId VARCHAR(20)
-	DECLARE @Pass BIT = NULL
-
-	SELECT @StudentId = StudentId, @SubjectId = mc.SubjectId
-    FROM Inserted i
-	JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId
-	JOIN Subject s ON mc.SubjectId = s.SubjectId
-
-	SELECT @Pass = COALESCE(cr.IsPass, 0)
-	FROM CourseRegistration cr
-	WHERE cr.ModuleClassId IN (
-		SELECT s.ModuleClassId 
-		FROM ModuleClass s 
-		JOIN ClassSchedule c ON s.ModuleClassId = c.ModuleClassId
-		WHERE s.SubjectId = 'COMP1010'
-		AND cr.StudentId = '47.01.104.233')
-    
-	PRINT @Pass
-    IF @ContextInfo = 0x1
-    BEGIN
-		IF @Pass IS NULL
-		BEGIN
-		PRINT '1'
-			UPDATE cp
-			SET 
-				cp.TotalCredit = cp.TotalCredit + s.NumberOfCredit,
-				cp.CreditPass = cp.CreditPass + CASE WHEN cr.IsPass = 1 THEN s.NumberOfCredit ELSE 0 END,
-				cp.CreditFall = cp.CreditFall + CASE WHEN cr.IsPass = 1 THEN 0 ELSE s.NumberOfCredit END,
-				cp.CumulativeCredit = cp.CumulativeCredit + CASE WHEN s.IsCredit_GPA = 1 AND cr.IsPass = 1 THEN s.NumberOfCredit ELSE 0 END,
-				cp.CumulativeAverageGrade10 = dbo.CalculateNewCumulativeAverageGrade10(cr.StudentId,
-																					   cr.ModuleClassId, 
-																					   cp.CumulativeAverageGrade10, 
-																					   cp.CumulativeCredit, 
-																					   cr.AverageGrade10, 
-																					   s.NumberOfCredit)
-			FROM CumulativePoint AS cp
-			JOIN CourseRegistration AS cr ON cr.StudentId = cp.StudentId
-			JOIN Inserted i ON cr.ModuleClassId = i.ModuleClassId AND cr.StudentId = i.StudentId
-			JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId  
+	IF @OldAverageGrade10 > 0
+	BEGIN
+		UPDATE cp
+		SET 
+			cp.CreditPass = cp.CreditPass + CASE WHEN @OldAverageGrade10 < 4 AND Calc.GradeTotal >= 4 THEN s.NumberOfCredit 
+												 WHEN @OldAverageGrade10 >= 4 AND Calc.GradeTotal < 4 THEN (- s.NumberOfCredit)
+												 ELSE 0 END,
+			cp.CreditFall = cp.CreditFall + CASE WHEN @OldAverageGrade10 >= 4 AND Calc.GradeTotal >= 4 THEN 0 
+												 WHEN @OldAverageGrade10 < 4 AND Calc.GradeTotal < 4 THEN 0
+												 ELSE (- s.NumberOfCredit) END,
+			cp.CumulativeCredit = cp.CumulativeCredit + CASE WHEN s.IsCredit_GPA = 1 AND Calc.GradeTotal >= 4 THEN s.NumberOfCredit ELSE 0 END,
+			cp.CumulativeAverageGrade10 = dbo.CalculateNewCumulativeAverageGrade10(Calc.GradeTotal, 
+																				   s.NumberOfCredit, 
+																				   cp.CumulativeAverageGrade10, 
+																				   cp.CumulativeCredit, 
+																				   cp.StudentId, 
+																				   mc.ModuleClassId),
+			cp.CumulativeAverageGrade4 = dbo.ChangeAverageGrade10(dbo.CalculateNewCumulativeAverageGrade10(Calc.GradeTotal, 
+																										   s.NumberOfCredit, 
+																										   cp.CumulativeAverageGrade10, 
+																										   cp.CumulativeCredit, 
+																										   cp.StudentId, 
+																										   mc.ModuleClassId))
+			FROM CumulativePoint cp
+			JOIN inserted i ON cp.StudentId = i.StudentId
+			CROSS APPLY (SELECT CONVERT(DECIMAL(3,1), (i.MidtermGrade * i.MidtermGradePercentage) + (i.FinalExamGrade * i.FinalExamGradePercentage)) AS GradeTotal) AS Calc
+			JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId
 			JOIN Subject s ON mc.SubjectId = s.SubjectId
-			JOIN TrainingProgram_ModuleGroup_Subject tms ON mc.SubjectId = tms.SubjectId
+			WHERE cp.TrainingProgram_CourseId IN (
+				SELECT tc.TrainingProgram_CourseId 
+				FROM TrainingProgram_ModuleGroup_Subject tms
+				JOIN TrainingProgram_ModuleGroup tm ON tms.TrainingProgram_ModuleGroupId = tm.TrainingProgram_ModuleGroupId
+				JOIN TrainingProgram_Course tc ON tm.TrainingProgramId = tc.TrainingProgramId
+				WHERE mc.ModuleClassId = i.ModuleClassId
+				AND tms.SubjectId = mc.SubjectId)
+	END
+	ELSE
+	BEGIN
+		UPDATE cp
+		SET 
+			cp.TotalCredit = cp.TotalCredit + s.NumberOfCredit,
+			cp.CreditPass = cp.CreditPass + CASE WHEN Calc.GradeTotal >= 4 THEN s.NumberOfCredit ELSE 0 END,
+			cp.CreditFall = cp.CreditFall + CASE WHEN Calc.GradeTotal >= 4 THEN 0 ELSE s.NumberOfCredit END,
+			cp.CumulativeCredit = cp.CumulativeCredit + CASE WHEN s.IsCredit_GPA = 1 AND Calc.GradeTotal >= 4 THEN s.NumberOfCredit ELSE 0 END,
+			cp.CumulativeAverageGrade10 = dbo.CalculateNewCumulativeAverageGrade10(Calc.GradeTotal, 
+																				   s.NumberOfCredit, 
+																				   cp.CumulativeAverageGrade10, 
+																				   cp.CumulativeCredit, 
+																				   cp.StudentId, 
+																				   mc.ModuleClassId),
+			cp.CumulativeAverageGrade4 = dbo.ChangeAverageGrade10(dbo.CalculateNewCumulativeAverageGrade10(Calc.GradeTotal, 
+																										   s.NumberOfCredit, 
+																										   cp.CumulativeAverageGrade10, 
+																										   cp.CumulativeCredit, 
+																										   cp.StudentId, 
+																										   mc.ModuleClassId))
+		FROM CumulativePoint cp
+		JOIN inserted i ON cp.StudentId = i.StudentId
+		CROSS APPLY (SELECT CONVERT(DECIMAL(3,1), (i.MidtermGrade * i.MidtermGradePercentage) + (i.FinalExamGrade * i.FinalExamGradePercentage)) AS GradeTotal) AS Calc
+		JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId
+		JOIN Subject s ON mc.SubjectId = s.SubjectId
+		WHERE cp.TrainingProgram_CourseId IN (
+			SELECT tc.TrainingProgram_CourseId 
+			FROM TrainingProgram_ModuleGroup_Subject tms
 			JOIN TrainingProgram_ModuleGroup tm ON tms.TrainingProgram_ModuleGroupId = tm.TrainingProgram_ModuleGroupId
-			JOIN TrainingProgram t ON tm.TrainingProgramId = t.TrainingProgramId
-			JOIN TrainingProgram_Course tc ON t.TrainingProgramId = tc.TrainingProgramId AND cp.TrainingProgram_CourseId = tc.TrainingProgram_CourseId
-		END
-		ELSE
-		BEGIN
-			PRINT '2'
-			UPDATE cp
-			SET 
-				cp.CreditPass = cp.CreditPass + CASE WHEN @Pass = 0 AND cr.IsPass = 1 THEN s.NumberOfCredit 
-													 WHEN @Pass = 1 AND cr.IsPass = 0 THEN (- s.NumberOfCredit)
-													 ELSE 0 END,
-				cp.CreditFall = cp.CreditFall + CASE WHEN @Pass = 1 AND cr.IsPass = 1 THEN 0 
-													 WHEN @Pass = 0 AND cr.IsPass = 0 THEN 0
-													 ELSE (- s.NumberOfCredit) END,
-				cp.CumulativeCredit = cp.CumulativeCredit + CASE WHEN s.IsCredit_GPA = 1 AND cr.IsPass = 1 THEN s.NumberOfCredit ELSE 0 END,
-				cp.CumulativeAverageGrade10 = dbo.CalculateNewCumulativeAverageGrade10(cr.StudentId, 
-																					   cr.ModuleClassId, 
-																					   cp.CumulativeAverageGrade10, 
-																					   cp.CumulativeCredit, 
-																					   cr.AverageGrade10, 
-																					   s.NumberOfCredit)
-			FROM CumulativePoint AS cp
-			JOIN CourseRegistration AS cr ON cr.StudentId = cp.StudentId
-			JOIN Inserted i ON cr.ModuleClassId = i.ModuleClassId AND cr.StudentId = i.StudentId
-			JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId  
-			JOIN Subject s ON mc.SubjectId = s.SubjectId
-			JOIN TrainingProgram_ModuleGroup_Subject tms ON mc.SubjectId = tms.SubjectId
-			JOIN TrainingProgram_ModuleGroup tm ON tms.TrainingProgram_ModuleGroupId = tm.TrainingProgram_ModuleGroupId
-			JOIN TrainingProgram t ON tm.TrainingProgramId = t.TrainingProgramId
-			JOIN TrainingProgram_Course tc ON t.TrainingProgramId = tc.TrainingProgramId AND cp.TrainingProgram_CourseId = tc.TrainingProgram_CourseId
-		END
-
-	--UPDATE cp
-	--	SET 
-	--		cp.CumulativeAverageGrade4 = CASE 
-	--										WHEN cp.CumulativeAverageGrade10 >= 8.5 AND cp.CumulativeAverageGrade10 <= 10 THEN 4.0
-	--										WHEN cp.CumulativeAverageGrade10 >= 8.0 AND cp.CumulativeAverageGrade10 <= 8.4 THEN 3.5
-	--										WHEN cp.CumulativeAverageGrade10 >= 7.0 AND cp.CumulativeAverageGrade10 <= 7.9 THEN 3
-	--										WHEN cp.CumulativeAverageGrade10 >= 6.5 AND cp.CumulativeAverageGrade10 <= 6.9 THEN 2.5
-	--										WHEN cp.CumulativeAverageGrade10 >= 5.5 AND cp.CumulativeAverageGrade10 <= 6.4 THEN 2
-	--										WHEN cp.CumulativeAverageGrade10 >= 5.0 AND cp.CumulativeAverageGrade10 <= 5.4 THEN 1.5
-	--										WHEN cp.CumulativeAverageGrade10 >= 4.0 AND cp.CumulativeAverageGrade10 <= 4.9 THEN 1
-	--										ELSE 0
-	--								    END
-	--	FROM CumulativePoint AS cp
-	SET CONTEXT_INFO 0x0
+			JOIN TrainingProgram_Course tc ON tm.TrainingProgramId = tc.TrainingProgramId
+			WHERE mc.ModuleClassId = i.ModuleClassId
+			AND tms.SubjectId = mc.SubjectId)
 	END
 END
 GO
-
-EXEC sp_settriggerorder @triggername = 'trgAfterUpdateGrade', @order = 'First', @stmttype = 'UPDATE';
-EXEC sp_settriggerorder @triggername = 'trgTotalGrades', @order = 'Last', @stmttype = 'UPDATE';
