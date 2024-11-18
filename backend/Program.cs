@@ -1,5 +1,5 @@
 using backend.Models;
-using backend.Services;
+// using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,8 +8,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddScoped<HashPasswordService>();
-builder.Services.AddScoped<AddModuleClassService>();
+// builder.Services.AddScoped<HashPasswordService>();
+// builder.Services.AddScoped<AddModuleClassService>();
 
 builder.Services.AddDbContext<SchoolSystemManagementContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionStrings")));
 // Cấu hình JWT

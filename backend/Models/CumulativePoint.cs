@@ -5,7 +5,11 @@ namespace backend.Models;
 
 public partial class CumulativePoint
 {
-    public string CumulativePointId { get; set; } = null!;
+    public int CumulativePointId { get; set; }
+
+    public string? TrainingProgramCourseId { get; set; }
+
+    public string? StudentId { get; set; }
 
     public byte? TotalCredit { get; set; }
 
@@ -19,5 +23,7 @@ public partial class CumulativePoint
 
     public decimal? CumulativeAverageGrade4 { get; set; }
 
-    public virtual Student CumulativePointNavigation { get; set; } = null!;
+    public virtual Student? Student { get; set; }
+
+    public virtual TrainingProgramCourse? TrainingProgramCourse { get; set; }
 }

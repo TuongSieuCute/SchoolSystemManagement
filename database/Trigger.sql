@@ -1,4 +1,4 @@
-USE SchoolSystemManagement
+﻿USE SchoolSystemManagement
 GO
 
 CREATE OR ALTER TRIGGER trgInsertTrainingProgram_Course
@@ -254,5 +254,17 @@ BEGIN
 			WHERE mc.ModuleClassId = i.ModuleClassId
 			AND tms.SubjectId = mc.SubjectId)
 	END
+END
+GO
+
+CREATE TRIGGER trg_AfterInsertNotifications
+ON Notifications
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO StudentNotifications (NotificationId, StudentId, IsRead)
+    SELECT i.NotificationsId, s.StudentId, 0
+    FROM INSERTED i 
+    CROSS JOIN Student s
 END
 GO

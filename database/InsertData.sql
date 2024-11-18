@@ -97,19 +97,14 @@ INSERT INTO Major(MajorId, MajorName, DepartmentId) VALUES
 (N'N.CNTT104', N'Công nghệ thông tin', N'K.CNTT'),
 (N'N.CTXH612', N'Công tác xã hội', N'K.TLH')
 
-INSERT INTO Account(UserName, PasswordHash, Salt, Role, IsActive, Email) VALUES
-('Admin', '0c2dd3a13079db1fc7043e5e5785411bd48fe0658379ad48c1b50b6441ec7ccb', '153ea97fd27cde46fcf35e12852c6d602e4691cc25566c9e5fea42f1cd0e92d5', 0, 1, NULL),
-('GV.0001', '6e76576ec18bfa76f5a328f6141d54ea6da0bfd4680495f15e388862a5716e0e', '6cb7a154ecee5832c42e08a691a38d1c1703f083e147bcd67e660c06b72fbd1d', 1, 1, NULL),
-('47.01.104.233', 'a68ca2b59b559e775cd068b3f27f54eab5dc011f58990e5be2b3064c712112f8', 'f0b51f0f419d08842417f85204c68648961a3f304542554c51dee70d0a83472b', 2, 1, '4701104233@student.hcmue.edu.vn')
-
-INSERT INTO Lecturer(LecturerId, FullName, UrlImage, DateOfBirth, PlaceOfBirth, Gender, EthnicGroup, CitizenIdentification, Religion, Country, State_Province, District_County, Ward_Commune, PhoneNumber, DepartmentId) VALUES
-('GV.0001', N'Ngô Quốc Việt', '/Images/avt_girl.jpg', '1970-01-01', N'TP.Hồ Chí Minh', 0, N'Kinh', '123456789123', N'Phật', N'Việt Nam', N'TP.Hồ Chí Minh', N'Quận 5', N'Phường 15', '0123456789', 'K.CNTT')
+INSERT INTO Lecturer(LecturerId, FullName, DepartmentId) VALUES
+('4701104233@student.hcmue.edu.vn', N'Nguyễn Cát Tường', 'K.CNTT')
 
 INSERT INTO StudentClass(StudentClassId, StudentClassName, LecturerId, CourseId, MajorId) VALUES
-('47.01.CNTT.A', N'Lớp Công nghệ thông tin A khóa 47', 'GV.0001', 'K47', 'N.CNTT104')
+('47.01.CNTT.A', N'Lớp Công nghệ thông tin A khóa 47', '4701104233@student.hcmue.edu.vn', 'K47', 'N.CNTT104')
 
-INSERT INTO Student(StudentId, FullName, UrlImage, DateOfBirth, PlaceOfBirth, Gender, EthnicGroup, CitizenIdentification, Religion, Union_Party, TypeStudent, AcademicStatus, Country, State_Province, District_County, Ward_Commune, PhoneNumber, StudentClassId) VALUES
-('47.01.104.233', N'Nguyễn Cát Tường', '/Images/avt_girl.jpg', '2003-01-18', N'Đồng Nai', 1, N'Kinh', '123456789123', N'Phật', 1, N'Chính thức', N'Còn học', N'Việt Nam', N'Đồng Nai', N'Biên Hòa', N'Tân Vạn', '0123456789', '47.01.CNTT.A')
+INSERT INTO Student(StudentId, FullName, StudentClassId) VALUES
+('47.01.104.233', N'Nguyễn Cát Tường', '47.01.CNTT.A')
 
 INSERT INTO ModuleType(ModuleTypeId, ModuleTypeName) VALUES
 ('HP1', N'Học phần nền tảng'),
@@ -852,3 +847,5 @@ SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade =
 WHERE StudentId = '47.01.104.233'
 AND ModuleClassId = 'PSYC1001001'
 
+INSERT INTO Notifications (Title, Content)
+VALUES (N'Thông báo học phí', N'Hạn nộp học phí là ngày 30/11/2024.')

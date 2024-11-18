@@ -52,35 +52,12 @@ CREATE TABLE Major
 	FOREIGN KEY(DepartmentId) REFERENCES Department(DepartmentId),
 )
 
-CREATE TABLE Account
-(
-    UserName VARCHAR(20) PRIMARY KEY,
-    PasswordHash VARCHAR(64),
-    Salt VARCHAR(64),
-    Role CHAR(1),
-    IsActive BIT, -- Tinh trang hoat dong
-	Email VARCHAR(50),
-)
-
 CREATE TABLE Lecturer 
 (
-    LecturerId VARCHAR(20) PRIMARY KEY,
+    LecturerId VARCHAR(40) PRIMARY KEY,
     FullName NVARCHAR(100),
-	UrlImage VARCHAR(100),
-    DateOfBirth DATE,
-    PlaceOfBirth NVARCHAR(50),
-    Gender BIT,
-    EthnicGroup NVARCHAR(50), -- Dan toc
-    CitizenIdentification CHAR(15), -- CCCD
-    Religion NVARCHAR(50),
-    Country NVARCHAR(50),
-    State_Province NVARCHAR(50),
-    District_County NVARCHAR(50),
-    Ward_Commune NVARCHAR(50),
-    PhoneNumber CHAR(10),
     DepartmentId VARCHAR(20),
 
-    FOREIGN KEY(LecturerId) REFERENCES Account(UserName),
     FOREIGN KEY(DepartmentId) REFERENCES Department(DepartmentId),
 )
 
@@ -88,7 +65,7 @@ CREATE TABLE StudentClass
 (
 	StudentClassId VARCHAR(20) PRIMARY KEY,
 	StudentClassName NVARCHAR(100),
-    LecturerId VARCHAR(20),
+    LecturerId VARCHAR(40),
     CourseId VARCHAR(20),
 	MajorId VARCHAR(20),
 	
@@ -101,24 +78,8 @@ CREATE TABLE Student
 (
     StudentId VARCHAR(20) PRIMARY KEY,
     FullName NVARCHAR(100),
-	UrlImage VARCHAR(100),
-    DateOfBirth DATE,
-    PlaceOfBirth NVARCHAR(50),
-    Gender BIT,
-    EthnicGroup NVARCHAR(50),
-    CitizenIdentification CHAR(15),
-    Religion NVARCHAR(50),
-    Union_Party BIT, -- Dang/Doan
-    TypeStudent NVARCHAR(30),
-    AcademicStatus NVARCHAR(30), -- Tinh trang hoc tap
-    Country NVARCHAR(50),
-    State_Province NVARCHAR(50),
-    District_County NVARCHAR(50),
-    Ward_Commune NVARCHAR(50),
-    PhoneNumber CHAR(10),
     StudentClassId VARCHAR(20),
 
-	FOREIGN KEY(StudentId) REFERENCES Account(UserName),
 	FOREIGN KEY(StudentClassId) REFERENCES StudentClass(StudentClassId),
 )
 
@@ -204,7 +165,7 @@ CREATE TABLE ModuleClass
 (
     ModuleClassId VARCHAR(20) PRIMARY KEY,
     MaximumNumberOfStudents TINYINT, -- So luong sinh vien toi da
-    LecturerId VARCHAR(20),
+    LecturerId VARCHAR(40),
     SubjectId VARCHAR(20),
 
 	FOREIGN KEY(LecturerId) REFERENCES Lecturer(LecturerId),
@@ -264,4 +225,21 @@ CREATE TABLE CourseRegistration
 	FOREIGN KEY(StudentId) REFERENCES Student(StudentId),
 	FOREIGN KEY(ModuleClassId) REFERENCES ModuleClass(ModuleClassId),
     FOREIGN KEY(TuitionFeesId) REFERENCES TuitionFees(TuitionFeesId),
+)
+
+CREATE TABLE Notifications (
+    NotificationsId INT PRIMARY KEY IDENTITY,
+    Title NVARCHAR(255),
+    Content NVARCHAR(MAX),
+    CreatedAt DATETIME DEFAULT GETDATE()
+)
+
+CREATE TABLE StudentNotifications (
+    StudentNotificationsId INT PRIMARY KEY IDENTITY,
+    NotificationId INT,
+    StudentId VARCHAR(20),
+    IsRead BIT DEFAULT 0,
+    ReadAt DATETIME NULL,
+    FOREIGN KEY (NotificationId) REFERENCES Notifications(NotificationsId),
+    FOREIGN KEY (StudentId) REFERENCES Student(StudentId)
 )

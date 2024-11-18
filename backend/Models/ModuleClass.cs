@@ -14,17 +14,11 @@ public partial class ModuleClass
 
     public string? SubjectId { get; set; }
 
-    public string? SemesterId { get; set; }
-
     public virtual ICollection<ClassSchedule> ClassSchedules { get; set; } = new List<ClassSchedule>();
 
     public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; } = new List<CourseRegistration>();
 
     public virtual Lecturer? Lecturer { get; set; }
-
-    public virtual ICollection<ModuleClassTrainingProgramCourse> ModuleClassTrainingProgramCourses { get; set; } = new List<ModuleClassTrainingProgramCourse>();
-
-    public virtual Semester? Semester { get; set; }
 
     public virtual Subject? Subject { get; set; }
 
