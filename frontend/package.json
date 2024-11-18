@@ -20,7 +20,6 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
     "react-router-dom": "^6.26.2",
-    "react-scripts": "^3.0.1",
     "react-time-picker": "^7.0.0",
     "react-widgets": "^5.8.4",
     "redux": "^5.0.1",
@@ -30,31 +29,9 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "vitest"
-  },
-  "eslintConfig": {
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
-    },
-    "rules": {
-      "indent": [
-        "warn",
-        4
-      ],
-      "quotes": [
-        "warn",
-        "single"
-      ],
-      "semi": [
-        "warn",
-        "always"
-      ]
-    },
-    "extends": [
-      "react-app"
-    ]
+    "test": "vitest",
+    "eslint": "eslint",
+    "eslint:fix": "eslint --fix ."
   },
   "browserslist": {
     "production": [
@@ -69,11 +46,15 @@
     ]
   },
   "devDependencies": {
+    "@eslint/js": "^9.15.0",
     "@vitejs/plugin-react": "^4.3.2",
     "@vitest/browser": "^1.6.0",
-    "eslint-plugin-react": "^7.37.1",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react": "^7.37.2",
+    "globals": "^15.12.0",
     "playwright": "^1.47.2",
     "vite": "^5.4.8",
+    "vite-plugin-eslint": "^1.8.1",
     "vitest": "^1.6.0"
   }
 }

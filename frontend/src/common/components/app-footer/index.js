@@ -1,5 +1,5 @@
-import './styles.css';
 import React from 'react';
+import './styles.css';
 export const AppFooter = () => {
     return (
         <div className="app-footer flex flex-row gap-3 p-3">
@@ -13,16 +13,16 @@ export const AppFooter = () => {
                 <p>
                     <i className="pi pi-envelope pr-3"></i>
                     <span>
-            Email:{' '}
+                        Email:{' '}
                         <a href="mailto:Phongctct@hcmue.edu.vn">
-              Phongctct@hcmue.edu.vn
+                            Phongctct@hcmue.edu.vn
                         </a>
                     </span>
                 </p>
                 <p>
                     <i className="pi pi-phone pr-3"></i>
                     <span>
-            Hotline: <a href="tel:02838352020">(028) 38352020</a>
+                        Hotline: <a href="tel:02838352020">(028) 38352020</a>
                     </span>
                 </p>
             </div>

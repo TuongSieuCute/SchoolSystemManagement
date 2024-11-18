@@ -1,6 +1,6 @@
 /// <reference types="vitest/config" />
-import { defineConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig, transformWithEsbuild } from 'vite';
 export default defineConfig({
     optimizeDeps: {
         force: true,
@@ -10,7 +10,7 @@ export default defineConfig({
             },
         },
     },
-    build:{
+    build: {
         sourcemap: true
     },
     server: {

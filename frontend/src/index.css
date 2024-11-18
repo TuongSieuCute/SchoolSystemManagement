@@ -1,3 +1,6 @@
+@import "primeflex/primeflex.css";
+@import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
+@import 'primeicons/primeicons.css';
 :root {
     /* --background-color: #FFFFFF;
     --background-secondary-color: #E9ECEF;
@@ -26,33 +29,6 @@ body {
     padding: 0;
 }
 
-/* SIDEBAR */
-.sidebar-container {
-    background-color: var(--bg-header-sidebar); 
-    color: var(--cl-text-white);
-    transition: max-width 0.3s ease, opacity 0.3s ease;
-    overflow: hidden;
-}
-
-.sidebar-link {
-    color: var(--cl-text-white);
-}
-
-.sidebar-link:hover,
-.sidebar-link.active,
-.list-bottom:hover {
-    background-color: var(--bg-menu-highlight);
-    font-weight: 600;
-}
-
-.sidebar-open {
-    margin-left: 276px;
-}
-
-.sidebar-close {
-    margin-left: 100px;
-    transition: margin-left 0.3s ease;
-}
 
 /* 
 .modal, .overlay {

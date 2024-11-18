@@ -13,4 +13,4 @@ export const getUserInfoAzure = () => {
         username: localStorage.getItem('username'),
         loginMethod: 'azure'
     }; 
-}
+};
