@@ -31,13 +31,13 @@ const convertPhotoToString = (blob) => {
 
 export const getUserId = () => {
     const account = msalInstance.getAllAccounts()[0];
+    // username is account's email
     const username = account.username;
     const id = username.substring(0, username.indexOf('@'));
     // student id
     if (/^\d+$/.test(id)) {
         const studentId = id.replace(/(\d{2})(\d{2})(\d{3})(\d{3})/, '$1.$2.$3.$4');
         return studentId;
-    } else {
-        return id;
     }
+    return username;
 };
