@@ -3,11 +3,12 @@ import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { getUserInfoLocal } from '../../helper/token';
+import { useMsal } from '@azure/msal-react';
+import { getUserId } from '../../common/sevices/authService';
 
 const InstructionalPlan = () => {
-    const [username, setUsername] = useState('');
-    const [subjectSemester, setSubjectSemester] = useState({});
+    const [studentId, setStudentId] = useState('');
+    const [subjectSemester, setSubjectSemester] = useState([]);
     const [subjectElectiveCredit, setSubjectElectiveCredit] = useState({});
     const [selectedExercises1, setSelectedExercises1] = useState([]);
     const [selectedExercises2, setSelectedExercises2] = useState([]);
@@ -16,19 +17,50 @@ const InstructionalPlan = () => {
     const [defaultDropdown, setDefaultDropdown] = useState(null);
     const [dropdownOptions, setDropdownOptions] = useState([]);
     const [rawData, setRawData] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState(null);
+
+    const { accounts, instance } = useMsal();
 
     const exercises1 = useRef(['PHYL2401']);
     const exercises2 = useRef(['PHYL2405', 'PHYL2404', 'PHYL2403', 'PHYL2402', 'PHYL2410', 'PHYL2409', 'PHYL2408', 'PHYL2407', 'PHYL2406']);
     const exercises3 = useRef(['PHYL2419', 'PHYL2418', 'PHYL2417', 'PHYL2416', 'PHYL2415', 'PHYL2414', 'PHYL2413', 'PHYL2412', 'PHYL2411']);
     const moduleGroupId = useRef(['EDUC2801', 'PSYC1493', 'PSYC2801', 'DOMS0']);
+    const semesters = [
+        { label: 'Học kỳ 1', value: 'Học kì 1' },
+        { label: 'Học kỳ 2', value: 'Học kì 2' },
+        { label: 'Học kỳ 3', value: 'Học kì 3' },
+        { label: 'Học kỳ 4', value: 'Học kì 4' },
+        { label: 'Học kỳ 5', value: 'Học kì 5' },
+        { label: 'Học kỳ 6', value: 'Học kì 6' },
+        { label: 'Học kỳ 7', value: 'Học kì 7' },
+        { label: 'Học kỳ 8', value: 'Học kì 8' }
+    ];
+
+    const semesterFilterTemplate = (options) => {
+        return (
+            <Dropdown
+                value={selectedSemester}
+                options={semesters}
+                onChange={(e) => {
+                    setSelectedSemester(e.value);
+                    options.filterCallback(e.value); 
+                }}
+                placeholder="Chọn học kỳ"
+                filter
+            />
+        );
+    };
 
     useEffect(() => {
-        setUsername(getUserInfoLocal().username);
-    }, []);
+        if (!accounts?.length) {
+            return;
+        }
+        setStudentId(getUserId());
+    }, [accounts]);
 
     useEffect(() => {
-        if (username) {
-            fetch(`http://localhost:5065/api/InstructionalPlan/${username}`)
+        if (studentId) {
+            fetch(`http://localhost:5065/api/InstructionalPlan/${studentId}`)
                 .then(response => response.json())
                 .then((data) => {
                     const options = data.map(item => ({
@@ -45,22 +77,13 @@ const InstructionalPlan = () => {
                 })
                 .catch(err => console.error('Lỗi', err));
         }
-    }, [username]);
+    }, [studentId]);
 
     useEffect(() => {
         if (rawData && defaultDropdown) {
             const filteredData = rawData.filter(item => item.trainingProgramName === defaultDropdown);
 
-            // Lọc dữ liệu theo học kì
-            const groupedSemesters = filteredData.reduce((acc, subject) => {
-                const semesterName = subject.semesterName;
-                if (!acc[semesterName]) {
-                    acc[semesterName] = [];
-                }
-                acc[semesterName].push(subject);
-                return acc;
-            }, {});
-            setSubjectSemester(groupedSemesters);
+            setSubjectSemester(filteredData);
 
             // Lọc dữ liệu theo nhóm học phần tự chọn
             const groupedSubjects = filteredData.reduce((acc, subject) => {
@@ -103,32 +126,42 @@ const InstructionalPlan = () => {
 
     return (
         <div>
-            <h1>Chương trình đào tạo</h1>
+            <h1 className='title'>Chương trình đào tạo</h1>
             <div>
                 <FloatLabel>
                     <Dropdown
                         value={defaultDropdown}
                         options={dropdownOptions}
                         onChange={(e) => setDefaultDropdown(e.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
                     />
-                    <label htmlFor="defaultDropdown">Chương trình đào tạo</label>
+                    <label htmlFor="defaultDropdown" className='cus-label-dropdown'>Chương trình đào tạo</label>
                 </FloatLabel>
             </div>
             <div>
-                {Object.keys(subjectSemester)
-                    .sort()
-                    .map((semesterName) => (
-                        <div key={semesterName}>
-                            <h3>{semesterName}</h3>
-                            <DataTable value={subjectSemester[semesterName]}>
-                                <Column header="STT" body={(rowData, options) => options.rowIndex + 1} />
-                                <Column field="subjectId" header="Mã học phần" />
-                                <Column field="subjectName" header="Tên học phần" />
-                                <Column header="Số tín chỉ" body={renderNumberOfCredit} />
-                                <Column field="subjectType" header="Loại học phần" />
-                            </DataTable>
-                        </div>
-                    ))}
+                <DataTable
+                    value={subjectSemester}
+                    scrollable scrollHeight="500px"
+                    sortMode="multiple"
+                    multiSortMeta={[
+                        { field: 'semesterName', order: 1 },
+                        { field: 'subjectType', order: 1 }
+                    ]}
+                    filters={{ 'semesterName': { value: selectedSemester, matchMode: 'equals' } }}
+                    filterDisplay="row"
+                >
+                    <Column field="subjectId" header="Mã học phần" />
+                    <Column field="subjectName" header="Tên học phần" />
+                    <Column header="Số tín chỉ" body={renderNumberOfCredit} />
+                    <Column field="subjectType" header="Loại học phần" />
+                    <Column
+                        field="semesterName"
+                        header="Học kì"
+                        filter
+                        filterElement={semesterFilterTemplate}
+                    />
+                </DataTable>
             </div>
             <div>
                 <p>Ghi chú : Những môn có dấu (*) sẽ không tính điểm trung bình mà chỉ là môn điều kiện.</p>
@@ -178,7 +211,7 @@ const InstructionalPlan = () => {
                         </div>
                     ))}
             </div>
-        </div>
+        </div >
     );
 };
 

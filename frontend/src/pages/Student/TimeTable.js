@@ -4,10 +4,11 @@ import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import React, { useCallback, useEffect, useState } from 'react';
-import { getUserInfoLocal } from '../../helper/token';
+import { useMsal } from '@azure/msal-react';
+import { getUserId } from '../../common/sevices/authService';
 
 const TimeTable = () => {
-    const [username, setUsername] = useState('');
+    const [studentId, setStudentId] = useState('');
     const [moduleClasses, setModuleClasses] = useState([]);
     const [selectedYear, setSelectedYear] = useState(null);
     const [yearOptions, setYearOptions] = useState([]);
@@ -16,11 +17,15 @@ const TimeTable = () => {
     const [selectedWeek, setSelectedWeek] = useState(null);
     const [mdStartDate, setMdStartDate] = useState(null);
 
+    const { accounts, instance } = useMsal();
     const weekOptions = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8', 'Tuần 9', 'Tuần 10', 'Tuần 11', 'Tuần 12', 'Tuần 13', 'Tuần 14', 'Tuần 15'];
 
     useEffect(() => {
-        setUsername(getUserInfoLocal().username);
-    }, []);
+        if (!accounts?.length) {
+            return;
+        }
+        setStudentId(getUserId());
+    }, [accounts]);
 
     useEffect(() => {
         if (selectedYear && selectedSemester) {
@@ -47,8 +52,8 @@ const TimeTable = () => {
                         return (
                             itemStartDate >= startDate &&
                             itemStartDate <= endDate &&
-                            itemEndDate >= itemStartDate &&
-                            item.semesterId === selectedSemester
+                            itemEndDate >= itemStartDate 
+                            // item.semesterId === selectedSemester
                         );
                     });
 
@@ -112,10 +117,10 @@ const TimeTable = () => {
     );
 
     useEffect(() => {
-        if (username && selectedYear && selectedSemester && selectedWeek) {
+        if (studentId && selectedYear && selectedSemester && selectedWeek) {
             fetchModuleData(selectedYear, selectedSemester, selectedWeek, setModuleClasses);
         }
-    }, [username, selectedYear, selectedSemester, selectedWeek, fetchModuleData]);
+    }, [studentId, selectedYear, selectedSemester, selectedWeek, fetchModuleData]);
 
     useEffect(() => {
         fetch('http://localhost:5065/SemesterPeriod')

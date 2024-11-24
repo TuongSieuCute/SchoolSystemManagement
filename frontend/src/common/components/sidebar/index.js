@@ -27,7 +27,7 @@ export const Sidebar = (props) => {
 
     return (
         <div>
-            <div className={`${isOpen ? 'w-16rem' : 'w-5rem'} h-screen pt-4 fixed top-0 left-0 z-1 flex flex-column sidebar-container`}>
+            <div className={`${isOpen ? 'sidebar-open' : 'sidebar-close'} h-screen pt-4 fixed top-0 left-0 z-1 flex flex-column sidebar-container`}>
                 <div className='flex flex-column md:flex-row justify-content pl-4'>
                     <i className='pi pi-bars text-2xl cursor-pointer' onClick={toggleSidebar}></i>
                     {isOpen && <span className='pl-3 text-base font-bold'>Sư Phạm Hồ Chí Minh</span>}
@@ -90,7 +90,7 @@ export const Sidebar = (props) => {
                     </li>
                 </ul>
             </div>
-            <div className={`${isOpen ? 'sidebar-open' : 'sidebar-close'}`}>
+            <div className={`${isOpen ? 'main-open' : 'main-close'}`}>
                 <Outlet />
             </div>
         </div>

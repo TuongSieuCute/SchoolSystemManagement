@@ -5,6 +5,12 @@
     transition: max-width 0.3s ease, opacity 0.3s ease;
     overflow: hidden;
 }
+.sidebar-open {
+    width: 250px;
+}
+.sidebar-close {
+    width: 70px;
+}
 .sidebar-link {
     color: var(--cl-text-white);
 }
@@ -14,10 +20,9 @@
     background-color: var(--bg-menu-highlight);
     font-weight: 600;
 }
-.sidebar-open {
-    margin-left: 276px;
+.main-open {
+    margin-left: 270px;
 }
-.sidebar-close {
-    margin-left: 100px;
-    transition: margin-left 0.3s ease;
+.main-close {
+    margin-left: 90px;
 }
