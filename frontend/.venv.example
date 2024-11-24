@@ -1,0 +1,2 @@
+# không có dấu '/' ở cuối
+VITE_API_URL = 'https://localhost:7074/api'

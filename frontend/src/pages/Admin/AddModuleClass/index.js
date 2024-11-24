@@ -9,6 +9,9 @@ import { DataTable, } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
+import { addModuleClass } from '../../../common/sevices/moduleClassService';
+import { getCourses } from '../../../common/sevices/subjectService';
+import { getTrainingProgram } from '../../../common/sevices/trainingProgramCourseService';
 const AddModuleClass = ({ visible, toggleModalInsert }) => {
 
     const [selectedSemester, setSelectedSemester] = useState(null);
@@ -34,7 +37,7 @@ const AddModuleClass = ({ visible, toggleModalInsert }) => {
     const roomType = ['Phòng máy tính'];
 
     useEffect(() => {
-        fetch('http://localhost:5065/api/TrainingProgramCourse')
+        getTrainingProgram()
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -50,9 +53,7 @@ const AddModuleClass = ({ visible, toggleModalInsert }) => {
     }, []);
 
     useEffect(() => {
-        const trainingProgramCourseIdsString = selectedTrainingProgramCourseId.join(',');
-
-        fetch(`http://localhost:5065/api/Subject?trainingProgramCourseIds=${trainingProgramCourseIdsString}`)
+        getCourses(trainingProgramCourseIds)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -127,14 +128,7 @@ const AddModuleClass = ({ visible, toggleModalInsert }) => {
         };
 
         try {
-            const response = await fetch('http://localhost:5065/api/ModuleClass', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
+            const response = addModuleClass(data);
             if (response.ok) {
                 alert('Thêm lớp học phần thành công!');
                 const result = await response.json();

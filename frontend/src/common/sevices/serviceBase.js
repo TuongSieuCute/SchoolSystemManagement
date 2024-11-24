@@ -18,24 +18,28 @@ export const postRequest = (url, body) => {
 const sendRequest = async (url, method, body) => {
     const headers = await getHeaders();
 
+    /**
+     * @type {RequestInit}
+     */
     const options = {
         headers,
         method,
     };
     if (body) {
-        options.body = body;
+        if (body instanceof FormData) {
+            options.body = body;
+        } else {
+            options.body = JSON.stringify(body);
+        }
     }
-    return await fetch(url, {
-        headers,
-        method,
-        body,
-    });
+    return await fetch(url, options);
 };
 
 const getHeaders = async () => {
     const token = await getIdToken();
     const headers = new Headers();
     headers.append('Authorization', `Bearer ${token}`);
+    headers.append('Content-Type', 'application/json');
     return headers;
 };
 

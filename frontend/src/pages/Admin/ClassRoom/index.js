@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Combobox from 'react-widgets/Combobox';
 import 'react-widgets/styles.css';
+import { getClassrooms, searchClassroom } from '../../../common/sevices/classroomService';
 import './styles.css';
 
 const classRoom = () => {
@@ -30,19 +31,15 @@ const classRoom = () => {
         const isAllValid = startDate && lessonStart && lessonEnd;
         if (isAllNull || isAllValid) {
             try {
-                const formattedDate = formatDate(startDate);
+                const searchParams = {
+                    date: formatDate(startDate),
+                    lessonStart,
+                    lessonEnd,
+                    typeRoom,
+                    classRoomId: roomId
+                };
 
-                let url = 'http://localhost:5065/api/ClassRoom/Search?';
-
-                if (formattedDate) url += `date=${formattedDate}&`;
-                if (lessonStart) url += `lessonStart=${lessonStart}&`;
-                if (lessonEnd) url += `lessonEnd=${lessonEnd}&`;
-                if (typeRoom) url += `typeRoom=${typeRoom}&`;
-                if (roomId) url += `classRoomId=${roomId}&`;
-
-                url = url.slice(0, -1); // Xóa & cuối
-
-                const response = await fetch(url);
+                const response = await searchClassroom(searchParams);
                 const data = await response.json();
 
                 if (response.ok) {
@@ -61,7 +58,7 @@ const classRoom = () => {
     };
 
     useEffect(() => {
-        fetch('http://localhost:5065/api/ClassRoom')
+        getClassrooms()
             .then(response => response.json())
             .then(data => setListRooms(data))
             .catch(err => console.error('Lỗi', err));

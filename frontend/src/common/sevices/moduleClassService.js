@@ -1,5 +1,12 @@
-import { getRequest } from './serviceBase';
+import { getApiUrl } from './environmentService';
+import { getRequest, postRequest } from './serviceBase';
 
 export const getSubjects = () => {
-    return getRequest('https://localhost:7074/api/ModuleClass/subject');
+    const apiUrl = getApiUrl();
+    return getRequest(apiUrl + '/ModuleClass/subject');
+};
+
+export const addModuleClass = (moduleClass) => {
+    const apiUrl = getApiUrl();
+    return postRequest(apiUrl, moduleClass);
 };

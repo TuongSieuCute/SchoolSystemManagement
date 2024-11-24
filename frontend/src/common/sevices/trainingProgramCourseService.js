@@ -1,7 +1,6 @@
 import { getApiUrl } from './environmentService';
 import { getRequest } from './serviceBase';
-
-export const getCourseRegistration = () => {
+export const getTrainingProgram = () => {
     const apiUrl = getApiUrl();
-    return getRequest(apiUrl + '/CourseRegistration');
+    return getRequest(apiUrl + '/TrainingProgramCourse');
 };
