@@ -3,7 +3,7 @@ import { msalInstance } from './../../helper/authConfig';
 import { getAccessToken } from './serviceBase';
 
 export const getUsername = () => {
-    return msalInstance.getAllAccounts()[0].username;
+    return msalInstance.getAllAccounts()[0]?.username;
 };
 export const getProfilePicture = async () => {
     const headers = new Headers();
@@ -30,9 +30,11 @@ const convertPhotoToString = (blob) => {
 };
 
 export const getUserId = () => {
-    const account = msalInstance.getAllAccounts()[0];
     // username is account's email
-    const username = account.username;
+    const username = getUsername();
+    if (!username) {
+        return null;
+    }
     const id = username.substring(0, username.indexOf('@'));
     // student id
     if (/^\d+$/.test(id)) {
