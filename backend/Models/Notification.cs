@@ -11,7 +11,7 @@ public partial class Notification
 
     public string? Content { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateOnly? CreatedAt { get; set; }
 
     public virtual ICollection<StudentNotification> StudentNotifications { get; set; } = new List<StudentNotification>();
 }

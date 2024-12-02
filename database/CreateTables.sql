@@ -231,7 +231,7 @@ CREATE TABLE Notifications (
     NotificationsId INT PRIMARY KEY IDENTITY,
     Title NVARCHAR(255),
     Content NVARCHAR(MAX),
-    CreatedAt DATETIME DEFAULT GETDATE()
+    CreatedAt DATE DEFAULT GETDATE()
 )
 
 CREATE TABLE StudentNotifications (
@@ -239,7 +239,7 @@ CREATE TABLE StudentNotifications (
     NotificationId INT,
     StudentId VARCHAR(20),
     IsRead BIT DEFAULT 0,
-    ReadAt DATETIME NULL,
+    ReadAt DATE NULL,
     FOREIGN KEY (NotificationId) REFERENCES Notifications(NotificationsId),
     FOREIGN KEY (StudentId) REFERENCES Student(StudentId)
 )

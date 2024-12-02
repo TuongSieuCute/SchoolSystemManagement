@@ -13,7 +13,7 @@ public partial class StudentNotification
 
     public bool? IsRead { get; set; }
 
-    public DateTime? ReadAt { get; set; }
+    public DateOnly? ReadAt { get; set; }
 
     public virtual Notification? Notification { get; set; }
 

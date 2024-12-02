@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using backend.DTOs;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -17,40 +18,17 @@ namespace backend.Controllers
     [Route("api/[controller]")]
     public class ModuleClassController : Controller
     {
-        private readonly SchoolSystemManagementContext _context;
-        private readonly AddModuleClassService _addModuleClassService;
-
-        public ModuleClassController(SchoolSystemManagementContext context, AddModuleClassService addModuleClassService)
+        public readonly IModuleClassService _moduleClassService;
+        public ModuleClassController(IModuleClassService moduleClassService)
         {
-            _context = context;
-            _addModuleClassService = addModuleClassService;
+            _moduleClassService = moduleClassService;
         }
-
+        // Xem thời khóa biểu, Xem lớp học phần
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ModuleClass>>> GetModuleClasses()
+        public async Task<ActionResult<IEnumerable<ModuleClassDTO>>> GetModuleClass()
         {
-            var result = await (from mc in _context.ModuleClasses
-                                join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
-                                join s in _context.Subjects on mc.SubjectId equals s.SubjectId
-                                join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
-                                from l in lecturersGroup.DefaultIfEmpty()
-                                select new
-                                {
-                                    mc.ModuleClassId,
-                                    mc.SubjectId,
-                                    mc.MaximumNumberOfStudents,
-                                    cs.DayOfWeek,
-                                    cs.LessonStart,
-                                    cs.LessonEnd,
-                                    cs.NumberOfWeek,
-                                    cs.StartDate,
-                                    cs.EndDate,
-                                    cs.ClassRoomId,
-                                    s.SubjectName,
-                                    l.FullName,
-                                }).ToListAsync();
-
-            return Ok(result);
+            var moduleClass = await _moduleClassService.GetModuleClassDTOAsync();
+            return Ok(moduleClass);
         }
 
         // [HttpGet("subject")]

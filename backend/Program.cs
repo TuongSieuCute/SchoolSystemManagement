@@ -9,8 +9,10 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
-// builder.Services.AddScoped<HashPasswordService>();
-builder.Services.AddScoped<AddModuleClassService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IModuleClassService, ModuleClassService>();
+builder.Services.AddScoped<INotificationsService, NotificationsService>();
+builder.Services.AddScoped<ICourseRegistrationService, CourseRegistrationService>();
 
 builder.Services.AddDbContext<SchoolSystemManagementContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionStrings")));
 // Cấu hình JWT

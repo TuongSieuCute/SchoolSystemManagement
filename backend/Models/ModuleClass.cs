@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models;
 
@@ -21,28 +20,4 @@ public partial class ModuleClass
     public virtual Lecturer? Lecturer { get; set; }
 
     public virtual Subject? Subject { get; set; }
-
-    [NotMapped]
-    public byte? DaysAWeek { get; set; }
-
-    [NotMapped]
-    public byte? LessonsPerDay { get; set; }
-    
-    [NotMapped]
-    public byte? NumberOfWeek { get; set; }
-
-    [NotMapped]
-    public string? RoomType { get; set; }
-
-    [NotMapped]
-    public List<SubjectEntry> SubjectIds { get; set; } = new List<SubjectEntry>();
-
-    [NotMapped]
-    public List<string>? TrainingProgramCourseIds { get; set; } = new List<string>();
-}
-
-public class SubjectEntry 
-{
-    public string SubjectId { get; set; }
-    public int Count { get; set; }
 }

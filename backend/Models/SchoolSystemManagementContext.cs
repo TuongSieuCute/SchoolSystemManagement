@@ -61,11 +61,15 @@ public partial class SchoolSystemManagementContext : DbContext
 
     public virtual DbSet<TuitionFee> TuitionFees { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=SchoolSystemManagement;Integrated Security=True;Trust Server Certificate=True");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClassRoom>(entity =>
         {
-            entity.HasKey(e => e.ClassRoomId).HasName("PK__ClassRoo__742E12915882CF2F");
+            entity.HasKey(e => e.ClassRoomId).HasName("PK__ClassRoo__742E1291617825C1");
 
             entity.ToTable("ClassRoom");
 
@@ -82,7 +86,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<ClassSchedule>(entity =>
         {
-            entity.HasKey(e => e.ScheduleId).HasName("PK__ClassSch__9C8A5B49E6BF1404");
+            entity.HasKey(e => e.ScheduleId).HasName("PK__ClassSch__9C8A5B49532ECB2B");
 
             entity.ToTable("ClassSchedule");
 
@@ -105,7 +109,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Course>(entity =>
         {
-            entity.HasKey(e => e.CourseId).HasName("PK__Course__C92D71A74D404119");
+            entity.HasKey(e => e.CourseId).HasName("PK__Course__C92D71A7E7C16783");
 
             entity.ToTable("Course");
 
@@ -121,7 +125,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<CourseRegistration>(entity =>
         {
-            entity.HasKey(e => e.CourseRegistrationId).HasName("PK__CourseRe__A0FC0B768ABA57E7");
+            entity.HasKey(e => e.CourseRegistrationId).HasName("PK__CourseRe__A0FC0B7681D7F8FD");
 
             entity.ToTable("CourseRegistration", tb =>
                 {
@@ -165,7 +169,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<CumulativePoint>(entity =>
         {
-            entity.HasKey(e => e.CumulativePointId).HasName("PK__Cumulati__E43362A0AFC82066");
+            entity.HasKey(e => e.CumulativePointId).HasName("PK__Cumulati__E43362A0CFFCBC53");
 
             entity.ToTable("CumulativePoint");
 
@@ -190,7 +194,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Department>(entity =>
         {
-            entity.HasKey(e => e.DepartmentId).HasName("PK__Departme__B2079BED7A1564CF");
+            entity.HasKey(e => e.DepartmentId).HasName("PK__Departme__B2079BED4EC99429");
 
             entity.ToTable("Department");
 
@@ -202,7 +206,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Lecturer>(entity =>
         {
-            entity.HasKey(e => e.LecturerId).HasName("PK__Lecturer__5A78B93DFB4CB1E6");
+            entity.HasKey(e => e.LecturerId).HasName("PK__Lecturer__5A78B93D1FA44048");
 
             entity.ToTable("Lecturer");
 
@@ -221,7 +225,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Major>(entity =>
         {
-            entity.HasKey(e => e.MajorId).HasName("PK__Major__D5B8BF910BFC02F9");
+            entity.HasKey(e => e.MajorId).HasName("PK__Major__D5B8BF910D916A72");
 
             entity.ToTable("Major");
 
@@ -240,7 +244,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<ModuleClass>(entity =>
         {
-            entity.HasKey(e => e.ModuleClassId).HasName("PK__ModuleCl__B6EAAD82BCE03F7A");
+            entity.HasKey(e => e.ModuleClassId).HasName("PK__ModuleCl__B6EAAD82355A8EE3");
 
             entity.ToTable("ModuleClass");
 
@@ -265,7 +269,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<ModuleGroup>(entity =>
         {
-            entity.HasKey(e => e.ModuleGroupId).HasName("PK__ModuleGr__897B9013BFC002B0");
+            entity.HasKey(e => e.ModuleGroupId).HasName("PK__ModuleGr__897B9013B08AD7BC");
 
             entity.ToTable("ModuleGroup");
 
@@ -284,7 +288,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<ModuleType>(entity =>
         {
-            entity.HasKey(e => e.ModuleTypeId).HasName("PK__ModuleTy__5EBC4F0C074352C9");
+            entity.HasKey(e => e.ModuleTypeId).HasName("PK__ModuleTy__5EBC4F0CCAC1B017");
 
             entity.ToTable("ModuleType");
 
@@ -296,19 +300,17 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationsId).HasName("PK__Notifica__94E5596DAB127759");
+            entity.HasKey(e => e.NotificationsId).HasName("PK__Notifica__94E5596D716E8B17");
 
             entity.ToTable(tb => tb.HasTrigger("trg_AfterInsertNotifications"));
 
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Title).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Semester>(entity =>
         {
-            entity.HasKey(e => e.SemesterId).HasName("PK__Semester__043301DD6AE644A7");
+            entity.HasKey(e => e.SemesterId).HasName("PK__Semester__043301DD8233A5FE");
 
             entity.ToTable("Semester");
 
@@ -320,7 +322,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<SemesterPeriod>(entity =>
         {
-            entity.HasKey(e => e.SemesterPeriodId).HasName("PK__Semester__DDD0DF62058F88FB");
+            entity.HasKey(e => e.SemesterPeriodId).HasName("PK__Semester__DDD0DF62CB482445");
 
             entity.ToTable("SemesterPeriod");
 
@@ -339,7 +341,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Student>(entity =>
         {
-            entity.HasKey(e => e.StudentId).HasName("PK__Student__32C52B99200E084D");
+            entity.HasKey(e => e.StudentId).HasName("PK__Student__32C52B998643775B");
 
             entity.ToTable("Student");
 
@@ -358,7 +360,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<StudentClass>(entity =>
         {
-            entity.HasKey(e => e.StudentClassId).HasName("PK__StudentC__2FF1214761DA2D56");
+            entity.HasKey(e => e.StudentClassId).HasName("PK__StudentC__2FF1214733642CE4");
 
             entity.ToTable("StudentClass");
 
@@ -391,10 +393,9 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<StudentNotification>(entity =>
         {
-            entity.HasKey(e => e.StudentNotificationsId).HasName("PK__StudentN__AAE6E2E34BAA3108");
+            entity.HasKey(e => e.StudentNotificationsId).HasName("PK__StudentN__AAE6E2E321D724EE");
 
             entity.Property(e => e.IsRead).HasDefaultValue(false);
-            entity.Property(e => e.ReadAt).HasColumnType("datetime");
             entity.Property(e => e.StudentId)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -410,7 +411,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<Subject>(entity =>
         {
-            entity.HasKey(e => e.SubjectId).HasName("PK__Subject__AC1BA3A8BB022C1E");
+            entity.HasKey(e => e.SubjectId).HasName("PK__Subject__AC1BA3A8B53CFCD7");
 
             entity.ToTable("Subject");
 
@@ -424,7 +425,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<TrainingProgram>(entity =>
         {
-            entity.HasKey(e => e.TrainingProgramId).HasName("PK__Training__4F897A5D002CA559");
+            entity.HasKey(e => e.TrainingProgramId).HasName("PK__Training__4F897A5D5D50DEA7");
 
             entity.ToTable("TrainingProgram");
 
@@ -443,7 +444,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<TrainingProgramCourse>(entity =>
         {
-            entity.HasKey(e => e.TrainingProgramCourseId).HasName("PK__Training__B3C2FC5DEE22A691");
+            entity.HasKey(e => e.TrainingProgramCourseId).HasName("PK__Training__B3C2FC5DF9E27D1F");
 
             entity.ToTable("TrainingProgram_Course", tb => tb.HasTrigger("trgInsertTrainingProgram_Course"));
 
@@ -469,7 +470,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<TrainingProgramModuleGroup>(entity =>
         {
-            entity.HasKey(e => e.TrainingProgramModuleGroupId).HasName("PK__Training__680A19D4FA06C647");
+            entity.HasKey(e => e.TrainingProgramModuleGroupId).HasName("PK__Training__680A19D4A93CC49C");
 
             entity.ToTable("TrainingProgram_ModuleGroup", tb => tb.HasTrigger("trgInsertTrainingProgram_ModuleGroup"));
 
@@ -525,7 +526,7 @@ public partial class SchoolSystemManagementContext : DbContext
 
         modelBuilder.Entity<TuitionFee>(entity =>
         {
-            entity.HasKey(e => e.TuitionFeesId).HasName("PK__TuitionF__6F98818BD0CD0AF6");
+            entity.HasKey(e => e.TuitionFeesId).HasName("PK__TuitionF__6F98818BF2C483B1");
 
             entity.Property(e => e.TuitionFeesId)
                 .HasMaxLength(20)
