@@ -10,7 +10,7 @@ namespace backend.DTOs
     {
         public string? ModuleClassId { get; set; }
         public byte? MaximumNumberOfStudents { get; set; }
-        public string? LectureId { get; set; }
+        public string? LecturerId { get; set; }
         public string? FullName { get; set; }
         public string? SubjectId { get; set; }
         public string? SubjectName { get; set; }

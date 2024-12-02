@@ -30,7 +30,36 @@ namespace backend.Controllers
             var moduleClass = await _moduleClassService.GetModuleClassDTOAsync();
             return Ok(moduleClass);
         }
-
+        // Đăng kí dạy
+        [HttpPut("TeachingRegistration")]
+        public async Task<IActionResult> PutModuleClassDTORegisterAsync([FromBody] ModuleClassDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            var result = await _moduleClassService.PutModuleClassDTORegisterAsync(dto);
+            if (result)
+            {
+                return Ok();
+            }
+            return StatusCode(500, "Failed to update ModuleClassDTO");
+        }
+        // Hủy đăng kí dạy
+        [HttpPut("CancelRegistration")]
+        public async Task<IActionResult> PutModuleClassDTOCancelRegistrationAsync([FromBody] ModuleClassDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            var result = await _moduleClassService.PutModuleClassDTOCancelRegistrationAsync(dto);
+            if (result)
+            {
+                return Ok();
+            }
+            return StatusCode(500, "Failed to update ModuleClassDTO");
+        }
         // [HttpGet("subject")]
         // public async Task<ActionResult<IEnumerable<ModuleClass>>> GetModuleClassesSubject(string? subjectId)
         // {
@@ -184,47 +213,6 @@ namespace backend.Controllers
         // {
 
         //     return Ok();
-        // }
-
-        // [HttpPut]
-        // public async Task<IActionResult> UpdateLecturerId([FromBody] ModuleClass moduleClass)
-        // {
-        //     var existingModuleClass = await _context.ModuleClasses
-        //         .FirstOrDefaultAsync(mc => mc.ModuleClassId == moduleClass.ModuleClassId);
-
-        //     if (existingModuleClass == null)
-        //     {
-        //         return NotFound($"Không tìm thấy Mã lớp học phần {existingModuleClass}");
-        //     }
-
-        //     if (existingModuleClass.LecturerId != null)
-        //     {
-        //         return BadRequest("Không thể đăng kí dạy học do đã có giảng viên.");
-        //     }
-
-        //     // Kiểm tra sự xung đột lịch dạy
-        //     var hasConflict = await _context.ClassSchedules
-        //         .Where(cs1 => cs1.ModuleClassId == moduleClass.ModuleClassId)
-        //         .AnyAsync(cs1 => _context.ClassSchedules
-        //             .Where(cs2 => _context.ModuleClasses
-        //                 .Where(innerMc => innerMc.LecturerId == moduleClass.LecturerId)
-        //                 .Select(innerMc => innerMc.ModuleClassId)
-        //                 .Contains(cs2.ModuleClassId))
-        //             .Any(cs2 => cs1.DayOfWeek == cs2.DayOfWeek &&
-        //                 ((cs1.LessonStart < cs2.LessonEnd && cs1.LessonEnd > cs2.LessonStart) ||
-        //                 (cs1.LessonStart >= cs2.LessonStart && cs1.LessonStart <= cs2.LessonEnd) ||
-        //                 (cs1.LessonEnd >= cs2.LessonStart && cs1.LessonEnd <= cs2.LessonEnd)) &&
-        //                 (cs1.StartDate <= cs2.EndDate && cs1.EndDate >= cs2.StartDate)));
-
-        //     if (hasConflict)
-        //     {
-        //         return Conflict("Không thể đăng kí giảng dạy do trùng lịch dạy.");
-        //     }
-
-        //     existingModuleClass.LecturerId = moduleClass.LecturerId;
-        //     await _context.SaveChangesAsync();
-
-        //     return Ok(new { message = "Đăng kí giảng dạy thành công" });
         // }
 
         // [HttpPut("delete-LectureId")]

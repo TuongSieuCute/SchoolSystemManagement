@@ -10,6 +10,7 @@ namespace backend.Services
     {
         Task<IEnumerable<CourseRegistrationDTO>> GetCourseRegistrationDTOAsync();
         Task<bool> PostCourseRegistrationDTOAsync(CourseRegistrationDTO dto);
+        Task<bool> PutCourseRegistrationDTOAsync(CourseRegistrationDTO dto);
         Task<bool> DeleteCourseRegistrationDTOAsync(string moduleClassId, string studentId);
     }
 }

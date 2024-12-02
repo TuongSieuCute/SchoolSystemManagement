@@ -45,6 +45,21 @@ namespace backend.Controllers
 
             return Ok();
         }
+        // Cập nhật điểm (giảng viên)
+        [HttpPut]
+        public async Task<IActionResult> PutCourseRegistrationDTOAsync([FromBody] CourseRegistrationDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest();
+            }
+            var result = await _courseRegistrationService.PutCourseRegistrationDTOAsync(dto);
+            if (result)
+            {
+                return Ok();
+            }
+            return StatusCode(500, "Failed to update CourseRegistrationDTO");
+        }
         // Hủy đăng kí học phần (sinh viên)
         [HttpDelete]
         public async Task<IActionResult> DeleteCourseRegistrationDTOAsync([FromBody] CourseRegistrationDTO dto)
@@ -109,28 +124,6 @@ namespace backend.Controllers
         //     var registeredClasses = await query.ToListAsync();
 
         //     return Ok(registeredClasses);
-        // }
-
-        // [HttpPut]
-        // public async Task<IActionResult> PutCourseRegistration([FromBody] CourseRegistration courseRegistration)
-        // {
-        //     var existingCourseRegistration = await _context.CourseRegistrations
-        //         .FirstOrDefaultAsync(cr => cr.ModuleClassId == courseRegistration.ModuleClassId
-        //                                 && cr.StudentId == courseRegistration.StudentId);
-
-        //     if (existingCourseRegistration == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     existingCourseRegistration.MidtermGradePercentage = courseRegistration.MidtermGradePercentage;
-        //     existingCourseRegistration.FinalExamGradePercentage = courseRegistration.FinalExamGradePercentage;
-        //     existingCourseRegistration.MidtermGrade = courseRegistration.MidtermGrade;
-        //     existingCourseRegistration.FinalExamGrade = courseRegistration.FinalExamGrade;
-
-        //     await _context.SaveChangesAsync();
-
-        //     return Ok();
         // }
     }
 }

@@ -122,6 +122,25 @@ namespace backend.Services
             }
             return true;
         }
+        public async Task<bool> PutCourseRegistrationDTOAsync(CourseRegistrationDTO dto)
+        {
+            var find = await _context.CourseRegistrations
+                .FirstOrDefaultAsync(cr => cr.ModuleClassId == dto.ModuleClassId
+                                        && cr.StudentId == dto.StudentId);
+
+            if (find == null)
+            {
+                return false;
+            }
+
+            find.MidtermGradePercentage = dto.MidtermGradePercentage;
+            find.FinalExamGradePercentage = dto.FinalExamGradePercentage;
+            find.MidtermGrade = dto.MidtermGrade;
+            find.FinalExamGrade = dto.FinalExamGrade;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
         public async Task<bool> DeleteCourseRegistrationDTOAsync(string moduleClassId, string studentId)
         {
             var dto = await _context.CourseRegistrations
