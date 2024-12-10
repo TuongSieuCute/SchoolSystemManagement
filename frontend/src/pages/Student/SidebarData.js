@@ -14,7 +14,7 @@ export const SidebarData = [
     {
         title: 'Chương trình đào tạo',
         icon: <FaBook />,
-        link: '/student/instructionalPlan'
+        link: '/student/instructionalplan'
     },
     {
         title: 'Thời khóa biểu',
@@ -24,16 +24,16 @@ export const SidebarData = [
     {
         title: 'Kết quả học tập',
         icon: <FaGraduationCap />,
-        link: '/student/select-grades'
+        link: '/student/grades'
     },
     {
         title: 'Học phí',
         icon: <LiaMoneyBillWaveAltSolid />,
-        link: '/student/select-grades'
+        link: '/student/tuition'
     },
     {
         title: 'Đăng kí học phần',
         icon: <FaClipboardList />,
-        link: '/student/register-module'
+        link: '/student/registermodule'
     },
 ];

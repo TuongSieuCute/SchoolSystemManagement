@@ -26,6 +26,7 @@ namespace backend.DTOs
         public bool? IsCreditGpa { get; set; }
         public decimal? Total { get; set; }
         public string? TrainingProgramCourseId { get; set; }
+        public string? MajorName { get; set; }
         public string? TrainingProgramName { get; set; }
         public byte? TotalCredit { get; set; }
         public byte? CreditPass { get; set; }

@@ -28,6 +28,7 @@ namespace backend.Services
                                 join tm in _context.TrainingProgramModuleGroups on tms.TrainingProgramModuleGroupId equals tm.TrainingProgramModuleGroupId
                                 join t in _context.TrainingPrograms on tm.TrainingProgramId equals t.TrainingProgramId
                                 join tc in _context.TrainingProgramCourses on t.TrainingProgramId equals tc.TrainingProgramId
+                                join m in _context.Majors on t.MajorId equals m.MajorId
                                 join cp in _context.CumulativePoints on tc.TrainingProgramCourseId equals cp.TrainingProgramCourseId
                                 where cr.StudentId == cp.StudentId
                                 select new CourseRegistrationDTO
@@ -51,6 +52,7 @@ namespace backend.Services
                                     Total = cr.Total,
                                     TrainingProgramCourseId = tc.TrainingProgramCourseId,
                                     TrainingProgramName = t.TrainingProgramName,
+                                    MajorName = m.MajorName,
                                     TotalCredit = cp.TotalCredit,
                                     CreditPass = cp.CreditPass,
                                     CreditFall = cp.CreditFall,

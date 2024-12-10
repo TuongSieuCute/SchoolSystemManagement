@@ -110,6 +110,11 @@ BEGIN
 	DECLARE @TotalCumulativeAverageGrade10 DECIMAL(4,1) = 0
 	DECLARE @NewGPA DECIMAL(3,1) = 0
 
+	IF @AverageGrade10 < 4
+	BEGIN
+		RETURN @CumulativeAverageGrade10
+	END
+
 	SELECT @SubjectId = mc.SubjectId
 	FROM ModuleClass mc
 	WHERE mc.ModuleClassId = @ModuleClassId

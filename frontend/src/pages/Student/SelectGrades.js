@@ -30,7 +30,7 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
     const totalCreditsPass = filteredGrades.filter(item => item.isPass).reduce((sum, item) => sum + item.numberOfCredit, 0);
     const totalWeightedGrades = filteredGrades.filter(item => item.isCreditGpa).reduce((sum, item) => sum + (item.averageGrade10 * item.numberOfCredit), 0);
     const totalCreditGPA = filteredGrades.filter(item => item.isCreditGpa).reduce((sum, item) => sum + item.numberOfCredit, 0);
-    const cumulativeGPA10 = totalCreditGPA > 0 ? (totalWeightedGrades / totalCreditGPA).toFixed(2) : 'N/A';
+    const cumulativeGPA10 = totalCreditGPA > 0 ? (totalWeightedGrades / totalCreditGPA).toFixed(1) : 'N/A';
 
     const renderIsPass = (rowData) => {
         const isRequired = rowData.isPass;
@@ -39,7 +39,7 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
                 {isRequired ? (
                     <p><FaCheck style={{ color: 'green', fontSize: '20px' }} /></p>
                 ) : (
-                    <p><MdCancel  style={{ color: 'red', fontSize: '20px' }} /></p>
+                    <p><MdCancel style={{ color: 'red', fontSize: '20px' }} /></p>
                 )}
             </span>
         );
@@ -49,7 +49,7 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
         const literacy = rowData.literacy;
         let gradeClass = '';
         let gradeLabel = literacy;
-    
+
         switch (literacy) {
             case 'A ':
                 gradeClass = 'grade-A';
@@ -90,11 +90,15 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
                     header={
                         <div className="flex flex-wrap align-items-center justify-content-between gap-2">
                             <span>{'Năm học: ' + year.label + ' - ' + year.semesterName}</span>
-                            <Button onClick={toggleDataVisibility} icon={isDataVisible ? 'pi pi-angle-down' : 'pi pi-angle-up'} />
+                            <Button 
+                                style={{ background: 'var(--bg-red)'}} 
+                                onClick={toggleDataVisibility} 
+                                icon={isDataVisible ? 'pi pi-angle-down' : 'pi pi-angle-up'} 
+                            />
                         </div>
                     }
                     footer={
-                        <div className='flex flex-wrap justify-content-between gap-1 p-2' style={{ background: 'white'}}>
+                        <div className='flex flex-wrap justify-content-between gap-1 p-2' style={{ background: 'white' }}>
                             <p>Số tín chỉ đăng kí học kì: {totalCredits}</p>
                             <p>Số tín chỉ đạt: {totalCreditsPass}</p>
                             <p>Điểm trung bình học kì (hệ 10): {cumulativeGPA10}</p>
@@ -139,8 +143,8 @@ const SelectGrades = () => {
         fetch(`https://localhost:7074/api/CourseRegistration`)
             .then(response => response.json())
             .then(data => {
-                setRawData(data);
                 const filteredData = data.filter(item => item.studentId === studentId);
+                setRawData(filteredData);
                 const options = filteredData.map(item => ({
                     label: item.trainingProgramName,
                     value: item.trainingProgramName
@@ -189,6 +193,24 @@ const SelectGrades = () => {
                     />
                     <label htmlFor="selectedRegistration" className='cus-label-dropdown'>Chương trình đào tạo</label>
                 </FloatLabel>
+            </div>
+            <div className='datatable-container'>
+                {listGrades && listGrades.length > 0 && (
+                    <div>
+                        <div className='flex flex-wrap gap-6 p-2'>
+                            <p><strong>Mã số sinh viên: </strong>{studentId}</p>
+                            <p><strong>Họ và tên: </strong>{listGrades[0].fullName}</p>
+                            <p><strong>Ngành: </strong>{listGrades[0].majorName}</p>
+                        </div>
+                        <div className='flex flex-wrap gap-6 p-2'>
+                            <p><strong>Tổng số tín chỉ đăng ký: </strong>{listGrades[0].totalCredit}</p>
+                            <p><strong>Số tín chỉ đạt: </strong>{listGrades[0].creditPass}</p>
+                            <p><strong>Số tín chỉ không đạt: </strong>{listGrades[0].creditFall}</p>
+                            <p><strong>Điểm TB tích lũy hệ 10: </strong>{listGrades[0].cumulativeAverageGrade10}</p>
+                            <p><strong>Điểm TB tích lũy hệ 4: </strong>{listGrades[0].cumulativeAverageGrade4}</p>
+                        </div>
+                    </div>
+                )}
             </div>
             <div>
                 {yearOptions.map((year) => (

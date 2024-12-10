@@ -12,6 +12,7 @@ import RegisterModule from './pages/Student/RegisterModule/RegisterModule';
 import RegisterModuleDetail from './pages/Student/RegisterModule/RegisterModuleDetail';
 import SelectGrades from './pages/Student/SelectGrades';
 import TimeTable from './pages/Student/TimeTable';
+import Money from './pages/Student/Money';
 import { default as Teacher, default as TeachingRegistrationDetail } from './pages/Teacher';
 import Grades from './pages/Teacher/Grades';
 import TeachingRegistration from './pages/Teacher/TeachingRegistration';
@@ -33,10 +34,11 @@ export const router = createBrowserRouter([
         path: '/student', element: <Student />,
         children: [
             { path: '', index: true, element: <User />, },
-            { path: 'instructionalPlan', element: <InstructionalPlan /> },
-            { path: 'select-grades', element: <SelectGrades /> },
+            { path: 'instructionalplan', element: <InstructionalPlan /> },
+            { path: 'grades', element: <SelectGrades /> },
             { path: 'timetable', element: <TimeTable /> },
-            { path: 'register-module', element: <RegisterModule /> },
+            { path: 'tuition', element: <Money /> },
+            { path: 'registermodule', element: <RegisterModule /> },
             { path: 'register-module-detail', element: <RegisterModuleDetail /> },
         ]
     },

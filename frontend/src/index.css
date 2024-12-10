@@ -94,7 +94,7 @@ html, body {
 }
 
 .subject-elective {
-    background-color: var(--bg-green);
+    background-color: var(--bg-yellow);
     color: var(--cl-text-black);
     padding: 4px;
     border: 1px solid var(--cl-text-black);
