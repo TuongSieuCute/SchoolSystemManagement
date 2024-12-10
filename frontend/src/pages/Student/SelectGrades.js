@@ -4,8 +4,10 @@ import { Column } from 'primereact/column';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
-import 'primeicons/primeicons.css';
-import { getUserInfoLocal } from '../../helper/token';
+import { useMsal } from '@azure/msal-react';
+import { getUserId } from '../../common/sevices/authService';
+import { FaCheck } from 'react-icons/fa';
+import { MdCancel } from "react-icons/md";
 
 // Hàm tính GPA hệ 4 từ GPA hệ 10
 const calculateGPA = (cumulativeGPA10) => {
@@ -30,9 +32,58 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
     const totalCreditGPA = filteredGrades.filter(item => item.isCreditGpa).reduce((sum, item) => sum + item.numberOfCredit, 0);
     const cumulativeGPA10 = totalCreditGPA > 0 ? (totalWeightedGrades / totalCreditGPA).toFixed(2) : 'N/A';
 
+    const renderIsPass = (rowData) => {
+        const isRequired = rowData.isPass;
+        return (
+            <span>
+                {isRequired ? (
+                    <p><FaCheck style={{ color: 'green', fontSize: '20px' }} /></p>
+                ) : (
+                    <p><MdCancel  style={{ color: 'red', fontSize: '20px' }} /></p>
+                )}
+            </span>
+        );
+    };
+
+    const renderLiteracy = (rowData) => {
+        const literacy = rowData.literacy;
+        let gradeClass = '';
+        let gradeLabel = literacy;
+    
+        switch (literacy) {
+            case 'A ':
+                gradeClass = 'grade-A';
+                break;
+            case 'B+':
+                gradeClass = 'grade-Bplus';
+                break;
+            case 'B ':
+                gradeClass = 'grade-B';
+                break;
+            case 'C+':
+                gradeClass = 'grade-Cplus';
+                break;
+            case 'C ':
+                gradeClass = 'grade-C';
+                break;
+            case 'D+':
+                gradeClass = 'grade-Dplus';
+                break;
+            case 'D ':
+                gradeClass = 'grade-D';
+                break;
+            case 'F ':
+                gradeClass = 'grade-F';
+                break;
+            default:
+                gradeClass = 'grade-default';
+        }
+        return <span className={gradeClass}>{gradeLabel}</span>;
+    };
+
     return (
         hasDataForYear && (
-            <div key={year.label}>
+            <div key={year.label} className='datatable-container'>
                 <DataTable
                     emptyMessage=" "
                     value={isDataVisible ? filteredGrades : []}
@@ -43,7 +94,7 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
                         </div>
                     }
                     footer={
-                        <div>
+                        <div className='flex flex-wrap justify-content-between gap-1 p-2' style={{ background: 'white'}}>
                             <p>Số tín chỉ đăng kí học kì: {totalCredits}</p>
                             <p>Số tín chỉ đạt: {totalCreditsPass}</p>
                             <p>Điểm trung bình học kì (hệ 10): {cumulativeGPA10}</p>
@@ -52,12 +103,12 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
                     }
                 >
                     <Column field="subjectId" header="Mã học phần" />
-                    <Column field="subjectName" header="Tên học phần" />
+                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }} />
                     <Column field="numberOfCredit" header="Số tín chỉ" />
                     <Column field="averageGrade10" header="Điểm hệ 10" />
                     <Column field="averageGrade4" header="Điểm hệ 4" />
-                    <Column field="literacy" header="Điểm chữ" />
-                    <Column field="isPass" header="Kết quả" />
+                    <Column header="Điểm chữ" body={renderLiteracy} />
+                    <Column header="kết quả" body={renderIsPass} />
                 </DataTable>
             </div>
         )
@@ -66,39 +117,49 @@ const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) =>
 
 // Thành phần chính
 const SelectGrades = () => {
+    const [studentId, setStudentId] = useState('');
+    const [optionsProgram, setOptionsProgram] = useState([]);
+    const [selectedProgram, setSelectedProgram] = useState('');
     const [isDataVisible, setIsDataVisible] = useState(false);
     const [listGrades, setListGrades] = useState([]);
-    const [registrationOptions, setRegistrationOptions] = useState([]);
-    const [selectedRegistration, setSelectedRegistration] = useState(null);
-    const [rawData, setRawData] = useState({});
+    const [rawData, setRawData] = useState([]);
     const [yearOptions, setYearOptions] = useState([]);
-    const username = getUserInfoLocal().username;
 
+    const { accounts } = useMsal();
     const toggleDataVisibility = () => setIsDataVisible(!isDataVisible);
 
     useEffect(() => {
-        fetch(`http://localhost:5065/api/CourseRegistration?studentId=${username}`)
+        if (!accounts?.length) {
+            return;
+        }
+        setStudentId(getUserId());
+    }, [accounts]);
+
+    useEffect(() => {
+        fetch(`https://localhost:7074/api/CourseRegistration`)
             .then(response => response.json())
             .then(data => {
-                const options = Array.from(new Set(data.map(item => item.trainingProgramId)))
-                    .map(id => data.find(item => item.trainingProgramId === id))
-                    .map(item => ({ label: item.trainingProgramName, value: item.trainingProgramId }));
-                setRegistrationOptions(options);
-                setSelectedRegistration(options[0]?.value || null);
                 setRawData(data);
+                const filteredData = data.filter(item => item.studentId === studentId);
+                const options = filteredData.map(item => ({
+                    label: item.trainingProgramName,
+                    value: item.trainingProgramName
+                }));
+                const uniqueOptions = Array.from(new Set(options.map(option => option.value)))
+                    .map(uniqueValue => options.find(option => option.value === uniqueValue));
+                setOptionsProgram(uniqueOptions);
+                setSelectedProgram(uniqueOptions[0]?.value);
             })
             .catch(err => console.error('Lỗi', err));
-    }, [username]);
+    }, [studentId]);
 
     useEffect(() => {
-        if (selectedRegistration && rawData) {
-            const filteredData = rawData.filter(item => item.trainingProgramId === selectedRegistration);
-            setListGrades(filteredData);
-        }
-    }, [selectedRegistration, rawData]);
+        const filteredData = rawData.filter(item => item.trainingProgramName === selectedProgram);
+        setListGrades(filteredData);
+    }, [rawData, selectedProgram]);
 
     useEffect(() => {
-        fetch('http://localhost:5065/SemesterPeriod')
+        fetch('https://localhost:7074/Semester')
             .then(response => response.json())
             .then((data) => {
                 const options = Array.from(new Set(data.map(item => item.academicYear)))
@@ -116,15 +177,17 @@ const SelectGrades = () => {
 
     return (
         <div>
-            <h1>Điểm</h1>
-            <div>
+            <h3 className='title'>KẾT QUẢ HỌC TẬP</h3>
+            <div className='dropdown-container'>
                 <FloatLabel>
                     <Dropdown
-                        value={selectedRegistration}
-                        options={registrationOptions}
-                        onChange={(e) => setSelectedRegistration(e.value)}
+                        value={selectedProgram}
+                        options={optionsProgram}
+                        onChange={(e) => setSelectedProgram(e.target.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
                     />
-                    <label htmlFor="selectedRegistration">Chương trình đào tạo</label>
+                    <label htmlFor="selectedRegistration" className='cus-label-dropdown'>Chương trình đào tạo</label>
                 </FloatLabel>
             </div>
             <div>

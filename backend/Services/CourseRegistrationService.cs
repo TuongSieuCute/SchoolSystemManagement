@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,7 @@ namespace backend.Services
                                     SubjectId = mc.SubjectId,
                                     SubjectName = su.SubjectName,
                                     NumberOfCredit = su.NumberOfCredit,
+                                    IsCreditGpa = su.IsCreditGpa,
                                     Total = cr.Total,
                                     TrainingProgramCourseId = tc.TrainingProgramCourseId,
                                     TrainingProgramName = t.TrainingProgramName,

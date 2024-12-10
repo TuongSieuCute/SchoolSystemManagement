@@ -51,6 +51,22 @@ const InstructionalPlan = () => {
         );
     };
 
+    const renderNumberOfCredit = (rowData) => {
+        return rowData.isCreditGpa === false
+            ? rowData.numberOfCredit + '*'
+            : rowData.numberOfCredit;
+    };
+
+    const renderSubjectType = (rowData) => {
+        const isRequired = rowData.subjectType === "Tự chọn";
+        const className = isRequired ? 'subject-elective' : 'subject-required';
+        return (
+            <span className={className}>
+                {rowData.subjectType}
+            </span>
+        );
+    };
+
     useEffect(() => {
         if (!accounts?.length) {
             return;
@@ -122,12 +138,6 @@ const InstructionalPlan = () => {
 
     }, [rawData]);
 
-    const renderNumberOfCredit = (rowData) => {
-        return rowData.isCreditGpa === false
-            ? rowData.numberOfCredit + '*'
-            : rowData.numberOfCredit;
-    };
-
     return (
         <div>
             <h3 className='title'>CHƯƠNG TRÌNH ĐÀO TẠO</h3>
@@ -157,9 +167,9 @@ const InstructionalPlan = () => {
                     filterDisplay="row"
                 >
                     <Column field="subjectId" header="Mã học phần" />
-                    <Column field="subjectName" header="Tên học phần" />
+                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }} />
                     <Column header="Số tín chỉ" body={renderNumberOfCredit} />
-                    <Column field="subjectType" header="Loại học phần" />
+                    <Column header="Loại học phần" body={renderSubjectType} />
                     <Column
                         field="semesterName"
                         header="Học kì"

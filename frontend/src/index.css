@@ -4,8 +4,11 @@
 :root {
     --bg-gray: #f0f2f5;
     --bg-white: #FFFFFF;
-    --bg-header-sidebar: #2B78A2;
-    --bg-menu-highlight: #6EA8C9;
+    --bg-header-sidebar: #194263;
+    --bg-menu-highlight: #22659c;
+    --bg-green: #3faea3;
+    --bg-red: #f0593f;
+    --bg-yellow: #f6d65e;
     --cl-text-black: #1C1E21;
     --cl-text-white: #FFFFFF;
 }
@@ -80,4 +83,64 @@ html, body {
 .p-datatable .p-datatable-thead > tr > th {
     background-color: var(--bg-white); 
     color: var(--cl-text-black);
+}
+.subject-required {
+    background-color: var(--bg-red);
+    color: var(--cl-text-black);
+    padding: 4px;
+    border: 1px solid var(--cl-text-black);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.subject-elective {
+    background-color: var(--bg-green);
+    color: var(--cl-text-black);
+    padding: 4px;
+    border: 1px solid var(--cl-text-black);
+    border-radius: 5px;
+    text-align: center;
+}
+.grade-A {
+    color: green;
+    font-weight: bold;
+}
+
+.grade-Bplus {
+    color: #00b0ff; /* Màu xanh sáng */
+    font-weight: bold;
+}
+
+.grade-B {
+    color: blue;
+    font-weight: bold;
+}
+
+.grade-Cplus {
+    color: #ffb300; /* Màu vàng cam */
+    font-weight: bold;
+}
+
+.grade-C {
+    color: orange;
+    font-weight: bold;
+}
+
+.grade-Dplus {
+    color: #ff6600; /* Màu cam đậm */
+    font-weight: bold;
+}
+
+.grade-D {
+    color: red;
+    font-weight: bold;
+}
+
+.grade-F {
+    color: gray;
+    font-weight: bold;
+}
+
+.grade-default {
+    color: black;
 }

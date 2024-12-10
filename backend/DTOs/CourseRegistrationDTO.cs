@@ -23,6 +23,7 @@ namespace backend.DTOs
         public string? SubjectId { get; set; }
         public string? SubjectName { get; set; }
         public byte? NumberOfCredit { get; set; }
+        public bool? IsCreditGpa { get; set; }
         public decimal? Total { get; set; }
         public string? TrainingProgramCourseId { get; set; }
         public string? TrainingProgramName { get; set; }

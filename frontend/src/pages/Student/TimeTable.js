@@ -173,7 +173,7 @@ const TimeTable = () => {
                         }}
                     />
                     <Column field="moduleClassId" header="Lớp học phần"></Column>
-                    <Column field="subjectName" header="Tên học phần"></Column>
+                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }}></Column>
                     <Column field="fullName" header="Tên giảng viên"></Column>
                     <Column field="classRoomId" header="Phòng học"></Column>
                 </DataTable>
