@@ -18,12 +18,8 @@ namespace backend.DTOs
         public string? StudentId { get; set; }
         public string? FullName { get; set; }
         public string? ModuleClassId { get; set; }
-        public DateOnly? StartDateModuleClass { get; set; }
-        public string? AcademicYear { get; set; }
-        public DateOnly? StartDateSemester { get; set; }
-        public DateOnly? EndDateSemester { get; set; }
-        public string? SemesterId { get; set; }
-        public string? SemesterName { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public string? SubjectId { get; set; }
         public string? SubjectName { get; set; }
         public byte? NumberOfCredit { get; set; }

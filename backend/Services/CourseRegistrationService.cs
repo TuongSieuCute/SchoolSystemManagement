@@ -22,8 +22,6 @@ namespace backend.Services
                                 join s in _context.Students on cr.StudentId equals s.StudentId
                                 join mc in _context.ModuleClasses on cr.ModuleClassId equals mc.ModuleClassId
                                 join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
-                                from sp in _context.SemesterPeriods
-                                join se in _context.Semesters on sp.SemesterId equals se.SemesterId
                                 join su in _context.Subjects on mc.SubjectId equals su.SubjectId
                                 join tms in _context.TrainingProgramModuleGroupSubjects on su.SubjectId equals tms.SubjectId
                                 join tm in _context.TrainingProgramModuleGroups on tms.TrainingProgramModuleGroupId equals tm.TrainingProgramModuleGroupId
@@ -44,12 +42,7 @@ namespace backend.Services
                                     StudentId = cr.StudentId,
                                     FullName = s.FullName,
                                     ModuleClassId = cr.ModuleClassId,
-                                    StartDateModuleClass = cs.StartDate,
-                                    AcademicYear = sp.AcademicYear,
-                                    StartDateSemester = sp.StartDate,
-                                    EndDateSemester = sp.EndDate,
-                                    SemesterId = sp.SemesterId,
-                                    SemesterName = se.SemesterName,
+                                    StartDate = cs.StartDate,
                                     SubjectId = mc.SubjectId,
                                     SubjectName = su.SubjectName,
                                     NumberOfCredit = su.NumberOfCredit,

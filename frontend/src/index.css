@@ -2,6 +2,7 @@
 @import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
 @import 'primeicons/primeicons.css';
 :root {
+    --bg-gray: #f0f2f5;
     --bg-white: #FFFFFF;
     --bg-header-sidebar: #2B78A2;
     --bg-menu-highlight: #6EA8C9;
@@ -19,25 +20,64 @@ html, body {
     line-height: 1.5;
     overflow-x: hidden;
     color: var(--cl-text-black);
-    background-color: var(--bg-white);
+    background-color: var(--bg-gray);
+    font-weight: 400;
 }
 .title {
-    border-bottom: 2px solid var(--bg-header-sidebar);
-    margin-bottom: 2rem;
+    background-color: var(--bg-white);
+    padding: 20px 20px 20px 30px;
+}
+.dropdown-container {
+    margin: 15px 20px 0 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: var(--bg-white);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 10px;
+}
+.datatable-container {
+    margin: 15px 20px 0 20px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: var(--bg-white);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .cus-dropdown {
-    padding: 10px;
-    margin-top: 15px;
+    padding: 5px;
+    margin-top: 10px;
+    border: 1px solid var(--bg-header-sidebar);
+    border-radius: 5px;
+    width: 300px;
 }
 .cus-panel-dropdown {
-    padding: 10px;
+    padding: 5px;
 }
 .cus-label-dropdown {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--cl-text-black);
 }
 /* Xoa so 1 va 2 tren header DataTable */
 .p-sortable-column-badge {
     display: none !important;
+}
+.p-datatable {
+    margin: 10px;
+}
+.p-datatable .p-datatable-header {
+    background-color: var(--bg-white);
+    padding: 10px;
+    font-weight: bold;
+    color: var(--cl-text-black);
+}
+.p-datatable .p-datatable-thead th,
+.p-datatable .p-datatable-tbody td {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+.p-datatable .p-datatable-thead > tr > th {
+    background-color: var(--bg-white); 
+    color: var(--cl-text-black);
 }

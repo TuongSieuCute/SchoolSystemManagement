@@ -1,25 +1,44 @@
-import { debounce } from 'lodash';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { getUserId } from '../../common/sevices/authService';
+import { addDays } from 'date-fns';
 
 const TimeTable = () => {
     const [studentId, setStudentId] = useState('');
-    const [moduleClasses, setModuleClasses] = useState([]);
-    const [selectedYear, setSelectedYear] = useState(null);
-    const [yearOptions, setYearOptions] = useState([]);
-    const [selectedSemester, setSelectedSemester] = useState(null);
-    const [semesterOptions, setSemesterOptions] = useState([]);
-    const [selectedWeek, setSelectedWeek] = useState(null);
-    const [mdStartDate, setMdStartDate] = useState(null);
+    const [time, setTime] = useState([]);
+    const [optionsYear, setOptionsYear] = useState([]);
+    const [selectedYear, setSelectedYear] = useState('');
+    const [optionsSemester, setOptionsSemester] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState('');
+    const [selectedWeek, setSelectedWeek] = useState('');
+    const [moduleClassId, setModuleClassId] = useState([]);
+    const [moduleClass, setModuleClass] = useState([]);
+    const [showData, setShowData] = useState([]);
 
-    const { accounts, instance } = useMsal();
-    const weekOptions = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8', 'Tuần 9', 'Tuần 10', 'Tuần 11', 'Tuần 12', 'Tuần 13', 'Tuần 14', 'Tuần 15'];
+    const { accounts } = useMsal();
+    const optionsWeek = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5', 'Tuần 6', 'Tuần 7', 'Tuần 8', 'Tuần 9', 'Tuần 10', 'Tuần 11', 'Tuần 12', 'Tuần 13', 'Tuần 14', 'Tuần 15'];
 
+    const calculateRowSpan = (data) => {
+        return data.map((item, index) => {
+            if (index === 0 || item.dayOfWeek !== data[index - 1].dayOfWeek) {
+                // Đếm số hàng liên tiếp có cùng giá trị dayOfWeek
+                let rowSpan = 1;
+                for (let i = index + 1; i < data.length && data[i].dayOfWeek === item.dayOfWeek; i++) {
+                    rowSpan++;
+                }
+                return { ...item, rowSpan };
+            } else {
+                return { ...item, rowSpan: 0 };
+            }
+        });
+    };
+
+    const processedData = calculateRowSpan(showData);
+    
     useEffect(() => {
         if (!accounts?.length) {
             return;
@@ -28,244 +47,135 @@ const TimeTable = () => {
     }, [accounts]);
 
     useEffect(() => {
-        if (selectedYear && selectedSemester) {
-            setSelectedWeek('Tuần 1');
-        }
-    }, [selectedYear, selectedSemester]);
-
-    const fetchModuleData = useCallback(
-        debounce((selectedYear, selectedSemester, selectedWeek, setModuleClasses) => {
-            fetch('http://localhost:5065/api/ModuleClass')
-                .then(response => response.json())
-                .then((data) => {
-                    const weekIndex = weekOptions.indexOf(selectedWeek);
-                    const filteredData = data.filter(item => {
-                        const itemStartDate = new Date(item.startDate);
-                        itemStartDate.setDate(itemStartDate.getDate() + (weekIndex * 7));
-
-                        setMdStartDate(itemStartDate);
-
-                        const startDate = new Date(selectedYear.startDate);
-                        const endDate = new Date(selectedYear.endDate);
-                        const itemEndDate = new Date(item.endDate);
-
-                        return (
-                            itemStartDate >= startDate &&
-                            itemStartDate <= endDate &&
-                            itemEndDate >= itemStartDate 
-                            // item.semesterId === selectedSemester
-                        );
-                    });
-
-                    const transformedData = filteredData.reduce((acc, item) => {
-                        const { classRoomId, dayOfWeek, subjectName, subjectId, moduleClassId, lessonStart, lessonEnd, fullName } = item;
-
-                        let room = acc.find(r => r.classRoomId === classRoomId);
-                        if (!room) {
-                            room = {
-                                classRoomId,
-                                Monday: '',
-                                Tuesday: '',
-                                Wednesday: '',
-                                Thursday: '',
-                                Friday: '',
-                                Saturday: ''
-                            };
-                            acc.push(room);
-                        }
-
-                        const subjectDetails = (
-                            <>
-                                <div>{subjectName}</div>
-                                <div>({subjectId})</div>
-                                <div>Mã LHP: {moduleClassId}</div>
-                                <div>Tiết: {lessonStart} - {lessonEnd}</div>
-                                <div>GV: {fullName}</div>
-                            </>
-                        );
-
-                        switch (dayOfWeek) {
-                        case 'Thứ hai':
-                            room.Monday = subjectDetails;
-                            break;
-                        case 'Thứ ba':
-                            room.Tuesday = subjectDetails;
-                            break;
-                        case 'Thứ tư':
-                            room.Wednesday = subjectDetails;
-                            break;
-                        case 'Thứ năm':
-                            room.Thursday = subjectDetails;
-                            break;
-                        case 'Thứ sáu':
-                            room.Friday = subjectDetails;
-                            break;
-                        case 'Thứ bảy':
-                            room.Saturday = subjectDetails;
-                            break;
-                        default:
-                            break;
-                        }
-                        return acc;
-                    }, []);
-
-                    setModuleClasses(transformedData);
-                })
-                .catch(err => console.error('Lỗi', err));
-        }, 300), 
-        []
-    );
-
-    useEffect(() => {
-        if (studentId && selectedYear && selectedSemester && selectedWeek) {
-            fetchModuleData(selectedYear, selectedSemester, selectedWeek, setModuleClasses);
-        }
-    }, [studentId, selectedYear, selectedSemester, selectedWeek, fetchModuleData]);
-
-    useEffect(() => {
-        fetch('http://localhost:5065/SemesterPeriod')
+        fetch('https://localhost:7074/Semester')
             .then(response => response.json())
             .then((data) => {
-                const options1 = data.map(item => ({
+                setTime(data);
+                // dropdown Year
+                const options = data.map(item => ({
                     label: item.academicYear,
-                    value: item.academicYear,
-                    startDate: item.startDate,
-                    endDate: item.endDate
+                    value: item.academicYear
+                }));
+                const uniqueOptions = Array.from(new Set(options.map(option => option.value)))
+                    .map(uniqueValue => options.find(option => option.value === uniqueValue));
+                setOptionsYear(uniqueOptions);
+                // dropdown Semester
+                const options1 = data.map(item => ({
+                    label: item.semesterName,
+                    value: item.semesterName
                 }));
                 const uniqueOptions1 = Array.from(new Set(options1.map(option => option.value)))
                     .map(uniqueValue => options1.find(option => option.value === uniqueValue));
-                setYearOptions(uniqueOptions1);
-
-                const options2 = data.map(item => ({
-                    label: item.semesterName,
-                    value: item.semesterId
-                }));
-                const uniqueOptions2 = Array.from(new Set(options2.map(option => option.value)))
-                    .map(uniqueValue => options2.find(option => option.value === uniqueValue));
-                setSemesterOptions(uniqueOptions2);
+                setOptionsSemester(uniqueOptions1);
             })
             .catch(err => console.error('Lỗi', err));
-    }, []);
+    }, [])
 
-    const handleYearChange = (e) => {
-        const selectedOption = yearOptions.find(option => option.value === e.value);
-        setSelectedYear(selectedOption ? {
-            academicYear: selectedOption.value,
-            startDate: selectedOption.startDate,
-            endDate: selectedOption.endDate
-        } : null);
-    };
+    useEffect(() => {
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        const filteredTime = time.filter(item => item.startDate <= formattedToday && item.endDate >= formattedToday);
+        if (filteredTime.length > 0) {
+            setSelectedYear(filteredTime[0].academicYear);
+            setSelectedSemester(filteredTime[0].semesterName);
+            setSelectedWeek("Tuần 1");
+        }
+    }, [time])
+
+    useEffect(() => {
+        if (studentId) {
+            fetch('https://localhost:7074/api/CourseRegistration')
+                .then(response => response.json())
+                .then((data) => {
+                    const filteredData = data.filter(item => item.studentId === studentId);
+                    const id = filteredData.map(item => item.moduleClassId);
+                    setModuleClassId(id);
+                })
+                .catch(err => console.error('Lỗi', err));
+        }
+    }, [studentId])
+
+    useEffect(() => {
+        if (moduleClassId) {
+            fetch('https://localhost:7074/api/ModuleClass')
+                .then(response => response.json())
+                .then((data) => {
+                    const filteredData = data.filter(item => moduleClassId.includes(item.moduleClassId));
+                    setModuleClass(filteredData);
+                })
+                .catch(err => console.error('Lỗi', err));
+        }
+    }, [moduleClassId])
+
+    useEffect(() => {
+        const filteredTime = time.filter(item => item.academicYear === selectedYear && item.semesterName === selectedSemester);
+        if (filteredTime.length > 0) {
+            // Vị trí của Tuần
+            const weekIndex = optionsWeek.indexOf(selectedWeek);
+            const startDate = new Date(filteredTime[0].startDate);
+            const calculatedStartDate = addDays(startDate, 7 * weekIndex);
+            const formattedStartDate = calculatedStartDate.toISOString().split('T')[0];
+
+            const filteredData = moduleClass.filter(item => item.endDate >= formattedStartDate);
+            setShowData(filteredData);
+        }
+    }, [selectedYear, selectedSemester, selectedWeek, time, moduleClass])
 
     return (
         <div>
-            <h1>Thời khóa biểu</h1>
-            <div>
+            <h3 className='title'>THỜI KHÓA BIỂU</h3>
+            <div className='dropdown-container'>
                 <FloatLabel>
                     <Dropdown
-                        value={selectedYear ? selectedYear.academicYear : null}
-                        options={yearOptions}
-                        onChange={handleYearChange}
+                        value={selectedYear}
+                        options={optionsYear}
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
                     />
-                    <label htmlFor="selectedYear">Năm học</label>
+                    <label htmlFor="selectedYear" className='cus-label-dropdown'>Năm học</label>
                 </FloatLabel>
                 <FloatLabel>
                     <Dropdown
                         value={selectedSemester}
-                        options={semesterOptions}
-                        onChange={(e) => setSelectedSemester(e.value)}
+                        options={optionsSemester}
+                        onChange={(e) => setSelectedSemester(e.target.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
                     />
-                    <label htmlFor="selectedYear">Học kì</label>
+                    <label htmlFor="selectedYear" className='cus-label-dropdown'>Học kì</label>
                 </FloatLabel>
                 <FloatLabel>
                     <Dropdown
                         value={selectedWeek}
-                        options={weekOptions}
+                        options={optionsWeek}
                         onChange={(e) => setSelectedWeek(e.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
                     />
-                    <label htmlFor="selectedWeek">Tuần</label>
+                    <label htmlFor="selectedWeek" className='cus-label-dropdown'>Tuần</label>
                 </FloatLabel>
             </div>
-            <div>
-                <DataTable value={moduleClasses}>
-                    <Column field="classRoomId" header="Phòng" />
+            <div className='datatable-container'>
+                <DataTable value={processedData}>
                     <Column
-                        header={`Thứ hai ${mdStartDate ? mdStartDate.toLocaleDateString() : ''}`}
-                        body={(data) => (
-                            <div>
-                                {data.Monday}
-                            </div>
-                        )}
-                    />
-                    <Column
-                        header={() => {
-                            const newDate = mdStartDate ? new Date(mdStartDate) : null;
-                            if (newDate) {
-                                newDate.setDate(newDate.getDate() + 1); 
+                        header="Thứ"
+                        body={(rowData) => {
+                            if (rowData.rowSpan > 0) {
+                                return (
+                                    <div rowSpan={rowData.rowSpan}>
+                                        {`${rowData.dayOfWeek}`}
+                                    </div>
+                                );
+                            } else {
+                                return null;
                             }
-                            return `Thứ ba ${newDate ? newDate.toLocaleDateString() : ''}`;
                         }}
-                        body={(data) => (
-                            <div>
-                                {data.Tuesday}
-                            </div>
-                        )}
                     />
-                    <Column
-                        header={() => {
-                            const newDate = mdStartDate ? new Date(mdStartDate) : null;
-                            if (newDate) {
-                                newDate.setDate(newDate.getDate() + 2); 
-                            }
-                            return `Thứ tư ${newDate ? newDate.toLocaleDateString() : ''}`;
-                        }}
-                        body={(data) => (
-                            <div>
-                                {data.Wednesday}
-                            </div>
-                        )}
-                    />
-                    <Column
-                        header={() => {
-                            const newDate = mdStartDate ? new Date(mdStartDate) : null;
-                            if (newDate) {
-                                newDate.setDate(newDate.getDate() + 3); 
-                            }
-                            return `Thứ năm ${newDate ? newDate.toLocaleDateString() : ''}`;
-                        }}
-                        body={(data) => (
-                            <div>
-                                {data.Thursday}
-                            </div>
-                        )}
-                    />
-                    <Column
-                        header={() => {
-                            const newDate = mdStartDate ? new Date(mdStartDate) : null;
-                            if (newDate) {
-                                newDate.setDate(newDate.getDate() + 4); 
-                            }
-                            return `Thứ sáu ${newDate ? newDate.toLocaleDateString() : ''}`;
-                        }}
-                        body={(data) => (
-                            <div>
-                                {data.Friday}
-                            </div>
-                        )}
-                    />
-                    <Column 
-                        header={() => {
-                            const newDate = mdStartDate ? new Date(mdStartDate) : null;
-                            if (newDate) {
-                                newDate.setDate(newDate.getDate() + 5); 
-                            }
-                            return `Thứ bảy ${newDate ? newDate.toLocaleDateString() : ''}`;
-                        }}
-                        body={(data) => (
-                            <div>
-                                {data.Saturday}
-                            </div>
-                        )}
-                    />
+                    <Column field="moduleClassId" header="Lớp học phần"></Column>
+                    <Column field="subjectName" header="Tên học phần"></Column>
+                    <Column field="fullName" header="Tên giảng viên"></Column>
+                    <Column field="classRoomId" header="Phòng học"></Column>
                 </DataTable>
             </div>
         </div>

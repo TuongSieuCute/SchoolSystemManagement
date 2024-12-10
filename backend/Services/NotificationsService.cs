@@ -31,5 +31,8 @@ namespace backend.Services
 
             return result;
         }
+        // public async Task<bool> PostNotificationsDTOAsync(NotificationsDTO dto) {
+            
+        // }
     }
 }

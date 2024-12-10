@@ -9,5 +9,6 @@ namespace backend.Services
     public interface INotificationsService
     {
         Task<IEnumerable<NotificationsDTO>> GetNotificationsDTOAsync();
+        // Task<bool> PostNotificationsDTOAsync(NotificationsDTO dto);
     }
 }
