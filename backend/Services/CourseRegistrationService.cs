@@ -45,6 +45,7 @@ namespace backend.Services
                                     FullName = s.FullName,
                                     ModuleClassId = cr.ModuleClassId,
                                     StartDate = cs.StartDate,
+                                    EndDate = cs.EndDate,
                                     SubjectId = mc.SubjectId,
                                     SubjectName = su.SubjectName,
                                     NumberOfCredit = su.NumberOfCredit,

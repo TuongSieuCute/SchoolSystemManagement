@@ -24,7 +24,7 @@ const calculateGPA = (cumulativeGPA10) => {
 
 // Thành phần hiển thị bảng điểm cho từng năm
 const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) => {
-    const filteredGrades = grades.filter(item => item.startDate >= year.startDate);
+    const filteredGrades = grades.filter(item => item.startDate >= year.startDate && item.endDate <= year.endDate);
     const hasDataForYear = filteredGrades.length > 0;
     const totalCredits = filteredGrades.reduce((sum, item) => sum + item.numberOfCredit, 0);
     const totalCreditsPass = filteredGrades.filter(item => item.isPass).reduce((sum, item) => sum + item.numberOfCredit, 0);
@@ -172,6 +172,7 @@ const SelectGrades = () => {
                         label: item.academicYear,
                         value: item.academicYear,
                         startDate: item.startDate,
+                        endDate: item.endDate,
                         semesterName: item.semesterName,
                     }));
                 setYearOptions(options);
