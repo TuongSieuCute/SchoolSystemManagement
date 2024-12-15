@@ -2,8 +2,8 @@ import { graphConfig } from '../../helper/authConfig';
 import { msalInstance } from './../../helper/authConfig';
 import { getAccessToken } from './serviceBase';
 
-export const getUsername = () => {
-    return msalInstance.getAllAccounts()[0]?.username;
+export const getName = () => {
+    return msalInstance.getAllAccounts()[0]?.name;
 };
 export const getProfilePicture = async () => {
     const headers = new Headers();
@@ -31,7 +31,7 @@ const convertPhotoToString = (blob) => {
 
 export const getUserId = () => {
     // username is account's email
-    const username = getUsername();
+    const username = msalInstance.getAllAccounts()[0]?.username;
     if (!username) {
         return null;
     }

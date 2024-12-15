@@ -1,8 +1,8 @@
+import React, { useEffect, useState } from 'react';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
-import React, { useEffect, useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { getUserId } from '../../common/sevices/authService';
 import { addDays } from 'date-fns';
@@ -38,7 +38,7 @@ const TimeTable = () => {
     };
 
     const processedData = calculateRowSpan(showData);
-    
+
     useEffect(() => {
         if (!accounts?.length) {
             return;
@@ -76,9 +76,25 @@ const TimeTable = () => {
         const formattedToday = today.toISOString().split('T')[0];
         const filteredTime = time.filter(item => item.startDate <= formattedToday && item.endDate >= formattedToday);
         if (filteredTime.length > 0) {
+            const startDate = new Date(filteredTime[0].startDate);
+            const daysElapsed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const currentWeek = Math.ceil(daysElapsed / 7);
+
+            const weekArray = Array.from({ length: 15 }, (_, i) => `Tuần ${i + 1}`);
+            const selectedWeek = weekArray[Math.min(currentWeek - 1, weekArray.length - 1)];
+
             setSelectedYear(filteredTime[0].academicYear);
             setSelectedSemester(filteredTime[0].semesterName);
-            setSelectedWeek("Tuần 1");
+            setSelectedWeek(selectedWeek);
+        }
+        else {
+            const upcomingTime = time.filter(item => item.startDate > formattedToday);
+
+            if (upcomingTime.length > 0) {
+                setSelectedYear(upcomingTime[0].academicYear);
+                setSelectedSemester(upcomingTime[0].semesterName);
+                setSelectedWeek("Tuần 1");
+            }
         }
     }, [time])
 
@@ -172,10 +188,18 @@ const TimeTable = () => {
                             }
                         }}
                     />
-                    <Column field="moduleClassId" header="Lớp học phần"></Column>
-                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }}></Column>
-                    <Column field="fullName" header="Tên giảng viên"></Column>
-                    <Column field="classRoomId" header="Phòng học"></Column>
+                    <Column
+                        header="Tiết học"
+                        body={(rowData) => (
+                            <div>
+                                {`${rowData.lessonStart} - ${rowData.lessonEnd}`}
+                            </div>
+                        )}
+                    />
+                    <Column field="moduleClassId" header="Lớp học phần" />
+                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }} />
+                    <Column field="fullName" header="Tên giảng viên" />
+                    <Column field="classRoomId" header="Phòng học" />
                 </DataTable>
             </div>
         </div>

@@ -2,7 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { Tooltip } from 'primereact/tooltip';
 import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { getUserId } from '../../sevices/authService';
+import { getName } from '../../sevices/authService';
 import './styles.css';
 export const Sidebar = (props) => {
     const { accounts, instance } = useMsal();
@@ -13,7 +13,7 @@ export const Sidebar = (props) => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getName());
     }, [accounts]);
     const handleAzureLogout = () => {
         instance.logoutPopup({

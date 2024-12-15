@@ -3,7 +3,6 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getUserInfoLocal } from '../../../helper/token';
 
 const RegisterModule = () => {
     const [listSubject, setListSubject] = useState([]);

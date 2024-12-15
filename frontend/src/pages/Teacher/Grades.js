@@ -3,7 +3,6 @@ import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import React, { useEffect, useState } from 'react';
 import { getSubjects } from '../../common/sevices/moduleClassService';
-import { getUserInfoLocal } from '../../helper/token';
 import { getCourseRegistration } from './../../common/sevices/courseRegistrationService';
 const Grades = () => {
     const [listModuleClass, setListModuleClass] = useState([]);

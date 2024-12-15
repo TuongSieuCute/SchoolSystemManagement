@@ -4,7 +4,6 @@ import Admin from './pages/Admin';
 import ClassRoom from './pages/Admin/ClassRoom';
 import ModuleClass from './pages/Admin/ModuleClass';
 import Home from './pages/Home';
-import ChangePassword from './pages/Home/ChangePassword';
 import Login from './pages/Home/Login';
 import Student from './pages/Student';
 import InstructionalPlan from './pages/Student/InstructionalPlan';
@@ -13,6 +12,7 @@ import RegisterModuleDetail from './pages/Student/RegisterModule/RegisterModuleD
 import SelectGrades from './pages/Student/SelectGrades';
 import TimeTable from './pages/Student/TimeTable';
 import Money from './pages/Student/Money';
+import TimeTableTeacher from './pages/Teacher/TimeTableTeacher';
 import { default as Teacher, default as TeachingRegistrationDetail } from './pages/Teacher';
 import Grades from './pages/Teacher/Grades';
 import TeachingRegistration from './pages/Teacher/TeachingRegistration';
@@ -21,7 +21,6 @@ import { User } from './pages/User';
 export const router = createBrowserRouter([
     { path: '/', element: <Home /> },
     { path: '/login', element: <Login /> },
-    { path: '/changePassword', element: <ChangePassword /> },
     {
         path: '/admin', element: <Admin />,
         children: [
@@ -46,6 +45,7 @@ export const router = createBrowserRouter([
         path: '/teacher', element: <Teacher />,
         children: [
             { path: '', index: true, element: <User /> },
+            { path: 'timetable', element: <TimeTableTeacher /> },
             { path: 'teaching-registration', element: <TeachingRegistration /> },
             { path: 'teaching-registration-detail', element: <TeachingRegistrationDetail /> },
             { path: 'grades', element: <Grades /> },

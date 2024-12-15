@@ -3,13 +3,13 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getUsername } from '../../../common/sevices/authService';
+import { getName } from '../../../common/sevices/authService';
 import { getSubjects } from '../../../common/sevices/moduleClassService';
 
 const TeachingRegistration = () => {
     const [listSubject, setListSubject] = useState([]);
     const [listModuleClass, setListModuleClass] = useState([]);
-    const username = useMemo(() => getUsername(), []);
+    const username = useMemo(() => getName(), []);
 
     useEffect(() => {
         const fetchingData = async () => {

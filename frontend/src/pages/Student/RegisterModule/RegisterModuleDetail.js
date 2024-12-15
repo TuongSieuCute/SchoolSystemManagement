@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { RadioButton } from 'primereact/radiobutton';
-import { getUserInfoLocal } from '../../../helper/token';
 
 const RegisterModuleDetail = () => {
     const [listModuleClass, setListModuleClass] = useState([]);
