@@ -5,6 +5,11 @@ import { getAccessToken } from './serviceBase';
 export const getName = () => {
     return msalInstance.getAllAccounts()[0]?.name;
 };
+
+export const getUserName = () => {
+    return msalInstance.getAllAccounts()[0]?.username;
+}
+
 export const getProfilePicture = async () => {
     const headers = new Headers();
     const accessToken = await getAccessToken();
@@ -29,9 +34,9 @@ const convertPhotoToString = (blob) => {
     return url;
 };
 
-export const getUserId = () => {
+export const getStudentId = () => {
     // username is account's email
-    const username = msalInstance.getAllAccounts()[0]?.username;
+    const username = getUserName();
     if (!username) {
         return null;
     }

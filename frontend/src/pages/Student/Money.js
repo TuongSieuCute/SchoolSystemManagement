@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
-import { getUserId } from '../../common/sevices/authService';
+import { getStudentId } from '../../common/sevices/authService';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -62,7 +62,7 @@ const Money = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getStudentId());
     }, [accounts]);
 
     useEffect(() => {

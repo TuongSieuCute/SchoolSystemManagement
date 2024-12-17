@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { scopes } from '../../../helper/authConfig';
-import { getUserId } from './../../sevices/authService';
+import { getStudentId } from './../../sevices/authService';
 import './styles.css';
 export const AppHeader = () => {
     const { accounts, instance } = useMsal();
@@ -23,7 +23,7 @@ export const AppHeader = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getStudentId());
     }, [accounts]);
 
     const handleRoleNavigation = useCallback((role) => {

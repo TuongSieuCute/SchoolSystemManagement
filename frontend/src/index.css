@@ -107,7 +107,7 @@ html, body {
 }
 
 .grade-Bplus {
-    color: #00b0ff; /* Màu xanh sáng */
+    color: #00b0ff; 
     font-weight: bold;
 }
 
@@ -117,7 +117,7 @@ html, body {
 }
 
 .grade-Cplus {
-    color: #ffb300; /* Màu vàng cam */
+    color: #ffb300; 
     font-weight: bold;
 }
 
@@ -127,7 +127,7 @@ html, body {
 }
 
 .grade-Dplus {
-    color: #ff6600; /* Màu cam đậm */
+    color: #ff6600; 
     font-weight: bold;
 }
 

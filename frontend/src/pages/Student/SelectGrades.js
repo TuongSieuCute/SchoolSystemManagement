@@ -5,7 +5,7 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { useMsal } from '@azure/msal-react';
-import { getUserId } from '../../common/sevices/authService';
+import { getStudentId } from '../../common/sevices/authService';
 import { FaCheck } from 'react-icons/fa';
 import { MdCancel } from "react-icons/md";
 
@@ -136,7 +136,7 @@ const SelectGrades = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getStudentId());
     }, [accounts]);
 
     useEffect(() => {

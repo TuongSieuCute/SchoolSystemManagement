@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { useMsal } from '@azure/msal-react';
-import { getUserId } from '../../common/sevices/authService';
+import { getStudentId } from '../../common/sevices/authService';
 import { addDays } from 'date-fns';
 
 const TimeTable = () => {
@@ -43,7 +43,7 @@ const TimeTable = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getStudentId());
     }, [accounts]);
 
     useEffect(() => {

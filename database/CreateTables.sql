@@ -77,6 +77,7 @@ CREATE TABLE StudentClass
 CREATE TABLE Student 
 (
     StudentId VARCHAR(20) PRIMARY KEY,
+	Email VARCHAR(40),
     FullName NVARCHAR(100),
     StudentClassId VARCHAR(20),
 

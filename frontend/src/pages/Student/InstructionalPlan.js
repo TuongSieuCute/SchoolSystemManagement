@@ -4,7 +4,7 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useMsal } from '@azure/msal-react';
-import { getUserId } from '../../common/sevices/authService';
+import { getStudentId } from '../../common/sevices/authService';
 
 const InstructionalPlan = () => {
     const [studentId, setStudentId] = useState('');
@@ -71,7 +71,7 @@ const InstructionalPlan = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getUserId());
+        setStudentId(getStudentId());
     }, [accounts]);
 
     useEffect(() => {

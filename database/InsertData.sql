@@ -98,13 +98,13 @@ INSERT INTO Major(MajorId, MajorName, DepartmentId) VALUES
 (N'N.CTXH612', N'Công tác xã hội', N'K.TLH')
 
 INSERT INTO Lecturer(LecturerId, FullName, DepartmentId) VALUES
-('4701104233@student.hcmue.edu.vn', N'Nguyễn Cát Tường', 'K.CNTT')
+('K40.104.074@student.hcmup.edu.vn', N'Nguyễn Hoàng Minh', 'K.CNTT')
 
 INSERT INTO StudentClass(StudentClassId, StudentClassName, LecturerId, CourseId, MajorId) VALUES
-('47.01.CNTT.A', N'Lớp Công nghệ thông tin A khóa 47', '4701104233@student.hcmue.edu.vn', 'K47', 'N.CNTT104')
+('47.01.CNTT.A', N'Lớp Công nghệ thông tin A khóa 47', 'K40.104.074@student.hcmup.edu.vn', 'K47', 'N.CNTT104')
 
-INSERT INTO Student(StudentId, FullName, StudentClassId) VALUES
-('47.01.104.233', N'Nguyễn Cát Tường', '47.01.CNTT.A')
+INSERT INTO Student(StudentId, Email, FullName, StudentClassId) VALUES
+('47.01.104.233', '4701104233@student.hcmue.edu.vn', N'Nguyễn Cát Tường', '47.01.CNTT.A')
 
 INSERT INTO ModuleType(ModuleTypeId, ModuleTypeName) VALUES
 ('HP1', N'Học phần nền tảng'),
@@ -774,15 +774,15 @@ INSERT INTO ClassRoom(ClassRoomId, Sector, Floor, RoomType, Capacity) VALUES
 ('CV.LTR', null, null, N'Công viên Lê Thị Riêng', null)
 
 INSERT INTO ModuleClass(ModuleClassId, MaximumNumberOfStudents, LecturerId, SubjectId) VALUES
-('COMP1010001', 40, null, 'COMP1010'),
-('COMP1800001', 40, null, 'COMP1800'),
-('COMP1801001', 40, null, 'COMP1801'),
-('COMP1802001', 40, null, 'COMP1802'),
-('MILI2701001', 40, null, 'MILI2701'),
-('PHYL2401001', 40, null, 'PHYL2401'),
-('POLI1903001', 40, null, 'POLI1903'),
-('POLI2001001', 40, null, 'POLI2001'),
-('PSYC1001001', 40, null, 'PSYC1001')
+('COMP1010001', 40, 'K40.104.074@student.hcmup.edu.vn', 'COMP1010'),
+('COMP1800001', 40, 'K40.104.074@student.hcmup.edu.vn', 'COMP1800'),
+('COMP1801001', 40, 'K40.104.074@student.hcmup.edu.vn', 'COMP1801'),
+('COMP1802001', 40, 'K40.104.074@student.hcmup.edu.vn', 'COMP1802'),
+('MILI2701001', 40, 'K40.104.074@student.hcmup.edu.vn', 'MILI2701'),
+('PHYL2401001', 40, 'K40.104.074@student.hcmup.edu.vn', 'PHYL2401'),
+('POLI1903001', 40, 'K40.104.074@student.hcmup.edu.vn', 'POLI1903'),
+('POLI2001001', 40, 'K40.104.074@student.hcmup.edu.vn', 'POLI2001'),
+('PSYC1001001', 40, 'K40.104.074@student.hcmup.edu.vn', 'PSYC1001')
 
 INSERT INTO ClassSchedule(ModuleClassId, DayOfWeek, LessonStart, LessonEnd, NumberOfWeek, StartDate, EndDate, ClassRoomId) VALUES
 ('COMP1010001', N'Thứ hai', 2, 6, 10, '2021-09-06', '2021-11-08', 'I.102'),
@@ -834,18 +834,26 @@ UPDATE CourseRegistration
 SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 7.5
 WHERE StudentId = '47.01.104.233'
 AND ModuleClassId = 'PHYL2401001'
-UPDATE CourseRegistration 
-SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 9, FinalExamGrade = 9
-WHERE StudentId = '47.01.104.233'
-AND ModuleClassId = 'POLI1903001'
-UPDATE CourseRegistration 
-SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 10, FinalExamGrade = 5.5
-WHERE StudentId = '47.01.104.233'
-AND ModuleClassId = 'POLI2001001'
-UPDATE CourseRegistration 
-SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 8
-WHERE StudentId = '47.01.104.233'
-AND ModuleClassId = 'PSYC1001001'
+--UPDATE CourseRegistration 
+--SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 9, FinalExamGrade = 9
+--WHERE StudentId = '47.01.104.233'
+--AND ModuleClassId = 'POLI1903001'
+--UPDATE CourseRegistration 
+--SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 10, FinalExamGrade = 5.5
+--WHERE StudentId = '47.01.104.233'
+--AND ModuleClassId = 'POLI2001001'
+--UPDATE CourseRegistration 
+--SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 8
+--WHERE StudentId = '47.01.104.233'
+--AND ModuleClassId = 'PSYC1001001'
 
 INSERT INTO Notifications (Title, Content)
 VALUES (N'Thông báo học phí', N'Hạn nộp học phí là ngày 30/11/2024.')
+
+INSERT INTO Student(StudentId, Email, FullName, StudentClassId) VALUES
+('47.01.104.234', null, N'Lê Văn A', '47.01.CNTT.A')
+
+INSERT INTO CumulativePoint(TrainingProgram_CourseId, StudentId, TotalCredit, CreditPass, CreditFall, CumulativeCredit, CumulativeAverageGrade10, CumulativeAverageGrade4) VALUES 
+('K47.CNTT.2021', '47.01.104.234', 0, 0, 0, 0, 0, 0)
+INSERT INTO CourseRegistration(StudentId, ModuleClassId) VALUES
+('47.01.104.234', 'COMP1010001')

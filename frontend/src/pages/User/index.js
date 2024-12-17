@@ -1,6 +1,6 @@
 import { useMsal } from '@azure/msal-react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { getProfilePicture, getUserId } from '../../common/sevices/authService';
+import { getProfilePicture, getStudentId } from '../../common/sevices/authService';
 import './styles.css';
 
 export const User = () => {
@@ -41,7 +41,7 @@ export const User = () => {
 
         };
         setUserData();
-        setId(getUserId());
+        setId(getStudentId());
     }, [accounts]);
     return (
         <div>
