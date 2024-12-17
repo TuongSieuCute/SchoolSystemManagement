@@ -109,7 +109,7 @@ const Grades = () => {
         });
 
         if (response.ok) {
-            toast.current.show({severity:'success', summary: 'Success', detail:'Cập nhật thành công', life: 3000});
+            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
             const id = rowData?.id || rowData?.studentId;
             setModifiedRows(prev => {
                 const newModifiedRows = { ...prev };
@@ -156,25 +156,45 @@ const Grades = () => {
     }, [])
 
     useEffect(() => {
-        fetch('https://localhost:7074/api/ModuleClass')
-            .then(response => response.json())
-            .then((data) => {
-                const filteredTime = time.filter(item => item.academicYear === selectedYear && item.semesterName === selectedSemester);
-                if (filteredTime.length > 0) {
-                    const startDate = filteredTime[0].startDate;
-                    const endDate = filteredTime[0].endDate;
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        const filteredTime = time.filter(item => item.startDate <= formattedToday && item.endDate >= formattedToday);
+        if (filteredTime.length > 0) {
+            setSelectedYear(filteredTime[0].academicYear);
+            setSelectedSemester(filteredTime[0].semesterName);
+        }
+        else {
+            const upcomingTime = time.filter(item => item.startDate < formattedToday);
 
-                    const filteredData = data.filter(item => item.lecturerId === teacherId && item.startDate >= startDate && item.startDate <= endDate);
-                    const options = filteredData.map(item => ({
-                        label: item.subjectName,
-                        value: item.moduleClassId
-                    }));
-                    const uniqueOptions = Array.from(new Set(options.map(option => option.value)))
-                        .map(uniqueValue => options.find(option => option.value === uniqueValue));
-                    setOptionsModuleClass(uniqueOptions);
-                }
-            })
-            .catch(err => console.error('Lỗi', err));
+            if (upcomingTime.length > 0) {
+                setSelectedYear(upcomingTime[upcomingTime.length - 1].academicYear);
+                setSelectedSemester(upcomingTime[upcomingTime.length - 1].semesterName);
+            }
+        }
+    }, [time])
+
+    useEffect(() => {
+        if (selectedYear && selectedSemester) {
+            fetch('https://localhost:7074/api/ModuleClass')
+                .then(response => response.json())
+                .then((data) => {
+                    const filteredTime = time.filter(item => item.academicYear === selectedYear && item.semesterName === selectedSemester);
+                    if (filteredTime.length > 0) {
+                        const startDate = filteredTime[0].startDate;
+                        const endDate = filteredTime[0].endDate;
+
+                        const filteredData = data.filter(item => item.lecturerId === teacherId && item.startDate >= startDate && item.startDate <= endDate);
+                        const options = filteredData.map(item => ({
+                            label: item.subjectName,
+                            value: item.moduleClassId
+                        }));
+                        const uniqueOptions = Array.from(new Set(options.map(option => option.value)))
+                            .map(uniqueValue => options.find(option => option.value === uniqueValue));
+                        setOptionsModuleClass(uniqueOptions);
+                    }
+                })
+                .catch(err => console.error('Lỗi', err));
+        }
     }, [time, selectedYear, selectedSemester, teacherId])
 
     useEffect(() => {
@@ -236,7 +256,7 @@ const Grades = () => {
             </div>
             <div className='datatable-container'>
                 <DataTable value={moduleClass}>
-                    <Column field="studentId" header="Mã số sinh viên" /> 
+                    <Column field="studentId" header="Mã số sinh viên" />
                     <Column field="fullName" header="Họ và tên" />
                     <Column
                         header="% Điểm Giữa kỳ"
