@@ -241,6 +241,7 @@ CREATE TABLE StudentNotifications (
     StudentId VARCHAR(20),
     IsRead BIT DEFAULT 0,
     ReadAt DATE NULL,
+
     FOREIGN KEY (NotificationId) REFERENCES Notifications(NotificationsId),
     FOREIGN KEY (StudentId) REFERENCES Student(StudentId)
 )

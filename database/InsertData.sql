@@ -834,26 +834,6 @@ UPDATE CourseRegistration
 SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 7.5
 WHERE StudentId = '47.01.104.233'
 AND ModuleClassId = 'PHYL2401001'
---UPDATE CourseRegistration 
---SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 9, FinalExamGrade = 9
---WHERE StudentId = '47.01.104.233'
---AND ModuleClassId = 'POLI1903001'
---UPDATE CourseRegistration 
---SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 10, FinalExamGrade = 5.5
---WHERE StudentId = '47.01.104.233'
---AND ModuleClassId = 'POLI2001001'
---UPDATE CourseRegistration 
---SET MidtermGradePercentage = 0.4, FinalExamGradePercentage = 0.6, MidtermGrade = 8, FinalExamGrade = 8
---WHERE StudentId = '47.01.104.233'
---AND ModuleClassId = 'PSYC1001001'
 
 INSERT INTO Notifications (Title, Content)
 VALUES (N'Thông báo học phí', N'Hạn nộp học phí là ngày 30/11/2024.')
-
-INSERT INTO Student(StudentId, Email, FullName, StudentClassId) VALUES
-('47.01.104.234', null, N'Lê Văn A', '47.01.CNTT.A')
-
-INSERT INTO CumulativePoint(TrainingProgram_CourseId, StudentId, TotalCredit, CreditPass, CreditFall, CumulativeCredit, CumulativeAverageGrade10, CumulativeAverageGrade4) VALUES 
-('K47.CNTT.2021', '47.01.104.234', 0, 0, 0, 0, 0, 0)
-INSERT INTO CourseRegistration(StudentId, ModuleClassId) VALUES
-('47.01.104.234', 'COMP1010001')

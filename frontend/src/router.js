@@ -4,7 +4,6 @@ import Admin from './pages/Admin';
 import ClassRoom from './pages/Admin/ClassRoom';
 import ModuleClass from './pages/Admin/ModuleClass';
 import Home from './pages/Home';
-import Login from './pages/Home/Login';
 import Student from './pages/Student';
 import InstructionalPlan from './pages/Student/InstructionalPlan';
 import RegisterModule from './pages/Student/RegisterModule/RegisterModule';
@@ -20,7 +19,6 @@ import { User } from './pages/User';
 
 export const router = createBrowserRouter([
     { path: '/', element: <Home /> },
-    { path: '/login', element: <Login /> },
     {
         path: '/admin', element: <Admin />,
         children: [

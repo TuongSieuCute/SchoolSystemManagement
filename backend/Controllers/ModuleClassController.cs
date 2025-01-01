@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using backend.DTOs;
 using backend.Models;
@@ -29,6 +30,21 @@ namespace backend.Controllers
         {
             var moduleClass = await _moduleClassService.GetModuleClassDTOAsync();
             return Ok(moduleClass);
+        }
+        [HttpPost]
+        public async Task<IActionResult> PostModuleClassDTO([FromBody] PostModuleClassDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("DTO is null");
+            }
+
+            var result = await _moduleClassService.PostModuleClassDTO(dto);
+            if (!result)
+            {
+                return StatusCode(500, "Failed to create CourseRegistrationDTO");
+            }
+            return Ok();
         }
         // Đăng kí dạy
         [HttpPut("TeachingRegistration")]

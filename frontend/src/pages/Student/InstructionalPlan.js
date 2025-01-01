@@ -58,7 +58,7 @@ const InstructionalPlan = () => {
     };
 
     const renderSubjectType = (rowData) => {
-        const isRequired = rowData.subjectType === "Tự chọn";
+        const isRequired = rowData.subjectType === 'Tự chọn';
         const className = isRequired ? 'subject-elective' : 'subject-required';
         return (
             <span className={className}>
@@ -91,10 +91,10 @@ const InstructionalPlan = () => {
                 })
                 .catch(err => console.error('Lỗi', err));
         }
-    }, [studentId])
+    }, [studentId]);
 
     useEffect(() => {
-        fetch(`https://localhost:7074/api/Subject?studentId=${studentId}`)
+        fetch(`https://localhost:7074/api/Subject/studentId?studentId=${studentId}`)
             .then(response => response.json())
             .then((data) => {
                 const filteredData = data.filter(item => item.trainingProgramName === selectedProgram);

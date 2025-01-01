@@ -109,22 +109,22 @@ namespace backend.Services
         }
 
         // Hàm lấy dữ liệu ngày bắt đầu và ngày kết thúc của một học kì
-        public async Task<(DateOnly? StartDate, DateOnly? EndDate)> GetCurrentSemesterPeriodAsync(string semesterId)
+        public async Task<(DateOnly? StartDate, DateOnly? EndDate)> GetCurrentSemesterPeriodAsync()
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
 
-            var nearestSemesterPeriod = await _context.SemesterPeriods
-                .Where(sp => sp.SemesterId == semesterId && sp.StartDate > today)
+            var nextSemester = await _context.SemesterPeriods
+                .Where(sp => sp.StartDate > today)
                 .OrderBy(sp => sp.StartDate)
                 .Select(sp => new { sp.StartDate, sp.EndDate })
                 .FirstOrDefaultAsync();
 
-            if (nearestSemesterPeriod == null)
+            if (nextSemester == null)
             {
                 return (null, null);
             }
 
-            return (nearestSemesterPeriod.StartDate, nearestSemesterPeriod.EndDate);
+            return (nextSemester.StartDate, nextSemester.EndDate);
         }
 
         // Hàm random lấy dữ liệu Mã phòng học dựa vào loại phòng

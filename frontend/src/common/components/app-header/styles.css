@@ -1,5 +1,5 @@
 .app-header {
-  background: var(--primary-400);
+  background: var(--bg-header-sidebar);
 }
 
 .app-header .image-logo {
@@ -8,4 +8,11 @@
 
 .app-header a {
   color: var(--primary-color-text);
+}
+
+.btn-login {
+  background-color: var(--bg-red);
+  padding: 5px 10px;
+  border: 1px solid black;
+  font-weight: bold;
 }

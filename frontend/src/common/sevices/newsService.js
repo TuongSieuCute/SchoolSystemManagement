@@ -5,13 +5,13 @@ export const getNewsCategory = () => {
             title: 'Tin Tức',
             categories: [{
                 id: crypto.randomUUID(),
-                title: 'tuyển dụng',
+                title: 'Tuyển dụng',
             }, {
                 id: crypto.randomUUID(),
                 title: 'Thông tin sinh viên'
             }, {
                 id: crypto.randomUUID(),
-                title: 'công đoàn',
+                title: 'Công đoàn',
             }, {
                 id: crypto.randomUUID(),
                 title: 'Tổ chức hành chính'
@@ -75,11 +75,11 @@ export const getNewsCategory = () => {
     });
 };
 
-export const getNews = async (categoryId) => {
-    let url = 'https://jsonplaceholder.typicode.com/users/1/photos?_limit=50';
-    if (categoryId) {
-        url = `${url}&albumId=${categoryId}`;
-    }
+export const getNews = async () => {
+    let url = 'https://localhost:7074/Notifications';
+    // if (categoryId) {
+    //     url = `${url}&albumId=${categoryId}`;
+    // }
 
     return await fetch(url).then(response => response.json());
 };

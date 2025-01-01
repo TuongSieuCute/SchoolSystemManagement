@@ -140,7 +140,7 @@ const SelectGrades = () => {
     }, [accounts]);
 
     useEffect(() => {
-        fetch(`https://localhost:7074/api/CourseRegistration`)
+        fetch('https://localhost:7074/api/CourseRegistration')
             .then(response => response.json())
             .then(data => {
                 const filteredData = data.filter(item => item.studentId === studentId);
@@ -163,9 +163,10 @@ const SelectGrades = () => {
     }, [rawData, selectedProgram]);
 
     useEffect(() => {
-        fetch('https://localhost:7074/Semester')
+        fetch('https://localhost:7074/api/Semester')
             .then(response => response.json())
             .then((data) => {
+                console.log(data);
                 const options = Array.from(new Set(data.map(item => item.academicYear)))
                     .map(year => data.find(item => item.academicYear === year))
                     .map(item => ({

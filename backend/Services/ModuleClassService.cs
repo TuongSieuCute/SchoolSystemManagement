@@ -12,9 +12,11 @@ namespace backend.Services
     public class ModuleClassService : IModuleClassService
     {
         private readonly SchoolSystemManagementContext _context;
-        public ModuleClassService(SchoolSystemManagementContext context)
+        public readonly AddModuleClassService _addModuleClassService;
+        public ModuleClassService(SchoolSystemManagementContext context, AddModuleClassService addModuleClassService)
         {
             _context = context;
+            _addModuleClassService = addModuleClassService;
         }
         public async Task<IEnumerable<ModuleClassDTO>> GetModuleClassDTOAsync()
         {
@@ -39,11 +41,85 @@ namespace backend.Services
                                     StartDate = cs.StartDate,
                                     EndDate = cs.EndDate,
                                     ClassRoomId = cs.ClassRoomId,
-                                    RomeType = cr.RoomType,
+                                    RoomType = cr.RoomType,
                                 }).ToListAsync();
 
             return result;
         }
+        public async Task<bool> PostModuleClassDTO(PostModuleClassDTO dto)
+        {
+            foreach (var data in dto.subjectDataDTO)
+            {
+                string? subjectId = data.SubjectIds;
+                byte count = data.Count ?? 1;
+                for (int i = 0; i < count; i++)
+                {
+                    string moduleClassId = _addModuleClassService.GenerateModuleClassId(subjectId ?? "");
+                    var newModuleClass = new ModuleClass
+                    {
+                        ModuleClassId = moduleClassId,
+                        MaximumNumberOfStudents = dto.MaximumNumberOfStudents,
+                        LecturerId = null,
+                        SubjectId = subjectId
+                    };
+                    var check = await _context.ModuleClasses
+                        .FirstOrDefaultAsync(m => m.ModuleClassId == newModuleClass.ModuleClassId);
+                    if (check != null)
+                    {
+                        return false;
+                    }
+                    _context.ModuleClasses.Add(newModuleClass);
+
+                    var (startDate, endDate) = await _addModuleClassService.GetCurrentSemesterPeriodAsync();
+                    if (!startDate.HasValue || !endDate.HasValue)
+                    {
+                        return false;
+                    }
+                    bool scheduleConflict = false;
+                    for (int j = 0; j < dto.NumberOfDaysAWeek; j++)
+                    {
+                        byte numberOfDaysAWeek = dto.NumberOfDaysAWeek;
+                        byte numberOfLessons = dto.NumberOfLessons;
+                        var uniqueSchedule = await _addModuleClassService.FindUniqueSchedule(dto.RoomType ?? "Phòng lý thuyết", startDate.Value, endDate.Value, numberOfDaysAWeek, numberOfLessons);
+                        if (uniqueSchedule == null)
+                        {
+                            scheduleConflict = true;
+                            break;
+                        }
+                        var newClassSchedule = new ClassSchedule
+                        {
+                            ModuleClassId = moduleClassId,
+                            DayOfWeek = uniqueSchedule.DayOfWeek,
+                            LessonStart = uniqueSchedule.LessonStart,
+                            LessonEnd = uniqueSchedule.LessonEnd,
+                            NumberOfWeek = dto.NumberOfWeeks,
+                            StartDate = uniqueSchedule.StartDate,
+                            EndDate = uniqueSchedule.EndDate,
+                            ClassRoomId = uniqueSchedule.ClassRoomId
+                        };
+                        _context.ClassSchedules.Add(newClassSchedule);
+                    }
+                    if (scheduleConflict)
+                    {
+                        _context.ModuleClasses.Remove(newModuleClass);
+                        return false;
+                    }
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException)
+                    {
+                        _context.ModuleClasses.Remove(newModuleClass);
+                        _context.ClassSchedules.RemoveRange(_context.ClassSchedules.Where(cs => cs.ModuleClassId == moduleClassId));
+
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         public async Task<bool> PutModuleClassDTORegisterAsync(ModuleClassDTO dto)
         {
             var lecturerId = await _context.ModuleClasses
@@ -80,7 +156,7 @@ namespace backend.Services
 
             return true;
         }
-        public async Task<bool> PutModuleClassDTOCancelRegistrationAsync(ModuleClassDTO dto) 
+        public async Task<bool> PutModuleClassDTOCancelRegistrationAsync(ModuleClassDTO dto)
         {
             var lecturerId = await _context.ModuleClasses
                             .Where(mc => mc.ModuleClassId == dto.ModuleClassId)

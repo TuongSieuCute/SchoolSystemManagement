@@ -21,10 +21,15 @@ namespace backend.Controllers
         {
             _subjectService = subjectService;
         }
-        [HttpGet]
+        [HttpGet("studentId")]
         public async Task<IEnumerable<SubjectDTO>> GetSubjectDTOByStudentIdAsync(string studentId)
         {
             return await _subjectService.GetSubjectDTOByStudentIdAsync(studentId);
+        }
+        [HttpGet]
+        public async Task<IEnumerable<SubjectDTO>> GetSubjectDTOAsync()
+        {
+            return await _subjectService.GetSubjectDTOAsync();
         }
         // [HttpGet]
         // public async Task<IActionResult> GetSubjects([FromQuery] string[] trainingProgramCourseIds)

@@ -21,6 +21,6 @@ namespace backend.DTOs
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public string? ClassRoomId { get; set; }
-        public string? RomeType { get; set; }
+        public string? RoomType { get; set; }
     }
 }

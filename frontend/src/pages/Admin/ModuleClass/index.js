@@ -1,135 +1,174 @@
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import { Dialog } from 'primereact/dialog';
-import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/saga-blue/theme.css';
 import React, { useEffect, useState } from 'react';
-import AddModuleClass from './../AddModuleClass';
+import { TreeTable } from 'primereact/treetable';
+import { Column } from 'primereact/column';
+import { Dropdown } from 'primereact/dropdown';
+import { FloatLabel } from 'primereact/floatlabel';
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import AddModuleClass from './AddModuleClass';
+import { getModuleClass } from '../../../common/sevices/moduleClassService';
+import { checkTime, defaultYearSemester, dropdownYearSemester, formatDate } from '../../../helper/function';
+
 const ModuleClass = () => {
-    const [modal, setModal] = useState(false);
-    const [modalInsert, setModalInsert] = useState(false);
-    const [listModuleClass, setListModuleClass] = useState([]);
-    const [selectedClass, setSelectedClass] = useState(null);
+    const [optionsYear, setOptionsYear] = useState([]);
+    const [selectedYear, setSelectedYear] = useState('');
+    const [optionsSemester, setOptionsSemester] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState('');
+    const [moduleClass, setModuleClass] = useState([]);
+    const [nodes, setNodes] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
-    const dayOfWeek = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
-    const lesson = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-    const toggleModalInsert = () => {
-        setModalInsert(!modalInsert);
+    const transformDataToTreeNodes = (data) => {
+        // Nhóm dữ liệu theo subjectId
+        const groupedData = data.reduce((acc, item) => {
+            if (!acc[item.subjectId]) {
+                acc[item.subjectId] = {
+                    key: item.subjectId,
+                    data: { subjectId: item.subjectId, subjectName: item.subjectName },
+                    children: []
+                };
+            }
+            acc[item.subjectId].children.push({
+                key: item.moduleClassId,
+                data: {
+                    moduleClassId: item.moduleClassId,
+                    fullName: item.fullName,
+                    maximumNumberOfStudents: item.maximumNumberOfStudents,
+                    dayOfWeek: item.dayOfWeek,
+                    lessonTime: `${item.lessonStart} - ${item.lessonEnd}`,
+                    timeRange: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
+                    classRoomId: item.classRoomId
+                }
+            });
+            return acc;
+        }, {});
+        // Chuyển đối tượng thành mảng
+        return Object.values(groupedData);
     };
 
-    const toggleModal = () => {
-        setModal(!modal);
+    const toggleDialog = () => {
+        setDialogOpen(!dialogOpen);
     };
 
-    const handleEditClick = (rowData) => {
-        setSelectedClass(rowData);
-        toggleModal();
-    };
+    const header = (
+        <div style={{ background: 'var(--bg-white)', display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ margin: 0 }}>Danh sách lớp học phần</h3>
+            <Button label="Thêm" icon='pi pi-plus' onClick={toggleDialog} className='p-2 mt-1' style={{ gap: '5px', background: 'var(--bg-red)' }} />
+        </div>
+    );
 
     useEffect(() => {
-        fetch('http://localhost:5065/api/ModuleClass')
-            .then(response => response.json())
-            .then(data => setListModuleClass(data))
-            .catch(err => console.error('Lỗi', err));
+        dropdownYearSemester(setOptionsYear, setOptionsSemester);
+        defaultYearSemester(setSelectedYear, setSelectedSemester);
     }, []);
 
-    const dialogFooter = (
-        <div>
-            <Button label="Cập nhật" />
-            <Button label="Thoát" onClick={toggleModal} />
-        </div>
-    );
+    useEffect(() => {
+        const fetchModuleClass = async () => {
+            try {
+                const filteredTime = await checkTime(selectedYear, selectedSemester);
 
-    const tableHeader = (
-        <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-            <span className="text-xl text-900 font-bold">Danh sách lớp học phần</span>
-            <Button onClick={toggleModalInsert} label="Thêm Lớp học phần " />
-        </div>
-    );
+                if (filteredTime && filteredTime.length > 0) {
+                    const startDate = filteredTime[0].startDate;
+                    const endDate = filteredTime[0].endDate;
+
+                    const response = await getModuleClass();
+                    if (response.ok) {
+                        const data = await response.json();
+                        const filteredData = data.filter(item => item.startDate >= startDate && item.startDate <= endDate);
+                        setModuleClass(filteredData);
+                    } else {
+                        throw new Error(`Lỗi ${response.status}`);
+                    }
+                }
+            } catch (err) {
+                console.error('Lỗi', err);
+            }
+        };
+        fetchModuleClass();
+    }, [selectedYear, selectedSemester]);
+
+    useEffect(() => {
+        const treeData = transformDataToTreeNodes(moduleClass);
+        setNodes(treeData);
+    }, [moduleClass]);
+
     return (
-        <>
-            <DataTable
-                value={listModuleClass}
-                paginator
-                rows={5}
-                rowsPerPageOptions={[5, 10, 25, 50]}
-                className="m-3 module-class-table"
-                header={tableHeader}>
-                <Column field="moduleClassId" header="Mã lớp học phần" />
-                <Column field="subjectId" header="Mã học phần" />
-                <Column field="subjectName" header="Tên học phần" />
-                <Column field="fullName" header="Tên giảng viên" />
-                <Column field="dayOfWeek" header="Thứ trong tuần" />
-                <Column field="lessonStart" header="Tiết bắt đầu" />
-                <Column field="lessonEnd" header="Tiết kết thúc" />
-                <Column field="numberOfWeek" header="Số tuần học" />
-                <Column field="startDate" header="Ngày bắt đầu" />
-                <Column field="endDate" header="Ngày kết thúc" />
-                <Column field="classRoomId" header="Mã phòng học" />
-                <Column field="maximumNumberOfStudents" header="Số lượng sinh viên tối đa" />
-                <Column
-                    header="Chỉnh sửa/Xóa"
-                    body={(rowData) => (
-                        <div className="flex flex-wrap">
-                            <Button onClick={() => handleEditClick(rowData)} className="m-2" icon="pi pi-pencil" />
-                            <Button className="m-2" icon="pi pi-times" severity='danger' />
-                        </div>
-                    )}
-                />
-            </DataTable>
+        <div>
+            <h3 className='title'>LỚP HỌC PHẦN</h3>
+            <div className='dropdown-container'>
+                <FloatLabel>
+                    <Dropdown
+                        value={selectedYear}
+                        options={optionsYear}
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
+                    />
+                    <label htmlFor="selectedYear" className='cus-label-dropdown'>Năm học</label>
+                </FloatLabel>
+                <FloatLabel>
+                    <Dropdown
+                        value={selectedSemester}
+                        options={optionsSemester}
+                        onChange={(e) => setSelectedSemester(e.target.value)}
+                        className='cus-dropdown'
+                        panelClassName='cus-panel-dropdown'
+                    />
+                    <label htmlFor="selectedYear" className='cus-label-dropdown'>Học kì</label>
+                </FloatLabel>
+            </div>
+            <div className='datatable-container'>
+                <TreeTable
+                    value={nodes}
+                    className="custom-tree-table"
+                    header={header}
+                    paginator rows={5}
+                >
+                    <Column
+                        field="subjectId"
+                        header="Mã học phần"
+                        expander
+                        body={(node) => (
+                            node.data.subjectId || node.data.moduleClassId
+                        )}
+                        filter filterPlaceholder="Tìm kiếm"
+                        style={{ width: '15%' }}
+                    />
+                    <Column field='subjectName' header="Tên học phần" filter filterPlaceholder="Tìm kiếm" style={{ width: '20%' }} />
+                    <Column field='fullName' header="Tên Giảng viên" />
+                    <Column field='maximumNumberOfStudents' header="Số lượng SV" />
+                    <Column field="dayOfWeek" header="Thứ" style={{ width: '10%' }} />
+                    <Column field='lessonTime' header="Tiết học" />
+                    <Column field='timeRange' header="Thời gian" />
+                    <Column field="classRoomId" header="Mã phòng học" />
+                    <Column header="Hành động" body={(node) => (
+                        node.data.moduleClassId ? (
+                            <div>
+                                <Button
+                                    icon="pi pi-pen-to-square"
+                                    className="p-button-rounded p-button-success mr-2"
+                                    onClick={() => handleEdit(node.data)}
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    className="p-button-rounded p-button-danger"
+                                    onClick={() => handleDelete(node.data)}
+                                />
+                            </div>
+                        ) : null
+                    )} />
+                </TreeTable>
 
-            {/* Modal Thêm */}
-            <AddModuleClass visible={modalInsert} toggleModalInsert={toggleModalInsert}></AddModuleClass>
-
-
-            {/* Modal Chỉnh sửa */}
-            <Dialog header="Chỉnh sửa lớp học phần" footer={dialogFooter} visible={modal} className='w-6'>
-                {selectedClass && (
-                    <div className='form-edit'>
-                        <label>Mã lớp học phần:</label>
-                        <InputText value={selectedClass.moduleClassId} onChange={(e) => setSelectedClass(e.target.value)} disabled />
-
-                        <label>Mã học phần:</label>
-                        <InputText value={selectedClass.subjectId} onChange={(e) => setSelectedClass(e.target.value)} disabled />
-
-                        <label>Tên học phần:</label>
-                        <InputText value={selectedClass.subjectName} onChange={(e) => setSelectedClass(e.target.value)} disabled />
-
-                        <label>Tên giảng viên:</label>
-                        <InputText value={selectedClass.fullName} onChange={(e) => setSelectedClass(e.target.value)} disabled />
-
-                        <label>Thứ trong tuần:</label>
-                        <Dropdown value={selectedClass.dayOfWeek} onChange={(e) => setSelectedClass({ ...selectedClass, dayOfWeek: e.value })} options={dayOfWeek} appendTo="self" />
-
-                        <label>Tiết bắt đầu:</label>
-                        <Dropdown value={selectedClass.lessonStart} onChange={(e) => setSelectedClass({ ...selectedClass, lessonStart: e.value })} options={lesson} appendTo="self" />
-
-                        <label>Tiết kết thúc:</label>
-                        <Dropdown value={selectedClass.lessonEnd} onChange={(e) => setSelectedClass({ ...selectedClass, lessonEnd: e.value })} options={lesson} appendTo="self" />
-
-                        <label>Số tuần học:</label>
-                        <InputText value={selectedClass.numberOfWeek} onChange={(e) => setSelectedClass(e.target.value)} />
-
-                        <label>Ngày bắt đầu:</label>
-                        <Calendar value={new Date(selectedClass.startDate)} onChange={(e) => setSelectedClass(e.target.value)} appendTo={document.body} />
-
-                        <label>Ngày kết thúc:</label>
-                        <Calendar value={new Date(selectedClass.endDate)} onChange={(e) => setSelectedClass(e.target.value)} disabled />
-
-                        <label>Mã phòng học:</label>
-                        <InputText value={selectedClass.classRoomId} onChange={(e) => setSelectedClass(e.target.value)} />
-
-                        <label>Số lượng sinh viên tối đa:</label>
-                        <InputText value={selectedClass.maximumNumberOfStudents} onChange={(e) => setSelectedClass(e.target.value)} />
-                    </div>
-                )}
-            </Dialog>
-        </>
+                <Dialog
+                    visible={dialogOpen}
+                    style={{ width: "50vw" }}
+                    header="Thêm lớp học phần"
+                    onHide={toggleDialog}
+                >
+                    <AddModuleClass></AddModuleClass>
+                </Dialog>
+            </div>
+        </div>
     );
 };
 

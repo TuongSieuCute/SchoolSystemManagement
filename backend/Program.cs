@@ -1,4 +1,5 @@
 using System.Reflection;
+using backend.DTOs;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,9 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IModuleClassService, ModuleClassService>();
 builder.Services.AddScoped<INotificationsService, NotificationsService>();
 builder.Services.AddScoped<ICourseRegistrationService, CourseRegistrationService>();
+builder.Services.AddScoped<SubjectDataDTO>();
+builder.Services.AddScoped<PostModuleClassDTO>();
+builder.Services.AddScoped<AddModuleClassService>();
 
 builder.Services.AddDbContext<SchoolSystemManagementContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionStrings")));
 // Cấu hình JWT

@@ -3,11 +3,11 @@ import { Button } from 'primereact/button';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { scopes } from '../../../helper/authConfig';
-import { getStudentId } from './../../sevices/authService';
+import { getName } from './../../sevices/authService';
 import './styles.css';
 export const AppHeader = () => {
     const { accounts, instance } = useMsal();
-    const [studentId, setStudentId] = useState('');
+    const [ username, setUsername] = useState('');
     const navigate = useNavigate();
     const getLinkBaseOnRole = useCallback((role) => {
         switch (role) {
@@ -23,7 +23,7 @@ export const AppHeader = () => {
         if (!accounts?.length) {
             return;
         }
-        setStudentId(getStudentId());
+        setUsername(getName());
     }, [accounts]);
 
     const handleRoleNavigation = useCallback((role) => {
@@ -48,27 +48,27 @@ export const AppHeader = () => {
                     className="image-logo "
                     alt="logo"
                 />
-                <Link to="" className="font-bold text-lg">
+                <Link to="" className="font-bold text-lg no-underline">
                     Trang Chủ
                 </Link>
-                <Link to="" className="font-bold text-lg">
+                <Link to="" className="font-bold text-lg no-underline">
                     Giới Thiệu
                 </Link>
 
-                <Link to="" className="font-bold text-lg">
+                <Link to="" className="font-bold text-lg no-underline">
                     Tuyển sinh
                 </Link>
-                <Link to="" className="font-bold text-lg">
+                <Link to="" className="font-bold text-lg no-underline">
                     Đào tạo
                 </Link>
             </div>
             <div className="flex align-items-center">
                 <UnauthenticatedTemplate>
-                    <Button onClick={handleAzureLogin} label='Đăng nhập' />
+                    <Button onClick={handleAzureLogin} label='Đăng nhập' className='btn-login' />
                 </UnauthenticatedTemplate>
                 <AuthenticatedTemplate>
-                    <Link to={getLinkBaseOnRole(accounts[0]?.idTokenClaims.roles?.[0])}>
-                        {studentId}
+                    <Link to={getLinkBaseOnRole(accounts[0]?.idTokenClaims.roles?.[0])} className='no-underline'>
+                        {username}
                     </Link>
                 </AuthenticatedTemplate>
             </div>

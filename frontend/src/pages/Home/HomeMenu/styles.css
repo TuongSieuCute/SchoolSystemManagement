@@ -1,0 +1,11 @@
+.p-panelmenu .p-panelmenu-header .p-panelmenu-header-content .p-panelmenu-header-link {
+    background-color: var(--bg-menu-highlight); 
+    font-weight: bold;
+    color: var(--cl-text-white);
+    padding: 10px;
+}
+.p-panelmenu .p-panelmenu-content .p-menuitem > .p-menuitem-content .p-menuitem-link {
+    padding: 10px; 
+    line-height: 1.5;
+    margin-left: 10px;
+}

@@ -1,8 +1,7 @@
 import { getApiUrl } from './environmentService';
-export const getCourses = (trainingProgramId) => {
+import { getRequest } from './serviceBase';
+
+export const getSubject = () => {
     const apiUrl = getApiUrl();
-    const params = new URLSearchParams({
-        trainingProgramId
-    });
-    return fetch(`${apiUrl}/subject?${params}`);
+    return getRequest(apiUrl + '/Subject');
 };

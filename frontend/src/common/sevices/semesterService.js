@@ -1,7 +1,7 @@
 import { getApiUrl } from './environmentService';
 import { getRequest } from './serviceBase';
 
-export const getModuleClass = () => {
+export const getSemester = () => {
     const apiUrl = getApiUrl();
-    return getRequest(apiUrl + '/ModuleClass');
+    return getRequest(apiUrl + '/Semester');
 };

@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getName } from '../../../common/sevices/authService';
-import { getSubjects } from '../../../common/sevices/moduleClassService';
+// import { getSubjects } from '../../../common/sevices/moduleClassService';
 
 const TeachingRegistration = () => {
     const [listSubject, setListSubject] = useState([]);

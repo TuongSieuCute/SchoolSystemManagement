@@ -9,6 +9,7 @@ namespace backend.Services
     public interface IModuleClassService
     {
         Task<IEnumerable<ModuleClassDTO>> GetModuleClassDTOAsync();
+        Task<bool> PostModuleClassDTO(PostModuleClassDTO dto);
         Task<bool> PutModuleClassDTORegisterAsync(ModuleClassDTO dto);
         Task<bool> PutModuleClassDTOCancelRegistrationAsync(ModuleClassDTO dto);
     }

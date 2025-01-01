@@ -3,7 +3,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
-import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { useMsal } from '@azure/msal-react';
@@ -31,68 +31,84 @@ const Grades = () => {
 
     // Hàm thay đổi input
     const handleInputChange = (e, rowData, field) => {
-        const newValue = e.target.value;
+        const newValue = e.value;
         const id = rowData?.id || rowData?.studentId;
-
-        // Đánh dấu để thay đổi màu button khi chỉnh sửa là màu đỏ và đã lưu là màu xanh
-        // Riêng 2 cột này, vì nhập 1 hàng thì tất cả các hàng đều thay đổi giống vậy nên phải đánh dấu từng id
-        if (field === 'midtermGradePercentage' || field === 'finalExamGradePercentage') {
-            setModifiedRows(prev => {
-                const updatedModifiedRows = moduleClass.reduce((acc, row) => {
+        // Kiểm tra nếu là các cột phần trăm
+        const isPercentageField =
+            field === 'midtermGradePercentage' ||
+            field === 'finalExamGradePercentage';
+        // Cập nhật trạng thái modified rows
+        setModifiedRows(prev => {
+            if (isPercentageField) {
+                // Nếu là cột phần trăm, đánh dấu tất cả các dòng
+                return moduleClass.reduce((acc, row) => {
                     acc[row.studentId] = true;
                     return acc;
                 }, {});
-                return updatedModifiedRows;
-            });
-        } else {
-            setModifiedRows(prev => ({
-                ...prev,
-                [id]: true,
-            }));
-        }
-
-        if (field === 'midtermGradePercentage' || field === 'finalExamGradePercentage') {
+            } else {
+                // Nếu không phải, chỉ đánh dấu dòng hiện tại
+                return {
+                    ...prev,
+                    [id]: true,
+                };
+            }
+        });
+        // Cập nhật giá trị chung cho các cột phần trăm
+        if (isPercentageField) {
             setCommonPercentages(prev => ({
                 ...prev,
                 [field]: newValue
             }));
-            const updatedModuleClass = moduleClass.map((row) => {
-                if (row.studentId === id) {
-                    return {
-                        ...row,
-                        [field]: newValue,
-                    };
-                }
-                return row;
-            });
-            setModuleClass(updatedModuleClass);
-        } else {
-            const updatedModuleClass = moduleClass.map((row) => {
-                if (row.studentId === id) {
-                    return {
-                        ...row,
-                        [field]: newValue,
-                    };
-                }
-                return row;
-            });
-            setModuleClass(updatedModuleClass);
         }
+        // Cập nhật moduleClass
+        setModuleClass(prevModuleClass =>
+            prevModuleClass.map(row => {
+                // Nếu là cột phần trăm, cập nhật toàn bộ các dòng
+                if (isPercentageField) {
+                    return {
+                        ...row,
+                        [field]: newValue
+                    };
+                }
+                // Nếu không phải, chỉ cập nhật dòng hiện tại
+                return row.studentId === id
+                    ? { ...row, [field]: newValue }
+                    : row;
+            })
+        );
     };
 
     const getValueToDisplay = (rowData, field) => {
+        const isPercentageField =
+            field === 'midtermGradePercentage' ||
+            field === 'finalExamGradePercentage';
         // Ưu tiên hiển thị giá trị chung nếu có
-        if ((field === 'midtermGradePercentage' || field === 'finalExamGradePercentage')
-            && commonPercentages[field] !== '') {
+        if (isPercentageField && commonPercentages[field] !== '') {
             return commonPercentages[field];
         }
-
-        return editedValues[rowData.id]?.[field] !== undefined
-            ? editedValues[rowData.id][field]
-            : rowData[field];
-    }
+        // Ưu tiên giá trị đã chỉnh sửa, sau đó là giá trị gốc
+        return editedValues[rowData.id]?.[field] ?? rowData[field];
+    };
 
     const saveStudentData = async (rowData, selectedModuleClass) => {
+        const midtermGradePercentage = commonPercentages.midtermGradePercentage !== ''
+            ? commonPercentages.midtermGradePercentage
+            : rowData.midtermGradePercentage;
+
+        const finalExamGradePercentage = commonPercentages.finalExamGradePercentage !== ''
+            ? commonPercentages.finalExamGradePercentage
+            : rowData.finalExamGradePercentage;
+
+        const midtermPercent = Number(midtermGradePercentage) * 10;
+        const finalExamPercent = Number(finalExamGradePercentage) * 10;
+        const totalPercentTimes10 = midtermPercent + finalExamPercent;
+
+        // Kiểm tra tổng phần trăm
+        if (totalPercentTimes10 !== 10) {
+            toast.current.show({severity: 'error', summary: 'Lỗi', detail: 'Tổng % GK và % CK không bằng 1', life: 3000});
+            return false;
+        }
+
         const response = await fetch('https://localhost:7074/api/CourseRegistration', {
             method: 'PUT',
             headers: {
@@ -101,8 +117,8 @@ const Grades = () => {
             body: JSON.stringify({
                 "studentId": rowData.studentId,
                 "moduleClassId": selectedModuleClass,
-                "midtermGradePercentage": rowData.midtermGradePercentage,
-                "finalExamGradePercentage": rowData.finalExamGradePercentage,
+                "midtermGradePercentage": midtermGradePercentage,
+                "finalExamGradePercentage": finalExamGradePercentage,
                 "midtermGrade": rowData.midtermGrade,
                 "finalExamGrade": rowData.finalExamGrade,
             }),
@@ -119,7 +135,6 @@ const Grades = () => {
             });
             return true;
         }
-
         return false;
     };
 
@@ -131,7 +146,7 @@ const Grades = () => {
     }, [accounts]);
 
     useEffect(() => {
-        fetch('https://localhost:7074/Semester')
+        fetch('https://localhost:7074/api/Semester')
             .then(response => response.json())
             .then((data) => {
                 setTime(data);
@@ -261,7 +276,12 @@ const Grades = () => {
                     <Column
                         header="% Điểm Giữa kỳ"
                         body={(rowData) => (
-                            <InputText
+                            <InputNumber
+                                mode='decimal'
+                                minFractionDigits={1}
+                                min={0.1}
+                                max={0.9}
+                                step={0.1}
                                 value={getValueToDisplay(rowData, "midtermGradePercentage") || ''}
                                 onChange={(e) => handleInputChange(e, rowData, "midtermGradePercentage")}
                                 className='w-9'
@@ -271,7 +291,12 @@ const Grades = () => {
                     <Column
                         header="% Điểm Cuối kỳ"
                         body={(rowData) => (
-                            <InputText
+                            <InputNumber
+                                mode='decimal'
+                                minFractionDigits={1}
+                                min={0.1}
+                                max={0.9}
+                                step={0.1}
                                 value={getValueToDisplay(rowData, "finalExamGradePercentage") || ''}
                                 onChange={(e) => handleInputChange(e, rowData, "finalExamGradePercentage")}
                                 className='w-9'
@@ -281,7 +306,12 @@ const Grades = () => {
                     <Column
                         header="Điểm Giữa kỳ"
                         body={(rowData) => (
-                            <InputText
+                            <InputNumber
+                                mode='decimal'
+                                minFractionDigits={1}
+                                min={0}
+                                max={10}
+                                step={0.1}
                                 value={getValueToDisplay(rowData, "midtermGrade") || ''}
                                 onChange={(e) => handleInputChange(e, rowData, "midtermGrade")}
                                 className='w-9'
@@ -291,7 +321,12 @@ const Grades = () => {
                     <Column
                         header="Điểm Cuối kỳ"
                         body={(rowData) => (
-                            <InputText
+                            <InputNumber
+                                mode='decimal'
+                                minFractionDigits={1}
+                                min={0}
+                                max={10}
+                                step={0.1}
                                 value={getValueToDisplay(rowData, "finalExamGrade") || ''}
                                 onChange={(e) => handleInputChange(e, rowData, "finalExamGrade")}
                                 className='w-9'

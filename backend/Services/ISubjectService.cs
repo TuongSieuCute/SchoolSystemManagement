@@ -8,6 +8,7 @@ namespace backend.Services
 {
     public interface ISubjectService
     {
+        Task<IEnumerable<SubjectDTO>> GetSubjectDTOAsync();
         Task<IEnumerable<SubjectDTO>> GetSubjectDTOByStudentIdAsync(string studentId);
     }
 }

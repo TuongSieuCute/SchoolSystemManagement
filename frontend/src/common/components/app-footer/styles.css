@@ -1,4 +1,7 @@
 .app-footer {
-  background: var(--primary-400);
+  background: var(--bg-header-sidebar);
   color: var(--primary-color-text);
+}
+span a {
+  color: var(--bg-red);
 }

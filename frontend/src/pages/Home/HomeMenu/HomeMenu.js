@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { PanelMenu } from 'primereact/panelmenu';
+import './styles.css';
 
 export const HomeMenu = (props) => {
     const { items } = props;
