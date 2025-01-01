@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import AddModuleClass from './AddModuleClass';
 import { getModuleClass } from '../../../common/sevices/moduleClassService';
 import { checkTime, defaultYearSemester, dropdownYearSemester, formatDate } from '../../../helper/function';
+import EditModuleClass from './EditModuleClass';
 
 const ModuleClass = () => {
     const [optionsYear, setOptionsYear] = useState([]);
@@ -16,7 +17,9 @@ const ModuleClass = () => {
     const [selectedSemester, setSelectedSemester] = useState('');
     const [moduleClass, setModuleClass] = useState([]);
     const [nodes, setNodes] = useState([]);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogOpenCreate, setDialogOpenCreate] = useState(false);
+    const [dialogOpenEdit, setDialogOpenEdit] = useState(false);
+    const [selectedRowData, setSelectedRowData] = useState(null);
 
     const transformDataToTreeNodes = (data) => {
         // Nhóm dữ liệu theo subjectId
@@ -46,14 +49,18 @@ const ModuleClass = () => {
         return Object.values(groupedData);
     };
 
-    const toggleDialog = () => {
-        setDialogOpen(!dialogOpen);
+    const toggleDialogCreate = () => {
+        setDialogOpenCreate(!dialogOpenCreate);
+    };
+    const toggleDialogEdit = (rowData) => {
+        setDialogOpenEdit(!dialogOpenEdit);
+        setSelectedRowData(rowData)
     };
 
     const header = (
         <div style={{ background: 'var(--bg-white)', display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0 }}>Danh sách lớp học phần</h3>
-            <Button label="Thêm" icon='pi pi-plus' onClick={toggleDialog} className='p-2 mt-1' style={{ gap: '5px', background: 'var(--bg-red)' }} />
+            <Button label="Thêm" icon='pi pi-plus' onClick={toggleDialogCreate} className='p-2 mt-1' style={{ gap: '5px', background: 'var(--bg-red)' }} />
         </div>
     );
 
@@ -147,7 +154,7 @@ const ModuleClass = () => {
                                 <Button
                                     icon="pi pi-pen-to-square"
                                     className="p-button-rounded p-button-success mr-2"
-                                    onClick={() => handleEdit(node.data)}
+                                    onClick={() => toggleDialogEdit(node.data)}
                                 />
                                 <Button
                                     icon="pi pi-trash"
@@ -160,13 +167,25 @@ const ModuleClass = () => {
                 </TreeTable>
 
                 <Dialog
-                    visible={dialogOpen}
+                    visible={dialogOpenCreate}
                     style={{ width: "50vw" }}
                     header="Thêm lớp học phần"
-                    onHide={toggleDialog}
+                    onHide={toggleDialogCreate}
                 >
                     <AddModuleClass></AddModuleClass>
                 </Dialog>
+
+                <Dialog
+                    visible={dialogOpenEdit}
+                    style={{ width: "50vw" }}
+                    header="Chỉnh sửa lớp học phần"
+                    onHide={toggleDialogEdit}
+                >
+                    {selectedRowData ? (
+                        <EditModuleClass data={selectedRowData} />
+                    ) : (null)}
+                </Dialog>
+
             </div>
         </div>
     );

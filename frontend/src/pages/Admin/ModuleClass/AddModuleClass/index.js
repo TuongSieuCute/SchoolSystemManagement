@@ -355,7 +355,6 @@ const AddModuleClass = () => {
                         <label htmlFor="selectedRoomType" className='cus-label-dropdown'>Loại phòng học</label>
                     </FloatLabel>
                     <div className='flex justify-content-end mt-4'>
-                        <Toast ref={toast} />
                         <Button label='Tạo mới' onClick={CreateModuleClass} className='p-2 font-bold' style={{ background: 'var(--bg-red)' }} />
                     </div>
                 </div>
