@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs;
+using backend.DTOs.ModuleClassDTO;
 using backend.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace backend.Services
             _context = context;
             _addModuleClassService = addModuleClassService;
         }
-        public async Task<IEnumerable<ModuleClassDTO>> GetModuleClassDTOAsync()
+        public async Task<IEnumerable<GetModuleClassDTO>> GetModuleClassDTOAsync()
         {
             var result = await (from mc in _context.ModuleClasses
                                 join cs in _context.ClassSchedules on mc.ModuleClassId equals cs.ModuleClassId
@@ -26,7 +27,7 @@ namespace backend.Services
                                 join cr in _context.ClassRooms on cs.ClassRoomId equals cr.ClassRoomId
                                 join l in _context.Lecturers on mc.LecturerId equals l.LecturerId into lecturersGroup
                                 from l in lecturersGroup.DefaultIfEmpty()
-                                select new ModuleClassDTO
+                                select new GetModuleClassDTO
                                 {
                                     ModuleClassId = mc.ModuleClassId,
                                     MaximumNumberOfStudents = mc.MaximumNumberOfStudents,
@@ -34,6 +35,8 @@ namespace backend.Services
                                     FullName = l.FullName,
                                     SubjectId = mc.SubjectId,
                                     SubjectName = s.SubjectName,
+                                    SubjectType = s.SubjectType,
+                                    NumberOfCredit = s.NumberOfCredit,
                                     DayOfWeek = cs.DayOfWeek,
                                     LessonStart = cs.LessonStart,
                                     LessonEnd = cs.LessonEnd,
@@ -78,9 +81,9 @@ namespace backend.Services
                     bool scheduleConflict = false;
                     for (int j = 0; j < dto.NumberOfDaysAWeek; j++)
                     {
-                        byte numberOfDaysAWeek = dto.NumberOfDaysAWeek;
+                        byte numberOfWeeks = dto.NumberOfWeeks;
                         byte numberOfLessons = dto.NumberOfLessons;
-                        var uniqueSchedule = await _addModuleClassService.FindUniqueSchedule(dto.RoomType ?? "Phòng lý thuyết", startDate.Value, endDate.Value, numberOfDaysAWeek, numberOfLessons);
+                        var uniqueSchedule = await _addModuleClassService.FindUniqueSchedule(dto.RoomType ?? "Phòng lý thuyết", startDate.Value, endDate.Value, numberOfWeeks, numberOfLessons);
                         if (uniqueSchedule == null)
                         {
                             scheduleConflict = true;
@@ -119,8 +122,36 @@ namespace backend.Services
             }
             return true;
         }
+        public async Task<bool> PutModuleClassDTO(PutModuleClassDTO dto)
+        {
+            var mc = await _context.ModuleClasses
+                .FirstOrDefaultAsync(mc => mc.ModuleClassId == dto.ModuleClassId);
+            if (mc == null) return false;
 
-        public async Task<bool> PutModuleClassDTORegisterAsync(ModuleClassDTO dto)
+            var cs = await _context.ClassSchedules
+                .FirstOrDefaultAsync(cs => cs.ModuleClassId == dto.ModuleClassId);
+            if (cs == null) return false;
+
+            mc.MaximumNumberOfStudents = dto.MaximumNumberOfStudents;
+            cs.DayOfWeek = dto.DayOfWeek;
+            cs.LessonStart = dto.LessonStart;
+            cs.LessonEnd = dto.LessonEnd;
+            cs.StartDate = dto.StartDate;
+            cs.EndDate = dto.EndDate;
+            cs.ClassRoomId = dto.ClassRoomId;
+
+            var result = await _context.ClassSchedules
+                .Where(a => a.ModuleClassId != dto.ModuleClassId)
+                .Where(a => a.ClassRoomId == dto.ClassRoomId)
+                .Where(a =>(
+                        a.StartDate <= dto.EndDate && a.EndDate >= dto.StartDate && 
+                        a.LessonStart <= dto.LessonEnd && a.LessonEnd >= dto.LessonStart))
+                .ToListAsync();
+            if(result.Any()) return false;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> PutModuleClassDTORegisterAsync(GetModuleClassDTO dto)
         {
             var lecturerId = await _context.ModuleClasses
                             .Where(mc => mc.ModuleClassId == dto.ModuleClassId)
@@ -156,13 +187,34 @@ namespace backend.Services
 
             return true;
         }
-        public async Task<bool> PutModuleClassDTOCancelRegistrationAsync(ModuleClassDTO dto)
+        public async Task<bool> PutModuleClassDTOCancelRegistrationAsync(PutModuleClassDTO dto)
         {
             var lecturerId = await _context.ModuleClasses
                             .Where(mc => mc.ModuleClassId == dto.ModuleClassId)
                             .Select(mc => mc.LecturerId)
                             .FirstOrDefaultAsync();
             lecturerId = null;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteModuleClassDTO(string moduleClassId)
+        {
+            var moduleClass = await _context.ModuleClasses
+                .FirstOrDefaultAsync(mc => mc.ModuleClassId == moduleClassId);
+
+            if (moduleClass == null)
+            {
+                return false;
+            }
+            var deleteCR = await _context.CourseRegistrations
+                .Where(cr => cr.ModuleClassId == moduleClassId)
+                .ToListAsync();
+            var deleteCS = await _context.ClassSchedules
+                .Where(cs => cs.ModuleClassId == moduleClassId)
+                .ToListAsync();
+            _context.CourseRegistrations.RemoveRange(deleteCR);
+            _context.ClassSchedules.RemoveRange(deleteCS);
+            _context.ModuleClasses.Remove(moduleClass);
             await _context.SaveChangesAsync();
             return true;
         }

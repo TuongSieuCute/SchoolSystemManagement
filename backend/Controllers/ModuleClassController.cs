@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using backend.DTOs;
+using backend.DTOs.ModuleClassDTO;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +21,15 @@ namespace backend.Controllers
     public class ModuleClassController : Controller
     {
         public readonly IModuleClassService _moduleClassService;
-        public ModuleClassController(IModuleClassService moduleClassService)
+        public readonly SchoolSystemManagementContext _context;
+        public ModuleClassController(IModuleClassService moduleClassService, SchoolSystemManagementContext context)
         {
             _moduleClassService = moduleClassService;
+            _context = context;
         }
         // Xem thời khóa biểu, Xem lớp học phần
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ModuleClassDTO>>> GetModuleClass()
+        public async Task<ActionResult<IEnumerable<GetModuleClassDTO>>> GetModuleClass()
         {
             var moduleClass = await _moduleClassService.GetModuleClassDTOAsync();
             return Ok(moduleClass);
@@ -42,39 +45,94 @@ namespace backend.Controllers
             var result = await _moduleClassService.PostModuleClassDTO(dto);
             if (!result)
             {
-                return StatusCode(500, "Failed to create CourseRegistrationDTO");
+                return StatusCode(500, "Failed to create ModuleClassDTO");
             }
             return Ok();
         }
-        // Đăng kí dạy
-        [HttpPut("TeachingRegistration")]
-        public async Task<IActionResult> PutModuleClassDTORegisterAsync([FromBody] ModuleClassDTO dto)
+        [HttpPut]
+        public async Task<IActionResult> PutModuleClassDTO([FromBody] PutModuleClassDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest();
-            }
-            var result = await _moduleClassService.PutModuleClassDTORegisterAsync(dto);
+            var result = await _moduleClassService.PutModuleClassDTO(dto);
             if (result)
             {
                 return Ok();
             }
             return StatusCode(500, "Failed to update ModuleClassDTO");
         }
-        // Hủy đăng kí dạy
+        // Đăng kí dạy
+        [HttpPut("TeachingRegistration")]
+        public async Task<IActionResult> PutModuleClassRegisterAsync([FromBody] RegisterDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Request body is null.");
+            }
+
+            // Kiểm tra module class tồn tại và chưa được đăng ký giảng viên
+            var moduleClass = await _context.ModuleClasses
+                .FirstOrDefaultAsync(m => m.ModuleClassId == dto.ModuleClassId && m.LecturerId == null);
+            if (moduleClass == null)
+            {
+                return NotFound("Module class not found or already assigned.");
+            }
+
+            // // Lấy thông tin lịch học của module class
+            var classSchedule = await _context.ClassSchedules
+                .FirstOrDefaultAsync(cs => cs.ModuleClassId == dto.ModuleClassId);
+            if (classSchedule == null)
+            {
+                return NotFound("Class schedule not found for the module class.");
+            }
+
+            // Kiểm tra trùng lịch với các lớp khác của giảng viên
+            var hasConflict = await _context.ClassSchedules
+                .Where(cs => cs.ModuleClass.LecturerId == dto.LecturerId) // Lọc các lớp của giảng viên
+                .Where(cs => cs.ModuleClassId != dto.ModuleClassId)       // Loại trừ module class hiện tại
+                .AnyAsync(cs =>
+                    cs.StartDate <= classSchedule.EndDate && cs.EndDate >= classSchedule.StartDate && // Trùng ngày
+                    cs.LessonStart <= classSchedule.LessonEnd && cs.LessonEnd >= classSchedule.LessonStart); // Trùng giờ
+            if (hasConflict)
+            {
+                return Conflict("Schedule conflict detected.");
+            }
+
+            // Gán LecturerId và lưu thay đổi
+            moduleClass.LecturerId = dto.LecturerId;
+            await _context.SaveChangesAsync();
+
+            return Ok("Module class successfully assigned to the lecturer.");
+        }
         [HttpPut("CancelRegistration")]
-        public async Task<IActionResult> PutModuleClassDTOCancelRegistrationAsync([FromBody] ModuleClassDTO dto)
+        public async Task<IActionResult> PutModuleClassDTOCancelRegistrationAsync([FromBody] RegisterDTO dto)
         {
             if (dto == null)
             {
                 return BadRequest();
             }
-            var result = await _moduleClassService.PutModuleClassDTOCancelRegistrationAsync(dto);
-            if (result)
+            var mc = await _context.ModuleClasses
+                .FirstOrDefaultAsync(m => m.ModuleClassId == dto.ModuleClassId && m.LecturerId == dto.LecturerId);
+            if (mc == null)
             {
-                return Ok();
+                return NotFound();
             }
-            return StatusCode(500, "Failed to update ModuleClassDTO");
+            mc.LecturerId = null;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        [HttpDelete("{moduleClassId}")]
+        public async Task<IActionResult> DeleteModuleClassDTO(string moduleClassId)
+        {
+            if (moduleClassId == null)
+            {
+                return BadRequest("moduleClassId is null");
+            }
+
+            var result = await _moduleClassService.DeleteModuleClassDTO(moduleClassId);
+            if (!result)
+            {
+                return StatusCode(500, "Failed to delete ModuleClassDTO");
+            }
+            return Ok();
         }
         // [HttpGet("subject")]
         // public async Task<ActionResult<IEnumerable<ModuleClass>>> GetModuleClassesSubject(string? subjectId)

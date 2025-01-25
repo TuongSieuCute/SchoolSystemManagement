@@ -188,3 +188,6 @@ html, body {
     font-size: 16px;
     cursor: pointer;
 }
+.p-calendar-w-btn-right .p-inputtext {
+    padding: 8px;
+}

@@ -29,26 +29,7 @@ const AddModuleClass = () => {
     const [checked, setChecked] = useState(false);
 
     const toast = useRef(null);
-    const showToast = (severity) => {
-        switch (severity) {
-        case 'success':
-            toast.current.show({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Thành công',
-                life: 3000
-            });
-            break;
-        default:
-            toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Đã xảy ra lỗi',
-                life: 3000
-            });
-            break;
-        }
-    };
+    
     const data = {
         'subjectDataDTO': subjectDataDTO.length > 0 ? subjectDataDTO.map((item) => ({
             'SubjectIds': item.SubjectIds,
@@ -148,8 +129,7 @@ const AddModuleClass = () => {
                 const jsonData = await readExcelFile(file);
                 setExcelData(jsonData);
             } catch (error) {
-                console.error('Lỗi khi đọc file:', error);
-                showToast('error');
+                toast.current.show({severity:'error', summary: 'Lỗi', detail:'Upload file thất bại!', life: 3000});
             }
         }
     };
@@ -167,20 +147,16 @@ const AddModuleClass = () => {
                         body: jsonPayload,
                     });
                     if (response.ok) {
-                        console.log('Đã lưu object:', singleObject);
-                        showToast('success');
+                        toast.current.show({severity:'success', summary: 'Thành công', detail:'Thêm lớp học phần thành công!', life: 3000});
                     } else {
-                        console.error('Lỗi lưu dữ liệu:', response.statusText, singleObject);
-                        showToast('error');
+                        toast.current.show({severity:'error', summary: 'Lỗi', detail:'Thêm lớp học phần thất bại!', life: 3000});
                     }
                 }
             } catch (error) {
-                console.error('Lỗi gửi dữ liệu:', error);
-                showToast('error');
+                toast.current.show({severity:'error', summary: 'Lỗi', detail:'Thêm lớp học phần thất bại!', life: 3000});
             }
         } else {
-            console.log('Chưa có dữ liệu để gửi!');
-            showToast('error');
+            toast.current.show({severity:'error', summary: 'Lỗi', detail:'Thêm lớp học phần thất bại!', life: 3000});
         }
     };
     const CreateModuleClass = async () => {
@@ -192,15 +168,12 @@ const AddModuleClass = () => {
             });
 
             if (response.ok) {
-                console.log('Thành công!');
-                showToast('error');
+                toast.current.show({severity:'success', summary: 'Thành công', detail:'Thêm lớp học phần thành công!', life: 3000});
             } else {
-                console.error(response.statusText);
-                showToast('error');
+                toast.current.show({severity:'error', summary: 'Lỗi', detail:'Thêm lớp học phần thất bại!', life: 3000});
             }
         } catch (error) {
-            console.error(error);
-            showToast('error');
+            toast.current.show({severity:'error', summary: 'Lỗi', detail:'Thêm lớp học phần thất bại!', life: 3000});
         }
     };
 
@@ -255,6 +228,7 @@ const AddModuleClass = () => {
                     accept=".xlsx, .xls"
                     onChange={handleFileUpload}
                 />
+                <Toast ref={toast} />
                 <Button label='Tải lên' onClick={handleUpload} className='p-2' style={{ background: 'var(--bg-red)' }} />
             </div>
             <div>
@@ -262,7 +236,7 @@ const AddModuleClass = () => {
             </div>
             {checked && (
                 <div>
-                    <FloatLabel>
+                    <FloatLabel className='mt-4'>
                         <Dropdown
                             value={selectedTrainingProgramName}
                             options={optionsTrainingProgramName}
@@ -304,7 +278,7 @@ const AddModuleClass = () => {
                             </DataTable>
                         )}
                     </FloatLabel>
-                    <FloatLabel className='mt-5'>
+                    <FloatLabel className='mt-4'>
                         <InputNumber
                             id='maximumNumberOfStudents'
                             value={inputMaximumNumberOfStudents || 40}
@@ -314,7 +288,7 @@ const AddModuleClass = () => {
                         />
                         <label htmlFor="maximumNumberOfStudents" className='cus-label-dropdown'>Số lượng sinh viên tối đa</label>
                     </FloatLabel>
-                    <FloatLabel className='mt-5'>
+                    <FloatLabel className='mt-4'>
                         <InputNumber
                             id='numberOfWeeks'
                             value={inputNumberOfWeeks || 10}
@@ -324,7 +298,7 @@ const AddModuleClass = () => {
                         />
                         <label htmlFor="numberOfWeeks" className='cus-label-dropdown'>Số lượng tuần học</label>
                     </FloatLabel>
-                    <FloatLabel className='mt-5'>
+                    <FloatLabel className='mt-4'>
                         <InputNumber
                             id='numberOfDaysAWeek'
                             value={inputNumberOfDaysAWeek || 1}
@@ -354,7 +328,8 @@ const AddModuleClass = () => {
                         />
                         <label htmlFor="selectedRoomType" className='cus-label-dropdown'>Loại phòng học</label>
                     </FloatLabel>
-                    <div className='flex justify-content-end mt-4'>
+                    <Toast ref={toast} />
+                    <div className='flex justify-content-end mt-3'>
                         <Button label='Tạo mới' onClick={CreateModuleClass} className='p-2 font-bold' style={{ background: 'var(--bg-red)' }} />
                     </div>
                 </div>

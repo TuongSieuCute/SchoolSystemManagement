@@ -6,20 +6,27 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
+using OpenAI.GPT3.Managers;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<ISemesterService, SemesterService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<ICumulativeService, CumulativeService>();
 builder.Services.AddScoped<IModuleClassService, ModuleClassService>();
 builder.Services.AddScoped<INotificationsService, NotificationsService>();
 builder.Services.AddScoped<ICourseRegistrationService, CourseRegistrationService>();
 builder.Services.AddScoped<SubjectDataDTO>();
 builder.Services.AddScoped<PostModuleClassDTO>();
 builder.Services.AddScoped<AddModuleClassService>();
+builder.Services.AddHttpClient();
 
-builder.Services.AddDbContext<SchoolSystemManagementContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionStrings")));
+builder.Services.AddDbContext<SchoolSystemManagementContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 // Cấu hình JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("EntraId"));

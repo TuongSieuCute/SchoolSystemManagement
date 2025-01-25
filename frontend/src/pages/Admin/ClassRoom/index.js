@@ -1,145 +1,99 @@
 import React, { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Combobox from 'react-widgets/Combobox';
-import 'react-widgets/styles.css';
-import { getClassrooms, searchClassroom } from '../../../common/sevices/classroomService';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { Calendar } from 'primereact/calendar';
 import './styles.css';
+import { Button } from 'primereact/button';
+import { formatDate } from '../../../helper/function';
 
 const classRoom = () => {
-    const [startDate, setStartDate] = useState(null);
-    const [lessonStart, setLessonStart] = useState(null);
-    const [lessonEnd, setLessonEnd] = useState(null);
-    const [typeRoom, setTypeRoom] = useState(null);
-    const [roomId, setRoomId] = useState(null);
-    const [listRooms, setListRooms] = useState([]);
-    const [error, setError] = useState('');
-
-    const lessons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-    const typeRooms = ['Phòng lý thuyết', 'Giảng đường', 'Phòng máy tính'];
-
-    const formatDate = (date) => {
-        if (!date) return '';
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    const fetchListRoom = async () => {
-        const isAllNull = !startDate && !lessonStart && !lessonEnd;
-        const isAllValid = startDate && lessonStart && lessonEnd;
-        if (isAllNull || isAllValid) {
-            try {
-                const searchParams = {
-                    date: formatDate(startDate),
-                    lessonStart,
-                    lessonEnd,
-                    typeRoom,
-                    classRoomId: roomId
-                };
-
-                const response = await searchClassroom(searchParams);
-                const data = await response.json();
-
-                if (response.ok) {
-                    setListRooms(data);
-                } else {
-                    setError(data.message);
-                }
-            } catch (err) {
-                console.log(err);
-                setError('Có lỗi xảy ra khi gọi API.');
-            }
-        }
-        else {
-            setError('Vui lòng điền đầy đủ thông tin ngày, tiết bắt đầu và tiết kết thúc.');
-        }
-    };
-
+    const [classRoom, setClassRoom] = useState([]);
+    const [moduleClass, setModuleClass] = useState([]);
+    const [day, setDay] = useState('');
+    const [checkSearch, setCheckSearch] = useState(false);
+    const [classRoomId, setClassRoomId] = useState([]);
     useEffect(() => {
-        getClassrooms()
+        fetch('https://localhost:7074/api/ClassRoom')
             .then(response => response.json())
-            .then(data => setListRooms(data))
+            .then((data) => {
+                setClassRoom(data);
+            })
             .catch(err => console.error('Lỗi', err));
-    }, []);
+    }, [])
+    useEffect(() => {
+        if (classRoomId) {
+            setCheckSearch(true);
+        }
+    }, [classRoomId]);
 
+    const toggleSearch = (classRoomId) => {
+        setClassRoomId(classRoomId);
+        const fetchDataMC = () => {
+            fetch('https://localhost:7074/api/ModuleClass')
+                .then(response => response.json())
+                .then((data) => {
+                    let filteredData = [];
+                    if (day === '') filteredData = data.filter(item => item.classRoomId === classRoomId); 
+                    else {
+                        filteredData = data.filter(item => {
+                            const startDate = new Date(item.startDate);
+                            const endDate = new Date(item.endDate); 
+                            return (
+                                item.classRoomId === classRoomId &&
+                                startDate.getTime() <= day.getTime() &&
+                                endDate.getTime() >= day.getTime()
+                            );
+                        });
+                    }
+                    console.log(filteredData);
+                    setModuleClass(filteredData);
+                })
+                .catch(err => console.error('Lỗi', err));
+        }
+        fetchDataMC();
+    }
     return (
-        <div className='admin-container'>
-            <div className='box'>
-                <div className='schedule-form'>
-                    <div className='lesson-schedule'>
-                        <label>Chọn ngày:</label>
-                        <DatePicker
-                            selected={startDate}
-                            onChange={(date) => setStartDate(date)}
-                            dateFormat="dd/MM/yyyy"
-                            className='custom-datepicker' />
-                    </div>
-                    <div className='lesson-schedule'>
-                        <label>Tiết bắt đầu:</label>
-                        <Combobox
-                            data={lessons}
-                            value={lessonStart}
-                            onChange={(value) => setLessonStart(value)} />
-                    </div>
-                    <div className='lesson-schedule'>
-                        <label>Tiết kết thúc:</label>
-                        <Combobox
-                            data={lessons}
-                            value={lessonEnd}
-                            onChange={(value) => setLessonEnd(value)} />
-                    </div>
-                    <div className='lesson-schedule'>
-                        <label>Loại phòng:</label>
-                        <Combobox
-                            data={typeRooms}
-                            value={typeRoom}
-                            onChange={(value) => setTypeRoom(value)} />
-                    </div>
-                    <div className='lesson-schedule'>
-                        <label>Mã phòng học:</label>
-                        <input
-                            type='text'
-                            value={roomId}
-                            onChange={(e) => setRoomId(e.target.value)}
-                            className='custom-datepicker' />
-                    </div>
-                    <button className='button-search' onClick={fetchListRoom}>Tìm kiếm</button>
-                </div>
-                <div className='table'>
-                    <h1>Danh sách phòng học:</h1>
-                    <table>
-                        <thead>
-                            <tr>Mã phòng</tr>
-                            <tr>Khu vực</tr>
-                            <tr>Tầng</tr>
-                            <tr>Loại phòng</tr>
-                            <tr>Số lượng</tr>
-                        </thead>
-                        <tbody>
-                            {listRooms.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} style={{ textAlign: 'center', color: 'red' }}>
-                                        Không tìm thấy phòng hoặc phòng đã có tiết học
-                                    </td>
-                                </tr>
-                            ) : (
-                                listRooms.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{item.classRoomId}</td>
-                                        <td>{item.sector}</td>
-                                        <td>{item.floor}</td>
-                                        <td>{item.roomType}</td>
-                                        <td>{item.capacity}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                        {error && <p className='error'>{error}</p>}
-                    </table>
-                </div>
+        <div>
+            <h3 className='title'>PHÒNG HỌC</h3>
+            <div className='datatable-container'>
+                <DataTable value={classRoom} stripedRows paginator rows={5}>
+                    <Column field="classRoomId" header="Mã phòng học" filter />
+                    <Column field="sector" header="Khu" />
+                    <Column field="floor" header="Tầng" />
+                    <Column field="roomType" header="Loại phòng học" filter />
+                    <Column field="capacity" header="Sức chứa" />
+                    <Column header="Hành động" body={(rowData) => (
+                        <Button icon='pi pi-search' onClick={() => toggleSearch(rowData.classRoomId)} />
+                    )} />
+                </DataTable>
             </div>
+            <div className='dropdown-container'>
+                <Calendar value={day} onChange={(e) => setDay(e.value)} dateFormat="dd/mm/yy" showIcon />
+            </div>
+            {checkSearch && (
+                <div className='datatable-container'>
+                    <DataTable value={moduleClass} stripedRows>
+                        <Column field="moduleClassId" header="Mã lớp học phần" />
+                        <Column
+                            header="Tiết học"
+                            body={(rowData) => (
+                                <div>
+                                    {`${rowData.lessonStart} - ${rowData.lessonEnd}`}
+                                </div>
+                            )}
+                        />
+                        <Column
+                            header="Thời gian"
+                            body={(rowData) => (
+                                <div>
+                                    {`${formatDate(rowData.startDate)} - ${formatDate(rowData.endDate)}`}
+                                </div>
+                            )}
+                        />
+                        <Column field="classRoomId" header="Mã phòng học" />
+                    </DataTable>
+                </div>
+            )}
         </div>
     );
 };

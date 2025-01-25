@@ -18,21 +18,32 @@ namespace backend.Services
         public async Task<IEnumerable<NotificationsDTO>> GetNotificationsDTOAsync()
         {
             var result = await (from n in _context.Notifications
-                            join sn in _context.StudentNotifications on n.NotificationsId equals sn.NotificationId
-                            select new NotificationsDTO
-                            {
-                                Title = n.Title,
-                                Content = n.Content,
-                                CreatedAt = n.CreatedAt,
-                                StudentId = sn.StudentId,
-                                IsRead = sn.IsRead,
-                                ReadAt = sn.ReadAt,
-                            }).ToListAsync();
+                                join sn in _context.StudentNotifications on n.NotificationsId equals sn.NotificationId
+                                select new NotificationsDTO
+                                {
+                                    Title = n.Title,
+                                    Content = n.Content,
+                                    CreatedAt = n.CreatedAt,
+                                    StudentId = sn.StudentId,
+                                    IsRead = sn.IsRead,
+                                    ReadAt = sn.ReadAt,
+                                }).ToListAsync();
 
             return result;
         }
-        // public async Task<bool> PostNotificationsDTOAsync(NotificationsDTO dto) {
-            
-        // }
+        public async Task<bool> PostNotificationsAsync(Notification notification)
+        {
+            try
+            {
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

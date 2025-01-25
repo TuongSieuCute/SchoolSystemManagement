@@ -76,7 +76,7 @@ const InstructionalPlan = () => {
 
     useEffect(() => {
         if (studentId) {
-            fetch('https://localhost:7074/api/CourseRegistration')
+            fetch('https://localhost:7074/api/Cumulative')
                 .then(response => response.json())
                 .then((data) => {
                     const filteredData = data.filter(item => item.studentId === studentId);

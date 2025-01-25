@@ -1,144 +1,216 @@
-import { format } from 'date-fns';
+import React, { useEffect, useState, useRef } from 'react';
+import { TreeTable } from 'primereact/treetable';
 import { Column } from 'primereact/column';
+import { Dropdown } from 'primereact/dropdown';
+import { FloatLabel } from 'primereact/floatlabel';
+import { Button } from "primereact/button";
 import { DataTable } from 'primereact/datatable';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getName } from '../../../common/sevices/authService';
-// import { getSubjects } from '../../../common/sevices/moduleClassService';
+import { Dialog } from "primereact/dialog";
+import { Toast } from "primereact/toast";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { formatDate } from '../../../helper/function';
+import { useMsal } from '@azure/msal-react';
+import { getUserName } from '../../../common/sevices/authService';
 
 const TeachingRegistration = () => {
-    const [listSubject, setListSubject] = useState([]);
-    const [listModuleClass, setListModuleClass] = useState([]);
-    const username = useMemo(() => getName(), []);
-
+    const [teacherId, setTeachertId] = useState('');
+    const [moduleClass, setModuleClass] = useState([]);
+    const [register, setRegister] = useState([]);
+    const [nodes, setNodes] = useState([]);
+    const { accounts } = useMsal();
+    const toast = useRef(null);
+    const confirmUpdate = (moduleClassId, teacherId) => {
+        confirmDialog({
+            message: 'Bạn có muốn đăng ký lớp học phần này không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => updateModuleClass(moduleClassId, teacherId),
+            reject: () => { }
+        });
+    };
+    const confirmDelete = (moduleClassId, teacherId) => {
+        confirmDialog({
+            message: 'Bạn có muốn xóa lớp học phần không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => deleteModuleClass(moduleClassId, teacherId),
+            reject: () => { }
+        });
+    };
     useEffect(() => {
-        const fetchingData = async () => {
-            const response = await getSubjects();
-            if (response.ok) {
-                const subjects = response.json();
-                setListSubject(subjects);
+        if (!accounts?.length) {
+            return;
+        }
+        setTeachertId(getUserName());
+    }, [accounts]);
+    const transformDataToTreeNodes = (data) => {
+        // Nhóm dữ liệu theo subjectId
+        const groupedData = data.reduce((acc, item) => {
+            if (!acc[item.subjectId]) {
+                acc[item.subjectId] = {
+                    key: item.subjectId,
+                    data: { subjectId: item.subjectId, subjectName: item.subjectName },
+                    children: []
+                };
             }
-            else {
-                alert('failed to fetch');
-            }
-        };
-        fetchingData();
-    }, []);
-
+            acc[item.subjectId].children.push({
+                key: item.moduleClassId,
+                data: {
+                    moduleClassId: item.moduleClassId,
+                    fullName: item.fullName,
+                    maximumNumberOfStudents: item.maximumNumberOfStudents,
+                    dayOfWeek: item.dayOfWeek,
+                    lessonTime: `${item.lessonStart} - ${item.lessonEnd}`,
+                    timeRange: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
+                    classRoomId: item.classRoomId
+                }
+            });
+            return acc;
+        }, {});
+        // Chuyển đối tượng thành mảng
+        return Object.values(groupedData);
+    };
     useEffect(() => {
-        getSubjects()
+        fetch('https://localhost:7074/api/ModuleClass')
             .then(response => response.json())
-            .then(data => {
-                const filteredData = data.filter(item => item.lecturerId === username);
-                setListModuleClass(filteredData);
+            .then((data) => {
+                const filteredData = data.filter(item => item.lecturerId === null);
+                setModuleClass(filteredData);
+
+                const filteredData1 = data.filter(item => item.lecturerId === teacherId);
+                setRegister(filteredData1);
             })
             .catch(err => console.error('Lỗi', err));
-    }, [username]);
+    }, [teacherId])
 
-    const subjectCount = listSubject.reduce((acc, item) => {
-        if (acc[item.subjectId]) {
-            acc[item.subjectId].count += 1;
-        } else {
-            acc[item.subjectId] = { ...item, count: 1 };
-        }
-        return acc;
-    }, {});
-
-    const uniqueSubjects = Object.values(subjectCount);
-
-    const mandatorySubjects = uniqueSubjects.filter(subject => subject.subjectType === 'Bắt buộc');
-    const electiveSubjects = uniqueSubjects.filter(subject => subject.subjectType === 'Tự chọn');
-
-    const deleteRegisterTeaching = async (moduleClassId) => {
-        const data = {
-            moduleClassId: moduleClassId,
-            lecturerId: null,
+    useEffect(() => {
+        const treeData = transformDataToTreeNodes(moduleClass);
+        setNodes(treeData);
+    }, [moduleClass]);
+    const updateModuleClass = async (moduleClassId, lecturerId) => {
+        const url = 'https://localhost:7074/api/ModuleClass/TeachingRegistration';
+        const dto = {
+            'moduleClassId': moduleClassId,
+            'lecturerId': lecturerId,
         };
 
         try {
-            const response = await fetch('http://localhost:5065/api/ModuleClass/delete-LectureId', {
+            const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(dto),
             });
 
             if (response.ok) {
-                alert('Thành công');
-                const result = await response.json();
-                console.log('Success:', result);
+                toast.current.show({ severity: 'success', summary: 'Thành công', detail: 'Đăng ký thành công', life: 3000 });
             } else {
-                const text = await response.text();
-                console.error('Server Error Response:', text);
+                const errorDetail = await response.text(); // Lấy chi tiết lỗi từ server nếu có
+                toast.current.show({ severity: 'error', summary: 'Lỗi', detail: 'Đăng ký thất bại', life: 3000 });
             }
         } catch (error) {
-            console.error('Error:', error);
+            toast.current.show({ severity: 'error', summary: 'Lỗi', detail: 'Đăng ký thất bại', life: 3000 });
         }
     };
+    const deleteModuleClass = async (moduleClassId, lecturerId) => {
+        const url = 'https://localhost:7074/api/ModuleClass/CancelRegistration';
+        const dto = {
+            'moduleClassId': moduleClassId,
+            'lecturerId': lecturerId,
+        };
 
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dto),
+            });
+
+            if (response.ok) {
+                toast.current.show({ severity: 'success', summary: 'Thành công', detail: 'Xóa thành công', life: 3000 });
+            } else {
+                const errorDetail = await response.text(); // Lấy chi tiết lỗi từ server nếu có
+                toast.current.show({ severity: 'error', summary: 'Lỗi', detail: 'Xóa thất bại', life: 3000 });
+            }
+        } catch (error) {
+            toast.current.show({ severity: 'error', summary: 'Lỗi', detail: 'Xóa thất bại', life: 3000 });
+        }
+    };
     return (
         <div>
-            <div>
-                <h3>Bắt buộc</h3>
-                <DataTable value={mandatorySubjects} tableStyle={{ minWidth: '50rem' }} header="Danh sách lớp học phần">
-                    <Column field="subjectId" header="Mã học phần" />
-                    <Column field="subjectName" header="Tên học phần" />
-                    <Column field="numberOfCredit" header="Số tín chỉ" />
-                    <Column field="count" header="Số lượng LHP" />
+            <h3 className='title'>ĐĂNG KÝ HỌC PHẦN</h3>
+            <Toast ref={toast} />
+            <ConfirmDialog />
+            <div className='datatable-container'>
+                <TreeTable
+                    value={nodes}
+                    className="custom-tree-table"
+                    paginator rows={5}
+                >
                     <Column
-                        body={(rowData) => (
-                            <div>
-                                <Link
-                                    to="/teacher/teaching-registration-detail"
-                                    state={{ subject: rowData }}
-                                >
-                                    Đăng kí
-                                </Link>
-                            </div>
+                        field="subjectId"
+                        header="Mã học phần"
+                        expander
+                        body={(node) => (
+                            node.data.subjectId || node.data.moduleClassId
                         )}
+                        filter filterPlaceholder="Tìm kiếm"
+                        style={{ width: '15%' }}
                     />
-                </DataTable>
-
-                <h3>Tự chọn</h3>
-                <DataTable value={electiveSubjects} tableStyle={{ minWidth: '50rem' }} header="Danh sách lớp học phần">
-                    <Column field="subjectId" header="Mã học phần" />
-                    <Column field="subjectName" header="Tên học phần" />
-                    <Column field="numberOfCredit" header="Số tín chỉ" />
-                    <Column field="count" header="Số lượng LHP" />
-                    <Column
-                        body={() => (
+                    <Column field='subjectName' header="Tên học phần" filter filterPlaceholder="Tìm kiếm" style={{ width: '20%' }} />
+                    <Column field='fullName' header="Tên Giảng viên" />
+                    <Column field='maximumNumberOfStudents' header="Số lượng SV" />
+                    <Column field="dayOfWeek" header="Thứ" style={{ width: '10%' }} />
+                    <Column field='lessonTime' header="Tiết học" />
+                    <Column field='timeRange' header="Thời gian" />
+                    <Column field="classRoomId" header="Mã phòng học" />
+                    <Column header="Hành động" body={(node) => (
+                        node.data.moduleClassId ? (
                             <div>
-                                <a href="/teacher/teaching-registration-detail" >Đăng kí</a>
+                                <Button
+                                    label='Đăng ký'
+                                    className="p-button-rounded p-button-success mr-2 p-2"
+                                    onClick={() => confirmUpdate(node.data.moduleClassId, teacherId)}
+                                />
                             </div>
-                        )}
-                    />
-                </DataTable>
+                        ) : null
+                    )} />
+                </TreeTable>
             </div>
-
-            <div>
-                <h3>Kết quả đăng kí:</h3>
-                <DataTable value={listModuleClass} tableStyle={{ minWidth: '50rem' }} header="Danh sách lớp học phần">
-                    <Column field="moduleClassId" header="Mã lớp học phần" />
-                    <Column field="subjectName" header="Tên học phần" />
+            <div className='datatable-container'>
+                <DataTable value={register} header='Kết quả đăng ký'>
+                    <Column field="dayOfWeek" header="Thứ" />
                     <Column
-                        header="Lịch học"
+                        header="Tiết học"
                         body={(rowData) => (
                             <div>
-                                <div>{rowData.dayOfWeek}, Tiết ({rowData.lessonStart} - {rowData.lessonEnd}), {rowData.classRoomId},</div>
-                                <div>({format(new Date(rowData.startDate), 'dd/MM/yyyy')} {'->'} {format(new Date(rowData.endDate), 'dd/MM/yyyy')})</div>
+                                {`${rowData.lessonStart} - ${rowData.lessonEnd}`}
                             </div>
                         )}
                     />
-                    <Column
-                        body={(rowData) => (
-                            <button onClick={() => deleteRegisterTeaching(rowData.moduleClassId)}>Hủy</button>
-                        )}
-                        header="Hủy đăng ký"
-                    />
+                    <Column field="moduleClassId" header="Lớp học phần" />
+                    <Column field="subjectName" header="Tên học phần" style={{ width: '40%' }} />
+                    <Column field="classRoomId" header="Phòng học" />
+                    <Column header="Hành động" body={(rowData) => (
+                        <div>
+                            <Button
+                                label='Hủy'
+                                className="p-button-rounded p-button-danger mr-2 p-2"
+                                onClick={() => confirmDelete(rowData.moduleClassId, teacherId)}
+                            />
+                        </div>
+                    )} />
                 </DataTable>
             </div>
         </div>
     );
 };
+
 export default TeachingRegistration;

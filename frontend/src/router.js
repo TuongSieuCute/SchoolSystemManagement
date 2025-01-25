@@ -7,15 +7,15 @@ import Home from './pages/Home';
 import Student from './pages/Student';
 import InstructionalPlan from './pages/Student/InstructionalPlan';
 import RegisterModule from './pages/Student/RegisterModule/RegisterModule';
-import RegisterModuleDetail from './pages/Student/RegisterModule/RegisterModuleDetail';
 import SelectGrades from './pages/Student/SelectGrades';
 import TimeTable from './pages/Student/TimeTable';
 import Money from './pages/Student/Money';
 import TimeTableTeacher from './pages/Teacher/TimeTableTeacher';
-import { default as Teacher, default as TeachingRegistrationDetail } from './pages/Teacher';
+import Teacher from './pages/Teacher';
 import Grades from './pages/Teacher/Grades';
 import TeachingRegistration from './pages/Teacher/TeachingRegistration';
 import { User } from './pages/User';
+import Notification from './pages/Admin/Notification';
 
 export const router = createBrowserRouter([
     { path: '/', element: <Home /> },
@@ -24,7 +24,8 @@ export const router = createBrowserRouter([
         children: [
             { path: '', index: true, element: <User /> },
             { path: 'classroom', index: true, element: <ClassRoom />, },
-            { path: 'moduleClass', element: <ModuleClass />, }
+            { path: 'moduleClass', element: <ModuleClass />, },
+            { path: 'notification', element: <Notification />, }
         ]
     },
     {
@@ -35,8 +36,7 @@ export const router = createBrowserRouter([
             { path: 'grades', element: <SelectGrades /> },
             { path: 'timetable', element: <TimeTable /> },
             { path: 'tuition', element: <Money /> },
-            { path: 'registermodule', element: <RegisterModule /> },
-            { path: 'register-module-detail', element: <RegisterModuleDetail /> },
+            { path: 'registermodule', element: <RegisterModule /> }
         ]
     },
     {
@@ -45,7 +45,6 @@ export const router = createBrowserRouter([
             { path: '', index: true, element: <User /> },
             { path: 'timetable', element: <TimeTableTeacher /> },
             { path: 'teaching-registration', element: <TeachingRegistration /> },
-            { path: 'teaching-registration-detail', element: <TeachingRegistrationDetail /> },
             { path: 'grades', element: <Grades /> },
         ]
     },

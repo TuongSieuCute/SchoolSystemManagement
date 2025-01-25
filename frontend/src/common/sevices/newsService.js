@@ -76,7 +76,7 @@ export const getNewsCategory = () => {
 };
 
 export const getNews = async () => {
-    let url = 'https://localhost:7074/Notifications';
+    let url = 'https://localhost:7074/api/Notifications';
     // if (categoryId) {
     //     url = `${url}&albumId=${categoryId}`;
     // }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.DTOs;
+using backend.DTOs.CourseRegistration;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +18,12 @@ namespace backend.Controllers
     public class CourseRegistrationController : Controller
     {
         private readonly ICourseRegistrationService _courseRegistrationService;
+        private readonly SchoolSystemManagementContext _context;
 
-        public CourseRegistrationController(ICourseRegistrationService courseRegistrationService)
+        public CourseRegistrationController(ICourseRegistrationService courseRegistrationService, SchoolSystemManagementContext context)
         {
             _courseRegistrationService = courseRegistrationService;
+            _context = context;
         }
         // Xem điểm từng môn, Xem điểm trung bình tích lũy, Xem học phí
         [HttpGet]
@@ -31,18 +34,60 @@ namespace backend.Controllers
         }
         // Đăng kí học phần (sinh viên)
         [HttpPost]
-        public async Task<IActionResult> PostCourseRegistrationDTOAsync([FromBody] CourseRegistrationDTO dto)
+        public async Task<IActionResult> PostCourseRegistrationDTOAsync([FromBody] CourseRegistration cr)
         {
-            if (dto == null || string.IsNullOrEmpty(dto.ModuleClassId) || string.IsNullOrEmpty(dto.StudentId))
+            var isDuplicate = await _context.CourseRegistrations
+                .AnyAsync(c => c.ModuleClassId == cr.ModuleClassId && c.StudentId == cr.StudentId);
+            if (isDuplicate) return BadRequest();
+
+            var money = await _context.TuitionFees
+                .OrderByDescending(t => t.TuitionFeesId)
+                .FirstOrDefaultAsync();
+
+            var subjectId = await _context.ModuleClasses
+                .Where(mc => mc.ModuleClassId == cr.ModuleClassId)
+                .Select(mc => mc.SubjectId)
+                .FirstOrDefaultAsync();
+
+            var credit = await _context.Subjects
+                .Where(s => s.SubjectId == subjectId)
+                .Select(s => s.NumberOfCredit)
+                .FirstOrDefaultAsync();
+
+            var registeredModuleClassIds = await _context.CourseRegistrations
+                 .Where(c => c.StudentId == cr.StudentId)
+                 .Select(c => c.ModuleClassId)
+                 .ToListAsync();
+
+            var classSchedule = await _context.ClassSchedules
+                .FirstOrDefaultAsync(cs => cs.ModuleClassId == cr.ModuleClassId);
+
+            if (classSchedule == null)
             {
-                return BadRequest();
-            }
-            var result = await _courseRegistrationService.PostCourseRegistrationDTOAsync(dto);
-            if (!result)
-            {
-                return StatusCode(500, "Failed to create CourseRegistrationDTO");
+                return NotFound();
             }
 
+            var hasConflict = await _context.ClassSchedules
+                .Where(cs => registeredModuleClassIds.Contains(cs.ModuleClassId)) 
+                .AnyAsync(cs =>
+                    cs.StartDate <= classSchedule.EndDate && cs.EndDate >= classSchedule.StartDate && 
+                    cs.LessonStart <= classSchedule.LessonEnd && cs.LessonEnd >= classSchedule.LessonStart); 
+
+            if (hasConflict)
+            {
+                return Conflict();
+            }
+
+            var newCr = new CourseRegistration
+            {
+                ModuleClassId = cr.ModuleClassId,
+                StudentId = cr.StudentId,
+                TuitionFeesId = money.TuitionFeesId,
+                Total = money.AmountPerCredit * credit,
+            };
+
+            _context.CourseRegistrations.Add(newCr);
+            await _context.SaveChangesAsync();
             return Ok();
         }
         // Cập nhật điểm (giảng viên)
@@ -62,13 +107,13 @@ namespace backend.Controllers
         }
         // Hủy đăng kí học phần (sinh viên)
         [HttpDelete]
-        public async Task<IActionResult> DeleteCourseRegistrationDTOAsync([FromBody] CourseRegistrationDTO dto)
+        public async Task<IActionResult> DeleteCourseRegistrationDTOAsync([FromQuery] string moduleClassId, [FromQuery] string studentId)
         {
-            if (dto == null || string.IsNullOrEmpty(dto.ModuleClassId) || string.IsNullOrEmpty(dto.StudentId))
+            if (string.IsNullOrEmpty(moduleClassId) || string.IsNullOrEmpty(studentId))
             {
                 return BadRequest();
             }
-            var result = await _courseRegistrationService.DeleteCourseRegistrationDTOAsync(dto.ModuleClassId, dto.StudentId);
+            var result = await _courseRegistrationService.DeleteCourseRegistrationDTOAsync(moduleClassId, studentId);
             if (result)
             {
                 return Ok();

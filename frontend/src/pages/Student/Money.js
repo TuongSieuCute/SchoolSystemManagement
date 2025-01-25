@@ -6,7 +6,8 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 
 const YearDataTable = ({ year, money, isDataVisible, toggleDataVisibility }) => {
-    const filteredMoney = money.filter(item => item.startDate >= year.startDate && item.endDate <= year.endDate);
+    const filteredMoney = money;
+    console.log(money);
     const hasDataForYear = filteredMoney.length > 0;
     const totalModney = filteredMoney.reduce((sum, item) => sum + item.total, 0);
 
@@ -96,6 +97,7 @@ const Money = () => {
                         ).values()
                     );
                     setRawData(uniqueData);
+                    console.log(uniqueData);
                 })
                 .catch(err => console.error('Lỗi', err));
         }

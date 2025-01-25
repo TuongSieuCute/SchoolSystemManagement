@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import AddModuleClass from './AddModuleClass';
+import EditModuleClass from './EditModuleClass';
+import { getModuleClass } from '../../../common/sevices/moduleClassService';
+import { checkTime, defaultYearSemester, dropdownYearSemester, formatDate } from '../../../helper/function';
+import './styles.css'
+
 import { TreeTable } from 'primereact/treetable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import AddModuleClass from './AddModuleClass';
-import { getModuleClass } from '../../../common/sevices/moduleClassService';
-import { checkTime, defaultYearSemester, dropdownYearSemester, formatDate } from '../../../helper/function';
-import EditModuleClass from './EditModuleClass';
+import { Toast } from "primereact/toast";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 const ModuleClass = () => {
     const [optionsYear, setOptionsYear] = useState([]);
@@ -20,6 +24,19 @@ const ModuleClass = () => {
     const [dialogOpenCreate, setDialogOpenCreate] = useState(false);
     const [dialogOpenEdit, setDialogOpenEdit] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
+
+    const toast = useRef(null);
+    const confirmDelete = (moduleClassId) => {
+        confirmDialog({
+            message: 'Bạn có muốn xóa lớp học phần không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => handleDelete(moduleClassId),
+            reject: () => {}
+        });
+    };
 
     const transformDataToTreeNodes = (data) => {
         // Nhóm dữ liệu theo subjectId
@@ -59,10 +76,28 @@ const ModuleClass = () => {
 
     const header = (
         <div style={{ background: 'var(--bg-white)', display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ margin: 0 }}>Danh sách lớp học phần</h3>
+            <h3>Danh sách lớp học phần</h3>
             <Button label="Thêm" icon='pi pi-plus' onClick={toggleDialogCreate} className='p-2 mt-1' style={{ gap: '5px', background: 'var(--bg-red)' }} />
         </div>
     );
+    const handleDelete = async (moduleClassId) => {
+        try {
+            const response = await fetch(`https://localhost:7074/api/ModuleClass/${moduleClassId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                toast.current.show({severity:'success', summary: 'Thành công', detail:'Xóa lớp học phần thành công!', life: 3000});
+            } else {
+                toast.current.show({severity:'error', summary: 'Lỗi', detail:'Xóa lớp học phần thất bại!', life: 3000});
+            }
+        } catch (error) {
+            toast.current.show({severity:'error', summary: 'Lỗi', detail:'Xóa lớp học phần thất bại!', life: 3000});
+        }
+    };
 
     useEffect(() => {
         dropdownYearSemester(setOptionsYear, setOptionsSemester);
@@ -156,16 +191,17 @@ const ModuleClass = () => {
                                     className="p-button-rounded p-button-success mr-2"
                                     onClick={() => toggleDialogEdit(node.data)}
                                 />
+                                <Toast ref={toast} />
                                 <Button
                                     icon="pi pi-trash"
                                     className="p-button-rounded p-button-danger"
-                                    onClick={() => handleDelete(node.data)}
+                                    onClick={() => confirmDelete(node.data.moduleClassId)}
                                 />
                             </div>
                         ) : null
                     )} />
                 </TreeTable>
-
+                <ConfirmDialog />
                 <Dialog
                     visible={dialogOpenCreate}
                     style={{ width: "50vw" }}

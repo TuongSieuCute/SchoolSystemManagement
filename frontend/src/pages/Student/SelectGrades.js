@@ -24,14 +24,14 @@ const calculateGPA = (cumulativeGPA10) => {
 
 // Thành phần hiển thị bảng điểm cho từng năm
 const YearDataTable = ({ year, grades, isDataVisible, toggleDataVisibility }) => {
-    const filteredGrades = grades.filter(item => item.startDate >= year.startDate && item.endDate <= year.endDate);
+    const filteredGrades = grades
     const hasDataForYear = filteredGrades.length > 0;
     const totalCredits = filteredGrades.reduce((sum, item) => sum + item.numberOfCredit, 0);
     const totalCreditsPass = filteredGrades.filter(item => item.isPass).reduce((sum, item) => sum + item.numberOfCredit, 0);
     const totalWeightedGrades = filteredGrades.filter(item => item.isCreditGpa).reduce((sum, item) => sum + (item.averageGrade10 * item.numberOfCredit), 0);
     const totalCreditGPA = filteredGrades.filter(item => item.isCreditGpa).reduce((sum, item) => sum + item.numberOfCredit, 0);
     const cumulativeGPA10 = totalCreditGPA > 0 ? (totalWeightedGrades / totalCreditGPA).toFixed(1) : 'N/A';
-
+    console.log(filteredGrades);
     const renderIsPass = (rowData) => {
         const isRequired = rowData.isPass;
         return (
@@ -126,7 +126,9 @@ const SelectGrades = () => {
     const [selectedProgram, setSelectedProgram] = useState('');
     const [isDataVisible, setIsDataVisible] = useState(false);
     const [listGrades, setListGrades] = useState([]);
+    const [listGrades1, setListGrades1] = useState([]);
     const [rawData, setRawData] = useState([]);
+    const [rawData1, setRawData1] = useState([]);
     const [yearOptions, setYearOptions] = useState([]);
 
     const { accounts } = useMsal();
@@ -140,7 +142,7 @@ const SelectGrades = () => {
     }, [accounts]);
 
     useEffect(() => {
-        fetch('https://localhost:7074/api/CourseRegistration')
+        fetch('https://localhost:7074/api/Cumulative')
             .then(response => response.json())
             .then(data => {
                 const filteredData = data.filter(item => item.studentId === studentId);
@@ -156,11 +158,20 @@ const SelectGrades = () => {
             })
             .catch(err => console.error('Lỗi', err));
     }, [studentId]);
+    useEffect(() => {
+        fetch('https://localhost:7074/api/CourseRegistration')
+            .then(response => response.json())
+            .then(data => {
+                const filteredData = data.filter(item => item.studentId === studentId);
+                setRawData1(filteredData);
+            })
+            .catch(err => console.error('Lỗi', err));
+    }, [studentId]);
 
     useEffect(() => {
         const filteredData = rawData.filter(item => item.trainingProgramName === selectedProgram);
         setListGrades(filteredData);
-    }, [rawData, selectedProgram]);
+    }, [rawData, rawData1, selectedProgram]);
 
     useEffect(() => {
         fetch('https://localhost:7074/api/Semester')
@@ -174,7 +185,7 @@ const SelectGrades = () => {
                         value: item.academicYear,
                         startDate: item.startDate,
                         endDate: item.endDate,
-                        semesterName: item.semesterName,
+                        semesterName: 'Học kì 2',
                     }));
                 setYearOptions(options);
             })
@@ -219,7 +230,7 @@ const SelectGrades = () => {
                     <YearDataTable
                         key={year.value}
                         year={year}
-                        grades={listGrades}
+                        grades={rawData1}
                         isDataVisible={isDataVisible}
                         toggleDataVisibility={toggleDataVisibility}
                     />

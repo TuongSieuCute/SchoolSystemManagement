@@ -6,7 +6,7 @@ using backend.Models;
 
 namespace backend.DTOs
 {
-    public class ModuleClassDTO
+    public class GetModuleClassDTO
     {
         public string? ModuleClassId { get; set; }
         public byte? MaximumNumberOfStudents { get; set; }
@@ -14,6 +14,8 @@ namespace backend.DTOs
         public string? FullName { get; set; }
         public string? SubjectId { get; set; }
         public string? SubjectName { get; set; }
+        public string? SubjectType { get; set; }
+        public byte? NumberOfCredit { get; set; }
         public string? DayOfWeek { get; set; } 
         public byte? LessonStart { get; set; }
         public byte? LessonEnd { get; set; }

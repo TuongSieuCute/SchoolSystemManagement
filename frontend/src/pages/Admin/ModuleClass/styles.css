@@ -1,0 +1,19 @@
+.p-dialog .p-dialog-header .p-dialog-title {
+    padding: 10px;
+}
+.p-confirm-dialog .p-dialog-content {
+    padding: 10px;
+    gap: 5px;
+}
+.p-dialog .p-dialog-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+button.p-button-danger.p-confirm-dialog-accept.p-button.p-component span.p-button-label.p-c {
+    padding: 5px 10px;
+}
+button.p-confirm-dialog-reject.p-button-text.p-button.p-component span.p-button-label.p-c {
+    padding: 5px 10px;
+}

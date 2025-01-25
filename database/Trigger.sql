@@ -23,26 +23,6 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER TRIGGER trgInsertCourseRes
-ON CourseRegistration
-INSTEAD OF INSERT
-AS
-BEGIN
-	DECLARE @TuitionFeesId VARCHAR(20)
-	DECLARE @AmountPerCredit DECIMAL(10,0)
-
-    SELECT TOP 1 @TuitionFeesId = TuitionFeesId, @AmountPerCredit = AmountPerCredit
-	FROM TuitionFees
-	ORDER BY TuitionFeesId DESC
-
-	INSERT INTO CourseRegistration(ModuleClassId, StudentId, TuitionFeesId, Total)
-	SELECT i.ModuleClassId, i.StudentId, @TuitionFeesId, @AmountPerCredit * s.NumberOfCredit
-	FROM inserted i
-	JOIN ModuleClass mc ON i.ModuleClassId = mc.ModuleClassId
-	JOIN Subject s ON mc.SubjectId = s.SubjectId
-END
-GO
-
 CREATE OR ALTER FUNCTION ChangeAverageGrade10
 (
 	@AverageGrade10 DECIMAL(3,1)

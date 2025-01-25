@@ -29,8 +29,6 @@ namespace backend.Services
                                 join t in _context.TrainingPrograms on tm.TrainingProgramId equals t.TrainingProgramId
                                 join tc in _context.TrainingProgramCourses on t.TrainingProgramId equals tc.TrainingProgramId
                                 join m in _context.Majors on t.MajorId equals m.MajorId
-                                join cp in _context.CumulativePoints on tc.TrainingProgramCourseId equals cp.TrainingProgramCourseId
-                                where cr.StudentId == cp.StudentId
                                 select new CourseRegistrationDTO
                                 {
                                     MidtermGradePercentage = cr.MidtermGradePercentage,
@@ -54,12 +52,6 @@ namespace backend.Services
                                     TrainingProgramCourseId = tc.TrainingProgramCourseId,
                                     TrainingProgramName = t.TrainingProgramName,
                                     MajorName = m.MajorName,
-                                    TotalCredit = cp.TotalCredit,
-                                    CreditPass = cp.CreditPass,
-                                    CreditFall = cp.CreditFall,
-                                    CumulativeCredit = cp.CumulativeCredit,
-                                    CumulativeAverageGrade10 = cp.CumulativeAverageGrade10,
-                                    CumulativeAverageGrade4 = cp.CumulativeAverageGrade4
                                 }).ToListAsync();
 
             return result;

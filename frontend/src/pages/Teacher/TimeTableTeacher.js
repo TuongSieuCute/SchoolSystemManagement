@@ -46,7 +46,7 @@ const TimeTableTeacher = () => {
     }, [accounts]);
 
     useEffect(() => {
-        fetch('https://localhost:7074/Semester')
+        fetch('https://localhost:7074/api/Semester')
             .then(response => response.json())
             .then((data) => {
                 setTime(data);
